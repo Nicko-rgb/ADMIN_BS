@@ -3,7 +3,8 @@ import { ShieldCheck, UploadCloud, X } from 'lucide-react';
 import { Modal } from '../../../shared/components/Modal';
 import { Button } from '../../../shared/components/Button';
 import { InputField, SelectField, TextAreaField, FormSection, FormRow, FormActions } from '../../../shared/components';
-import type { CreatePermissionPayload, PermissionAppAccess } from '../interfaces/permission.interface';
+import { MODULE_OPTIONS } from '../utils/permissionConstants';
+import type { CreatePermissionPayload, PermissionAppAccess, PermissionModule } from '../interfaces/permission.interface';
 
 const APP_ACCESS_OPTIONS = [
     { value: 'admin', label: 'Admin' },
@@ -21,7 +22,7 @@ interface EditRegisterPermissionProps {
     isSaving?: boolean;
 }
 
-/** Modal único de creación/edición de un permiso — key queda de solo lectura al editar, para no huerfanar a las filas que la referencian por string (menu_item.required_permission, user_permission.permission_key). */
+/** Modal único de creación/edición de un permiso — key queda de solo lectura al editar, para no huerfanar a las filas que la referencian por string (role_permission.permission_key, user_permission.permission_key). */
 export const EditRegisterPermission = ({ isOpen, onClose, onSubmit, mode, form, setField, isSaving = false }: EditRegisterPermissionProps) => (
     <Modal isOpen={isOpen} onClose={onClose} title={mode === 'create' ? 'Registrar permiso' : 'Editar permiso'} icon={ShieldCheck} size="md">
         <form onSubmit={onSubmit}>
@@ -34,7 +35,8 @@ export const EditRegisterPermission = ({ isOpen, onClose, onSubmit, mode, form, 
 
             <FormSection title="Clasificación">
                 <FormRow>
-                    <InputField name="module" label="Módulo" value={form.module} onChange={(e) => setField('module')(e.target.value)} required placeholder="booking" />
+                    <SelectField name="module" label="Módulo" value={form.module} onChange={(e) => setField('module')(e.target.value as PermissionModule)} options={MODULE_OPTIONS} required />
+                    <InputField name="group_name" label="Grupo" value={form.group_name} onChange={(e) => setField('group_name')(e.target.value)} required placeholder="booking" />
                     <SelectField name="app_access" label="Acceso por app" value={form.app_access} onChange={(e) => setField('app_access')(e.target.value as PermissionAppAccess)} options={APP_ACCESS_OPTIONS} required />
                 </FormRow>
                 <FormRow>

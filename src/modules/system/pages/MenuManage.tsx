@@ -21,11 +21,13 @@ const MenuManage = () => {
     const {
         items, isLoading,
         search, setSearch,
-        parentOptions, searchPermissionOptions,
-        openEdit, closeEdit, isEditOpen, form, setField, handleSubmit, isSaving,
-        openCreate, closeCreate, isCreateOpen, createForm, setCreateField, handleCreateSubmit, isCreating,
+        parentOptions, roles,
+        openEdit, closeEdit, isEditOpen, form, setField, toggleFormRole, handleSubmit, isSaving,
+        openCreate, closeCreate, isCreateOpen, createForm, setCreateField, toggleCreateFormRole, handleCreateSubmit, isCreating,
         deletingItem, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
     } = useMenuItems();
+
+    const roleLabelsById = new Map(roles.map((role) => [role.id, role.label]));
 
     const columns: TableColumn<MenuItemAdmin>[] = [
         { key: 'key', header: 'Key' },
@@ -34,7 +36,7 @@ const MenuManage = () => {
         { key: 'groupTitle', header: 'Grupo', render: (row) => row.groupTitle ?? '—' },
         { key: 'parentKey', header: 'Padre', render: (row) => row.parentKey ?? '—' },
         { key: 'appAccess', header: 'Acceso', render: (row) => <span className={`app_access_badge app_access_badge_${row.appAccess}`}>{APP_ACCESS_LABELS[row.appAccess] ?? row.appAccess}</span> },
-        { key: 'requiredPermission', header: 'Permiso Req', render: (row) => row.requiredPermission ?? '—'},
+        { key: 'roleIds', header: 'Roles', render: (row) => row.roleIds.length > 0 ? row.roleIds.map((id) => roleLabelsById.get(id) ?? id).join(', ') : '—' },
         { key: 'sortOrder', header: 'Orden' },
         { key: 'isActive', header: 'Estado', render: (row) => <span className={`status_badge ${row.isActive ? 'active' : 'inactive'}`}>{row.isActive ? 'Activo' : 'Inactivo'}</span> },
         { key: 'childrenCount', header: 'Hijos', render: (row) => <span className="references_badge">{row.childrenCount}</span> },
@@ -77,8 +79,9 @@ const MenuManage = () => {
                 mode="edit"
                 form={form ?? createForm}
                 setField={setField}
+                toggleRole={toggleFormRole}
                 parentOptions={parentOptions}
-                searchPermissionOptions={searchPermissionOptions}
+                roles={roles}
                 isSaving={isSaving}
             />
             <CreateEditMenuItem
@@ -88,8 +91,9 @@ const MenuManage = () => {
                 mode="create"
                 form={createForm}
                 setField={setCreateField}
+                toggleRole={toggleCreateFormRole}
                 parentOptions={parentOptions}
-                searchPermissionOptions={searchPermissionOptions}
+                roles={roles}
                 isSaving={isCreating}
             />
             <Dialog

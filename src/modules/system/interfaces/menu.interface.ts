@@ -1,6 +1,6 @@
 export type MenuAppAccess = 'admin' | 'booking' | 'both';
 
-// Ítem de menú — vista admin (system.full_access), sin el filtro por permiso que sí aplica el menú
+// Ítem de menú — vista admin (system.full_access), sin el filtro por rol que sí aplica el menú
 // de navegación real (ese usa un DTO más chico, consumido aparte para armar el sidebar).
 export interface MenuItemAdmin {
     id: number;
@@ -9,7 +9,8 @@ export interface MenuItemAdmin {
     icon: string | null;
     path: string | null;
     parentKey: string | null;
-    requiredPermission: string | null;
+    // Roles que ven este ítem (dsg_bss_role_menu_item) — reemplaza al viejo requiredPermission.
+    roleIds: number[];
     appAccess: MenuAppAccess;
     groupTitle: string | null;
     sortOrder: number;
@@ -26,11 +27,11 @@ export interface UpdateMenuItemPayload {
     icon?: string | null;
     path?: string | null;
     parent_key?: string | null;
-    required_permission?: string | null;
     app_access?: MenuAppAccess;
     group_title?: string | null;
     sort_order?: number;
     is_active?: boolean;
+    role_ids?: number[];
 }
 
 // Payload de creación — mismas claves que UpdateMenuItemPayload; app_access/sort_order/is_active
@@ -41,9 +42,9 @@ export interface CreateMenuItemPayload {
     icon: string | null;
     path: string | null;
     parent_key: string | null;
-    required_permission: string | null;
     app_access: MenuAppAccess;
     group_title: string | null;
     sort_order: number;
     is_active: boolean;
+    role_ids: number[];
 }

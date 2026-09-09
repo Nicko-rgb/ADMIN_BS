@@ -2,14 +2,14 @@ import { ShieldCheck, UploadCloud, X } from 'lucide-react';
 import { Modal } from '../../../shared/components/Modal';
 import { Button } from '../../../shared/components/Button';
 import { CheckboxField, FormSection, FormActions } from '../../../shared/components';
-import { MODULE_LABELS } from '../../system/utils/permissionConstants';
-import type { PermissionAdmin, PermissionModule } from '../../system/interfaces/permission.interface';
-import '../styles/ManageUserPermissions.css';
+import { MODULE_LABELS } from '../utils/permissionConstants';
+import type { PermissionAdmin, PermissionModule } from '../interfaces/permission.interface';
+import '../../users/styles/ManageUserPermissions.css';
 
-interface ManageUserPermissionsProps {
+interface ManageRolePermissionsProps {
     isOpen: boolean;
     onClose: () => void;
-    userName: string;
+    roleLabel: string;
     catalog: PermissionAdmin[];
     assignedKeys: string[];
     onToggle: (key: string) => void;
@@ -21,11 +21,10 @@ interface ManageUserPermissionsProps {
 type GroupedByModule = [PermissionModule, [string, PermissionAdmin[]][]][];
 
 /**
- * Agrupa el catálogo (ya provisto por PermissionService.listCatalog(), vía useUsers.ts) en dos
- * niveles: módulo real del código primero (permission.module — bookings, companys...), grupo
- * funcional después (permission.groupName — space, sucursal, company...) dentro de cada módulo.
- * Agrupar solo por módulo daría bloques enormes (16+ permisos juntos en `companys`); solo por
- * grupo pierde el panorama de a qué módulo pertenece cada cosa — de ahí los dos niveles.
+ * Agrupa el catálogo en dos niveles — mismo criterio que ManageUserPermissions.tsx: módulo real
+ * del código primero (permission.module), grupo funcional después (permission.groupName) dentro
+ * de cada módulo. Agrupar solo por módulo daría bloques enormes (16+ permisos juntos en
+ * `companys`); solo por grupo pierde el panorama de a qué módulo pertenece cada cosa.
  */
 const groupByModuleAndGroupName = (catalog: PermissionAdmin[]): GroupedByModule => {
     const moduleGroups = new Map<PermissionModule, Map<string, PermissionAdmin[]>>();
@@ -41,9 +40,14 @@ const groupByModuleAndGroupName = (catalog: PermissionAdmin[]): GroupedByModule 
     return Array.from(moduleGroups.entries()).map(([module, groupNames]) => [module, Array.from(groupNames.entries())]);
 };
 
-/** Modal de permisos directos de un usuario — un checkbox por permiso del catálogo, agrupados en tarjetas por módulo (FormSection) y, dentro de cada una, por grupo funcional. Manda siempre el set completo tildado al guardar (reemplazo, no diff). */
-export const ManageUserPermissions = ({ isOpen, onClose, userName, catalog, assignedKeys, onToggle, onSave, isLoading, isSaving = false }: ManageUserPermissionsProps) => (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Permisos de ${userName}`} icon={ShieldCheck} size="lg">
+/**
+ * Modal de permisos base de un rol — mismo patrón que ManageUserPermissions.tsx (checklist en
+ * tarjetas por módulo vía FormSection, subdividido por grupo funcional dentro de cada una,
+ * reemplazo completo al guardar) pero apuntando a un rol: editar acá cambia de una sola vez los
+ * permisos de TODOS los usuarios que tienen ese rol, sin tocarlos uno por uno.
+ */
+export const ManageRolePermissions = ({ isOpen, onClose, roleLabel, catalog, assignedKeys, onToggle, onSave, isLoading, isSaving = false }: ManageRolePermissionsProps) => (
+    <Modal isOpen={isOpen} onClose={onClose} title={`Permisos del rol: ${roleLabel}`} icon={ShieldCheck} size="lg">
         {isLoading ? (
             <div className="manage_permissions_loading">Cargando permisos...</div>
         ) : (
@@ -78,4 +82,4 @@ export const ManageUserPermissions = ({ isOpen, onClose, userName, catalog, assi
     </Modal>
 );
 
-export default ManageUserPermissions;
+export default ManageRolePermissions;

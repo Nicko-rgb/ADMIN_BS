@@ -5,6 +5,8 @@
     font-size: 1.4rem;
 }
 
+/* Nivel 1 (módulo real del código) se muestra con FormSection (form_section/.css) — acá solo
+ * queda el nivel 2: grupo funcional dentro del módulo (space, sucursal, company...). */
 .manage_permissions_module {
     margin-bottom: 1.6rem;
 

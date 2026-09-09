@@ -1,7 +1,8 @@
 /* Key del permiso — identificador técnico (ej: system.full_access), tipografía monoespaciada para diferenciarla del resto de columnas */
 .permission_key {
-    font-family: 'Courier New', monospace;
-    font-size: 1.3rem;
+    font-family: var(--font-secondary);
+    font-size: 1.6rem;
+    font-weight: 500;
     color: var(--text-soft);
 }
 

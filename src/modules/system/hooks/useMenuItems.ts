@@ -6,16 +6,8 @@ import { handleApiError } from '../../../shared/utils/errorHandler';
 import { trimValues } from '../../../shared/utils/trimValues';
 import { normalizeStr } from '../../../shared/utils/formatText';
 import toast from '../../../shared/utils/toast';
-import type { RawOption } from '../../../shared/interfaces/forms.interface';
+import type { RoleAdmin } from '../interfaces/role.interface';
 import type { CreateMenuItemPayload, MenuItemAdmin, UpdateMenuItemPayload } from '../interfaces/menu.interface';
-
-// Búsqueda remota para el select de "permiso requerido" — el catálogo de permisos no se
-// precarga (puede crecer), así que cada tecleo busca contra el backend en vez de filtrar un
-// array ya cargado. Usado como `onSearch` de SelectField (ver CreateEditMenuItem).
-const searchPermissionOptions = async (query: string): Promise<RawOption[]> => {
-    const res = await PermissionService.list(1, 20, query);
-    return res.data.map((permission) => ({ value: permission.key, label: `${permission.label} (${permission.key})` }));
-};
 
 const FETCH_LIMIT = 100; // catálogo pequeño — se trae completo una vez, sin paginación, y se busca/filtra en el front
 
@@ -26,11 +18,11 @@ const EMPTY_CREATE_FORM: CreateMenuItemPayload = {
     icon: null,
     path: null,
     parent_key: null,
-    required_permission: null,
     app_access: 'admin',
     group_title: null,
     sort_order: 0,
     is_active: true,
+    role_ids: [],
 };
 
 // Estado del formulario de edición — claves iguales al payload de escritura (snake_case).
@@ -40,11 +32,11 @@ const toEditForm = (item: MenuItemAdmin): Required<UpdateMenuItemPayload> => ({
     icon: item.icon,
     path: item.path,
     parent_key: item.parentKey,
-    required_permission: item.requiredPermission,
     app_access: item.appAccess,
     group_title: item.groupTitle,
     sort_order: item.sortOrder,
     is_active: item.isActive,
+    role_ids: item.roleIds,
 });
 
 /** Listado de ítems de menú (búsqueda en el front) + alta + edición + baja: todo se maneja íntegramente acá. */
@@ -54,6 +46,8 @@ export const useMenuItems = () => {
     const [reloadToken, setReloadToken] = useState(0);
 
     const [search, setSearch] = useState('');
+
+    const [roles, setRoles] = useState<RoleAdmin[]>([]);
 
     const [editingId, setEditingId] = useState<number | null>(null);
     const [form, setForm] = useState<Required<UpdateMenuItemPayload> | null>(null);
@@ -84,6 +78,17 @@ export const useMenuItems = () => {
 
         return () => { active = false; };
     }, [reloadToken]);
+
+    // Roles activos, para los checkboxes de "quién ve este ítem" — se cargan una sola vez.
+    useEffect(() => {
+        let active = true;
+
+        PermissionService.listRoles()
+            .then((allRoles) => { if (active) setRoles(allRoles.filter((role) => role.isActive)); })
+            .catch((err) => { if (active) toast.error(handleApiError(err)); });
+
+        return () => { active = false; };
+    }, []);
 
     const items = useMemo(() => {
         const term = normalizeStr(search);
@@ -122,6 +127,10 @@ export const useMenuItems = () => {
         setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
     };
 
+    const toggleFormRole = (roleId: number) => {
+        setForm((prev) => (prev ? { ...prev, role_ids: toggleInArray(prev.role_ids, roleId) } : prev));
+    };
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (editingId === null || !form) return;
@@ -149,6 +158,10 @@ export const useMenuItems = () => {
 
     const setCreateField = (name: keyof CreateMenuItemPayload) => (value: string | number | boolean | null) => {
         setCreateForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const toggleCreateFormRole = (roleId: number) => {
+        setCreateForm((prev) => ({ ...prev, role_ids: toggleInArray(prev.role_ids, roleId) }));
     };
 
     const handleCreateSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -191,9 +204,12 @@ export const useMenuItems = () => {
     return {
         items, isLoading,
         search, setSearch,
-        parentOptions, searchPermissionOptions,
-        editingId, isEditOpen: editingId !== null, form, setField, openEdit, closeEdit, handleSubmit, isSaving,
-        isCreateOpen, createForm, openCreate, closeCreate, setCreateField, handleCreateSubmit, isCreating,
+        parentOptions, roles,
+        editingId, isEditOpen: editingId !== null, form, setField, toggleFormRole, openEdit, closeEdit, handleSubmit, isSaving,
+        isCreateOpen, createForm, openCreate, closeCreate, setCreateField, toggleCreateFormRole, handleCreateSubmit, isCreating,
         deletingItem, isDeleteOpen: deletingItem !== null, openDelete, closeDelete, confirmDelete, isDeleting,
     };
 };
+
+const toggleInArray = (arr: number[], value: number): number[] =>
+    arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];

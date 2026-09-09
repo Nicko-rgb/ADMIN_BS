@@ -1,0 +1,30 @@
+.tabs_bar {
+    display: flex;
+    gap: .4rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.6rem;
+}
+
+.tabs_bar_item {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: 1rem 1.6rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color .15s ease, border-color .15s ease;
+
+    &:hover {
+        color: var(--text);
+    }
+
+    &.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+}
