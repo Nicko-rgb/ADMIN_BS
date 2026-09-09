@@ -1,0 +1,92 @@
+/**
+ * Sistema de color del panel admin.
+ *
+ * Una sola familia neutra con matiz verde (sin azul), y una escala de
+ * superficies real en ambos modos: color-bg < surface, con los
+ * inputs hundidos por debajo de la card en oscuro. El verde de marca es el
+ * mismo en claro y oscuro; solo cambian sus variantes de texto y hover.
+ */
+:root {
+  /* ── Marca ──────────────────────────────────────────────────────────────── */
+  --primary:        #2c9d75;  /* Rellenos: botón primario, toggle, switch */
+  --primary-dark:   #1b7f5c;  /* Dark variant */
+  --primary-light:  #21976e2f;  /* Light variant */
+
+  /* ── Superficies ────────────────────────────────────────────────────────── */
+  --color-bg:   #f5f8f7;  /* Lienzo de la app y cuerpo del modal */
+  --surface:    #ffffff;  /* Cards, sidebar, tabla, secciones de formulario */
+  --input-bg:   #ffffff;  /* Inputs */
+
+  /* ── Bordes ─────────────────────────────────────────────────────────────── */
+  --border:        #e3e9e7;  /* Hairline: cards, filas, divisores */
+  --border-strong: #ccd6d2;  /* Inputs y botón secundario */
+
+  /* ── Texto ──────────────────────────────────────────────────────────────── */
+  --text:        #1c201e;
+  --text-soft:   #3d3d3d;  /* Labels, ítems de menú, texto secundario */
+  --text-muted:  #64748b;  /* Placeholders, encabezados de tabla */
+  --text-white:  #ffffff;
+
+  /* ── Semánticos ─────────────────────────────────────────────────────────── */
+  --success-text: #1f7d5c;
+  --success-soft: #1f7d5c28;
+  --danger:       #e66a6a;  /* Relleno sólido (botón eliminar) */
+  --danger-text:  #ce3732;
+  --danger-soft:  #b3312d28;
+  --warning:      #a9701a;  /* Relleno sólido (acción editar) */
+  --warning-text: #a9701a;
+  --warning-soft: #a9701a28;
+  --info:         #4084f2;  /* Relleno sólido (acción ver) */
+  --info-text:    #4084f2;
+  --info-soft:    #2563c928;
+  --purple-text:  #5b34b0;
+  --purple-soft:  #5b34b028;
+
+  /* ── Elevación ──────────────────────────────────────────────────────────── */
+  --ring:      rgba(44, 157, 117, .16);      /* Halo de foco */
+  --shadow:    0 1px 2px rgba(22, 33, 29, .05);
+  --shadow-md: 0 4px 12px rgba(22, 33, 29, .07);
+  --shadow-lg: 0 16px 44px rgba(22, 33, 29, .14);
+  --overlay:   rgba(16, 26, 22, .38);        /* Fondo de modal/dialog */
+
+  /* ── Tipografía ─────────────────────────────────────────────────────────── */
+  --font-primary:   'Poppins', sans-serif;
+  --font-secondary: 'Open Sans';
+  --font-tertiary:  'Outfit', sans-serif;
+}
+
+/* ── Modo oscuro ─────────────────────────────────────────────────────────────
+ * El texto principal se mantiene en 86% de luminosidad y los inputs quedan por
+ * debajo de la card, para que la interfaz no emita más luz de la necesaria.
+ * ────────────────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --primary-dark:  #1b7353;
+
+  --color-bg:   #0d1110;
+  --surface:    #151a18;
+  --input-bg:   #101514;
+
+  --border:        #232b28;
+  --border-strong: #2e3835;
+
+  --text:        #d9dfdc;
+  --text-soft:   #b7b4b4;
+  --text-muted:  #909090;
+
+  --success-text: #55c79e;
+  --success-soft: #152e26;
+  --danger-text:  #f08b88;
+  --danger-soft:  #2e1a19;
+  --warning-text: #dfae62;
+  --warning-soft: #2c2416;
+  --info-text:    #749fe5;
+  --info-soft:    #16202f;
+  --purple-text:  #b295ef;
+  --purple-soft:  #241c38;
+
+  --ring:      rgba(44, 157, 117, .28);
+  --shadow:    0 1px 2px rgba(0, 0, 0, .4);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, .5);
+  --shadow-lg: 0 20px 52px rgba(0, 0, 0, .62);
+  --overlay:   rgba(0, 0, 0, .58);
+}

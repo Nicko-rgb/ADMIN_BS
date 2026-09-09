@@ -1,0 +1,167 @@
+.table_wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    /* Scroll horizontal siempre visible — el global oculta la barra horizontal (height: 0) */
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--surface-2);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-dark);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+
+        /* Encabezado neutro: una banda de color a todo el ancho pesa demasiado en modo oscuro */
+        thead th {
+            background: var(--primary-dark);
+            color: var(--text-white);
+            border-bottom: 1px solid var(--border);
+            padding: .6rem 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: .4rem 1rem;
+            font-size: 1.4rem;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background .2s ease;
+
+            &:hover {
+                background: var(--success-soft);
+            }
+
+            &:last-child td {
+                border-bottom: none;
+            }
+        }
+
+        .table_state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            white-space: normal;
+
+            .table_spinner {
+                display: inline-block;
+                width: 1.4rem;
+                height: 1.4rem;
+                margin-right: .6rem;
+                vertical-align: middle;
+                border: 2px solid var(--border);
+                border-top-color: var(--primary);
+                border-radius: 50%;
+                animation: table_spin .8s linear infinite;
+            }
+        }
+
+        .table_number_col {
+            width: 1%;
+            text-align: center;
+        }
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-top: 1px solid var(--border);
+
+        .pagination_label {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+    }
+}
+
+@keyframes table_spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.table_image {
+    height: 22px;
+    max-width: 25px;
+    width: auto;
+    border-radius: 4px;
+    object-fit: contain;
+    display: block;
+
+    &.table_image_empty {
+        background: var(--surface-2);
+    }
+}
+
+.table_cell_media {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+/* Botones de acción de una fila — chip neutro siempre visible (nunca un tinte de color a
+   pleno en reposo, que en modo oscuro queda demasiado brilloso); al hover sí se rellena a
+   pleno con el color de la variante e ícono/texto en blanco — ahí es momentáneo y con el
+   cursor encima, así que no pesa igual que un fondo de color permanente. */
+.table_actions {
+    display: flex;
+    gap: .5rem;
+
+    .table_action_btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background: var(--surface-2);
+        color: var(--text-soft);
+        font-size: 1.2rem;
+        font-weight: 600;
+
+        &:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        &.table_action_primary { color: var(--primary); border-color: var(--primary); }
+        &.table_action_edit { color: var(--warning-text); border-color: var(--warning); }
+        &.table_action_delete { color: var(--danger-text); border-color: var(--danger); }
+        &.table_action_view { color: var(--info-text); border-color: var(--info); border-color: var(--info); }
+
+        &:not(:disabled) {
+            &.table_action_primary:hover { background: var(--primary); border-color: var(--primary); color: var(--text-white); }
+            &.table_action_edit:hover { background: var(--warning); border-color: var(--warning); color: var(--text-white); }
+            &.table_action_delete:hover { background: var(--danger); border-color: var(--danger); color: var(--text-white); }
+            &.table_action_view:hover { background: var(--info); border-color: var(--info); color: var(--text-white); }
+        }
+    }
+}

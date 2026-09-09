@@ -1,0 +1,155 @@
+/* Grid de cards de planes — reemplaza la tabla genérica solo en esta página. */
+.plan_cards_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+}
+
+.plan_cards_state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    color: var(--text-muted);
+    font-size: 1.4rem;
+}
+
+.plan_card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+
+    .plan_card_header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.6rem;
+
+        .plan_card_name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .plan_card_badge {
+            flex-shrink: 0;
+            padding: .3rem .9rem;
+            border-radius: 999px;
+            background: var(--surface-2);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+    }
+
+    .plan_card_prices {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.6rem;
+
+        .plan_card_price_box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.2rem;
+            background: var(--color-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            .price_box {
+                display: flex;
+                align-items: flex-end;
+                gap: 5px;
+            }
+
+            .plan_card_price_label {
+                font-size: 1.4rem;
+                color: var(--text-muted);
+            }
+
+            .plan_card_price_value {
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--text);
+            }
+
+            .plan_card_price_period {
+                font-size: 1.4rem;
+                color: var(--text-muted);
+            }
+        }
+    }
+
+    .plan_card_limits {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .6rem;
+        margin-bottom: 1.6rem;
+
+        .plan_card_limit_pill,
+        .plan_card_stripe_pill {
+            padding: .4rem .9rem;
+            border-radius: 999px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .plan_card_limit_pill {
+            background: var(--success-soft);
+            color: var(--success-text);
+        }
+
+        .plan_card_stripe_pill {
+            background: var(--purple-soft);
+            color: var(--purple-text);
+        }
+    }
+
+    .plan_card_features {
+        display: flex;
+        flex-direction: column;
+        gap: .9rem;
+        list-style: none;
+        margin: 0 0 1.6rem;
+        padding: 0;
+        flex: 1;
+
+        li {
+            display: flex;
+            align-items: flex-start;
+            gap: .7rem;
+            font-size: 1.4rem;
+            color: var(--text);
+
+            svg {
+                flex-shrink: 0;
+                margin-top: .2rem;
+                color: var(--primary);
+            }
+        }
+
+        .plan_card_features_more {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+    }
+
+    .plan_card_actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.6rem;
+        border-top: 1px solid var(--border);
+
+        button {
+            width: 100%;
+        }
+    }
+}

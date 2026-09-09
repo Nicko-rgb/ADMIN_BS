@@ -1,0 +1,224 @@
+.ubigeo_page {
+
+    .ubigeo_breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        flex-wrap: wrap;
+
+        button {
+            display: inline-flex;
+            justify-content: flex-start;
+            border: none;
+            background: transparent;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--text-soft);
+            cursor: pointer;
+            padding: .3rem .5rem;
+            border-radius: 6px;
+            transition: all .2s ease;
+
+            &:hover {
+                background: var(--surface-2);
+                color: var(--text);
+            }
+
+            &.active {
+                color: var(--primary);
+                font-weight: 600;
+                cursor: default;
+
+                &:hover {
+                    background: transparent;
+                }
+            }
+        }
+
+        span.active {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        svg {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+    }
+
+    .ubigeo_tree {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        padding: 1rem;
+
+        /* Un color de acento por profundidad — para distinguir país / nivel 1 / nivel 2 / nivel 3 de un vistazo.
+        Cada nivel toma un par semántico de colors.css, así el acento y su fondo ya vienen resueltos por modo. */
+        .ubigeo_tree_list {
+            &.accent_country {
+                --tree-accent: var(--primary);
+                --tree-accent-tint: var(--surface-2);
+            }
+
+            &.accent_level1 {
+                --tree-accent: var(--info-text);
+                --tree-accent-tint: var(--info-soft);
+            }
+
+            &.accent_level2 {
+                --tree-accent: var(--warning-text);
+                --tree-accent-tint: var(--warning-soft);
+            }
+
+            &.accent_level3 {
+                --tree-accent: var(--purple-text);
+                --tree-accent-tint: var(--purple-soft);
+            }
+        }
+
+        .ubigeo_tree_nested {
+            margin-top: .4rem;
+            margin-left: 1.6rem;
+            padding-left: 1.2rem;
+            border-left: 1px solid var(--border);
+        }
+
+        .ubigeo_tree_list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+        }
+
+        .ubigeo_tree_row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border-radius: 8px;
+            transition: background .2s ease;
+
+            &:hover {
+                background: var(--surface-2);
+            }
+
+            &.expanded {
+                background: var(--tree-accent-tint, var(--surface-2));
+
+                .ubigeo_tree_chevron {
+                    transform: rotate(90deg);
+                    color: var(--tree-accent, var(--primary));
+                }
+            }
+
+            .ubigeo_tree_row_main {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                gap: .7rem;
+                flex: 1;
+                min-width: 0;
+                border: none;
+                background: transparent;
+                padding: .7rem .6rem;
+                cursor: pointer;
+                text-align: left;
+
+                &:disabled {
+                    cursor: default;
+                }
+
+                svg {
+                    color: var(--tree-accent, var(--primary));
+                    flex-shrink: 0;
+                }
+
+                .ubigeo_tree_chevron {
+                    color: var(--text-muted);
+                    transition: transform .2s ease;
+                }
+
+                .ubigeo_tree_name {
+                    font-size: 1.3rem;
+                    font-weight: 500;
+                    color: var(--text);
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .ubigeo_tree_code {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    font-family: monospace;
+                    color: var(--text-muted);
+                    background: var(--surface-2);
+                    border-radius: 4px;
+                    padding: .1rem .5rem;
+                    flex-shrink: 0;
+                }
+            }
+
+            .ubigeo_tree_actions {
+                display: flex;
+                gap: .4rem;
+                padding-right: .6rem;
+                flex-shrink: 0;
+
+                button {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 6px;
+
+                    &.add {
+                        background-color: var(--primary);
+                        color: var(--text-white);
+                    }
+
+                    &.edit {
+                        background-color: var(--info-text);
+                        color: var(--text-white);
+                    }
+
+                    &.delete {
+                        background-color: var(--danger);
+                        color: var(--text-white);
+                    }
+                }
+            }
+        }
+
+        .ubigeo_tree_state {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            padding: 1.2rem .6rem;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+
+            .ubigeo_tree_spinner {
+                width: 14px;
+                height: 14px;
+                border: 2px solid var(--border);
+                border-top-color: var(--primary);
+                border-radius: 50%;
+                animation: ubigeo_tree_spin .8s linear infinite;
+            }
+        }
+    }
+
+    .ubigeo_form_context {
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: var(--text-soft);
+        margin-bottom: 1rem;
+    }
+}
+
+@keyframes ubigeo_tree_spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

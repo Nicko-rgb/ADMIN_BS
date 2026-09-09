@@ -1,0 +1,62 @@
+.catalog_page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+
+    .catalog_toolbar {
+        display: flex;
+        align-items: flex-end;
+        gap: 1.5rem;
+        margin-top: 1rem;
+
+        .catalog_toolbar_search {
+            flex: 1;
+            max-width: 320px;
+        }
+
+        .catalog_toolbar_filter {
+            width: 180px;
+        }
+    }
+
+    /* Badge con el total de referencias de un catálogo hacia otras tablas — usado en las tablas de system/catalogs */
+    .references_badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 1.4rem !important;
+        font-weight: 600;
+        background: var(--surface-2);
+        color: var(--text-soft);
+    }
+
+    /* Badge de acceso por app (admin/booking/both) — usado en menú y permisos */
+    .app_access_badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 1.4rem;
+        font-weight: 600;
+
+        &.app_access_badge_admin {
+            background: var(--purple-soft);
+            color: var(--purple-text);
+        }
+
+        &.app_access_badge_booking {
+            background: var(--info-soft);
+            color: var(--info-text);
+        }
+
+        &.app_access_badge_both {
+            background: var(--success-soft);
+            color: var(--success-text);
+        }
+    }
+
+    .catalog_form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}

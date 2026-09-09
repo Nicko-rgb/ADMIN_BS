@@ -1,0 +1,280 @@
+.app_layout {
+    display: flex;
+    height: 100%;
+
+    /* ── Sidebar lateral ──────────────────────────────────── */
+    .sidebar {
+        width: 220px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: var(--surface);
+        transition: width .2s ease;
+        padding: 2rem 1rem;
+        /* box-shadow: var(--shadow); */
+        border-right: 1px solid var(--border);
+
+        .sidebar_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: .5rem;
+
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: .7rem;
+                overflow: hidden;
+
+                .brand_icon {
+                    flex-shrink: 0;
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 6px;
+                    background: var(--primary);
+                    color: var(--text-white);
+                }
+
+                .brand_text {
+                    display: flex;
+                    flex-direction: column;
+                    white-space: nowrap;
+                    line-height: 1.2;
+
+                    h2 {
+                        font-size: 1.4rem;
+                        font-weight: 700;
+                        color: var(--primary);
+                    }
+
+                    span {
+                        font-size: 1rem;
+                        font-weight: 600;
+                        letter-spacing: .05em;
+                    }
+                }
+            }
+
+            .collapse_toggle {
+                flex-shrink: 0;
+                background: transparent;
+                color: var(--text);
+                padding: .4rem;
+                border-radius: 6px;
+
+                &:hover {
+                    background-color: var(--surface-2);
+                    color: var(--text);
+                }
+            }
+        }
+
+        .menu_list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: .2rem;
+
+            .menu_state {
+                font-size: 1.2rem;
+                color: var(--text-muted);
+                padding: .7rem .6rem;
+            }
+
+            .menu_group {
+                display: flex;
+                flex-direction: column;
+                position: relative;
+                gap: .2rem;
+                border-top: 1px solid var(--border);
+                padding-bottom: .2rem;
+                padding-top: .3rem;
+
+                .group_title {
+                    font-size: .95rem;
+                    letter-spacing: .08em;
+                    color: var(--text-muted);
+                    margin: .5rem 0;
+                    font-weight: 600;
+                }
+            }
+        }
+
+        /* ── Ítems de menú — comparten estilo entre raíz, hijos y footer ────────── */
+        .menu_item {
+            justify-content: flex-start;
+            font-size: 1.2rem;
+            font-weight: 500;
+            display: flex;
+            gap: .6rem;
+            padding: .7rem .6rem;
+            border-radius: 6px;
+            color: var(--text-soft);
+            background: transparent;
+            text-decoration: none;
+            width: 100%;
+
+            &:hover {
+                background: var(--surface-2);
+                color: var(--text);
+            }
+
+            /* Activo sin tinte de marca: fondo neutro + barra verde a la izquierda */
+            &.active {
+                background: var(--primary-light);
+                color: var(--primary);
+                font-weight: 600;
+            }
+
+            .menu_chevron {
+                margin-left: auto;
+                transition: transform .2s ease;
+            }
+
+            &.expanded .menu_chevron {
+                transform: rotate(180deg);
+            }
+
+            svg {
+                stroke-width: 2.5;
+            }
+        }
+
+        .menu_submenu {
+            display: flex;
+            flex-direction: column;
+            padding-left: 1.2rem;
+            margin-top: .15rem;
+            border-left: 1px solid var(--border);
+            margin-left: 1rem;
+
+            .submenu_item {
+                padding: .4rem .6rem;
+                font-size: 1.2rem;
+                flex: 1;
+            }
+        }
+
+        .sidebar_footer {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+
+            .dark_mode_row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: .5rem .6rem;
+                font-size: 1.2rem;
+                font-weight: 500;
+                color: var(--text-soft);
+            }
+
+            .theme_switch {
+                position: relative;
+                width: 34px;
+                height: 18px;
+                border-radius: 999px;
+                background: var(--border-strong);
+                transition: background .2s ease;
+                flex-shrink: 0;
+
+                .theme_switch_thumb {
+                    position: absolute;
+                    top: 2px;
+                    left: 2px;
+                    width: 14px;
+                    height: 14px;
+                    border-radius: 50%;
+                    background: var(--text-white);
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+                    transition: transform .2s ease;
+                }
+
+                &.on {
+                    background: var(--primary);
+
+                    .theme_switch_thumb {
+                        transform: translateX(16px);
+                    }
+                }
+            }
+
+            /* Contorno: un relleno saturado a este tamaño pesa demasiado en modo oscuro */
+            .logout_btn {
+                gap: .6rem;
+                padding: .8rem;
+                border-radius: 6px;
+                background: var(--danger);
+                color: var(--text-white);
+                font-size: 1.2rem;
+                font-weight: 600;
+
+                &:hover {
+                    transform: scale(1.01);
+                }
+            }
+        }
+    }
+
+    /* ── Section principal de render de pages de la app ──────────────────────────*/
+    .app_section {
+        flex: 1;
+        overflow-y: auto;
+
+        .app_header {
+            height: 40px;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .app_main {
+            padding: 1rem;
+        }
+    }
+
+    /* ── Colapsado: solo íconos ───────────────────────────────────────────── */
+    &.collapsed .sidebar {
+        width: 50px;
+
+        /* Header colapsado: solo queda el botón de colapsar, el logo entero se oculta */
+        .sidebar_header {
+            justify-content: center;
+        }
+
+        .brand,
+        .menu_item_label,
+        .menu_chevron,
+        .dark_mode_row .menu_item_label {
+            display: none;
+        }
+
+        .menu_item,
+        .logout_btn {
+            width: 100%;
+            height: 30px;
+            padding: 0;
+            margin: 0 auto;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .menu_submenu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            .submenu_item {
+                padding-left: 0;
+            }
+        }
+
+        .dark_mode_row {
+            justify-content: center;
+        }
+    }
+}

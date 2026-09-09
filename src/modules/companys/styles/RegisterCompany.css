@@ -1,0 +1,273 @@
+.register_company {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+
+    .register_steps_card {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        padding: 1.6rem 2rem;
+        display: flex;
+        align-items: center;
+
+        /* Indicador de pasos — card aparte, nunca se anima (solo el contenido del paso lo hace) ── */
+        .steps {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            color: var(--text-muted);
+
+            .register_step_circle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                border: 1px solid var(--border-strong);
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--text-soft);
+            }
+
+            .register_step_label {
+                font-size: 1.4rem;
+                font-weight: 600;
+            }
+
+            &.is_active {
+                color: var(--text);
+
+                .register_step_circle {
+                    background: var(--primary);
+                    border-color: var(--primary);
+                    color: var(--text-white);
+                }
+            }
+
+            &.is_done .register_step_circle {
+                background: var(--primary);
+                border-color: var(--primary);
+                color: var(--text-white);
+            }
+        }
+
+        .register_step_divider {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            margin: 0 1.2rem;
+        }
+    }
+
+    .register_card {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        overflow: hidden;
+
+        .register_step_content {
+            animation-duration: .32s;
+            animation-timing-function: ease;
+            animation-fill-mode: both;
+
+            &.register_slide_forward {
+                animation-name: register_slide_in_from_right;
+            }
+
+            &.register_slide_backward {
+                animation-name: register_slide_in_from_left;
+            }
+        }
+    }
+
+    /* Paso 3 — cards de plan ─────────────────────────────────────────── */
+    .register_billing_toggle {
+        display: flex;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1rem auto;
+
+        button {
+            padding: .8rem 1.6rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+            background: var(--primary-light);
+
+            &.is_active {
+                background: var(--primary);
+                color: var(--text-white);
+            }
+        }
+    }
+
+    .register_plans_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.2rem;
+    }
+
+    .register_plan_card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        padding: 1.6rem;
+        text-align: left;
+        background: var(--color-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: border-color .15s ease, background-color .15s ease;
+
+        &:hover {
+            border-color: var(--border-strong);
+        }
+
+        &.is_selected {
+            background: var(--success-soft);
+            border-color: var(--primary);
+        }
+
+        /* Selector tipo radio — círculo vacío sin selección, relleno con check al seleccionar. */
+        .register_plan_radio {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid var(--border-strong);
+            background: var(--surface);
+            color: var(--text-white);
+        }
+
+        &.is_selected .register_plan_radio {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .register_plan_card_header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-right: 2.2rem;
+
+            .register_plan_card_name {
+                font-size: 1.6rem;
+                font-weight: 700;
+                color: var(--text);
+            }
+        }
+
+        .register_plan_price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+
+            span {
+                font-size: 1.2rem;
+                font-weight: 500;
+                color: var(--text-muted);
+            }
+        }
+
+        .register_plan_card_limits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+
+            .register_plan_limit_pill,
+            .register_plan_purple_pill {
+                padding: .3rem .8rem;
+                border-radius: 999px;
+                font-size: 1.1rem;
+                font-weight: 600;
+            }
+
+            .register_plan_limit_pill {
+                background: var(--success-soft);
+                color: var(--success-text);
+            }
+
+            .register_plan_purple_pill {
+                background: var(--purple-soft);
+                color: var(--purple-text);
+            }
+        }
+
+        .register_plan_features {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+            flex: 1;
+
+            li {
+                display: flex;
+                align-items: flex-start;
+                gap: .6rem;
+                font-size: 1.2rem;
+                color: var(--text-soft);
+
+                svg {
+                    flex-shrink: 0;
+                    margin-top: .1rem;
+                    color: var(--primary);
+                }
+            }
+
+            .register_plan_features_more {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--text-muted);
+            }
+        }
+    }
+
+    .register_footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+}
+
+/* @keyframes es una regla de nivel superior — no puede ir anidada dentro de un selector,
+   por eso vive afuera de .register_company. */
+@keyframes register_slide_in_from_right {
+    from {
+        opacity: 0;
+        transform: translateX(48px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes register_slide_in_from_left {
+    from {
+        opacity: 0;
+        transform: translateX(-48px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

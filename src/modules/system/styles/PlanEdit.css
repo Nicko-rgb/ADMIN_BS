@@ -1,0 +1,69 @@
+.plan_edit_form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.plan_features_editor {
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+
+    .plan_features_label {
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: var(--text-soft);
+    }
+
+    .plan_features_add {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+
+        > .input_group {
+            flex: 1;
+        }
+    }
+
+    .plan_features_list {
+        display: flex;
+        flex-direction: column;
+        gap: .3rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        .plan_features_empty {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            padding: .8rem 0;
+        }
+
+        .plan_features_item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: .4rem 1.2rem;
+            border-radius: 6px;
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--text);
+          
+            &:hover {
+                background: var(--surface-2);
+            }
+
+            .plan_features_remove {
+                width: 30px;
+                height: 30px;
+                flex-shrink: 0;
+                border-radius: 6px;
+                background: transparent;
+                color: var(--danger-text);
+
+                &:hover { background: var(--danger-soft); }
+            }
+        }
+    }
+}

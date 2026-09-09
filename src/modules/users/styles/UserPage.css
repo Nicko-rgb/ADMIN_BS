@@ -1,0 +1,21 @@
+.users_page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+
+    .users_toolbar {
+        display: flex;
+        align-items: flex-end;
+        gap: 1.5rem;
+        margin-top: 1rem;
+
+        .users_toolbar_search {
+            flex: 1;
+            max-width: 320px;
+        }
+
+        .users_toolbar_filter {
+            width: 180px;
+        }
+    }
+}

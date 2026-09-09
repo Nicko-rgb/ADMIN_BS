@@ -1,0 +1,108 @@
+html {
+    font-size: 62.5%;
+}
+
+/* Reset y configuración base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-primary);
+    scroll-behavior: smooth;
+}
+
+/* Cuerpo de toda la aplicacion */
+body {
+    color: var(--text);
+    background-color: var(--color-bg);
+    height: 100vh;
+}
+
+/* Elemento #root, div donde se monta la aplicacion */
+#root {
+    height: 100%;
+}
+
+/* Clase para centrar elementos hijos al centro */
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+
+/* Toast */
+
+.go2072408551 {
+    gap: .5rem;
+
+    /* icono */
+    .go2358747891 {
+        min-width: auto !important;
+    }
+
+    /* texto */
+    .go3958317564 {
+        margin: 4px 0 !important;
+    }
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 0px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-2);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* ── Utilidades globales reutilizables ────────────────────── */
+
+/* Badge de estado activo/inactivo — usado en tablas y listas.
+   Los pares soft + text vienen resueltos por modo desde colors.css, así el color
+   no depende de qué haya detrás. */
+.status_badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &.active {
+        background: var(--success-soft);
+        color: var(--success-text);
+    }
+
+    &.inactive {
+        background: var(--danger-soft);
+        color: var(--danger-text);
+    }
+
+    &.pending, &.maintenance {
+        background: var(--warning-soft);
+        color: var(--warning-text);
+    }
+}
+
+/* Fallback del <Suspense> mientras carga una página lazy */
+.route_loading {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--text-muted);
+}

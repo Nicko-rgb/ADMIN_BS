@@ -1,0 +1,82 @@
+.modal_overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1.5rem;
+    backdrop-filter: blur(2px);
+
+    /* El cuerpo del modal usa el lienzo de la app y las .form_section de adentro
+       usan --surface: la misma relación fondo/card que en una página, así los
+       grupos del formulario se separan igual de claro en ambos modos. */
+    .modal_container {
+        background: var(--color-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        &.modal_sm {
+            max-width: 450px;
+        }
+
+        &.modal_md {
+            max-width: 660px;
+        }
+
+        &.modal_lg {
+            max-width: 900px;
+        }
+
+        .modal_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+
+            .modal_title {
+                display: flex;
+                align-items: center;
+                gap: .8rem;
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: var(--primary);
+
+                svg {
+                    flex-shrink: 0;
+                    color: var(--primary);
+                }
+            }
+
+            .modal_close_btn {
+                width: 32px;
+                height: 32px;
+                flex-shrink: 0;
+                border-radius: 8px;
+                background: transparent;
+                border: 1px solid var(--border);
+                color: var(--text-soft);
+
+                &:hover {
+                    background: var(--surface-2);
+                    color: var(--text);
+                }
+            }
+        }
+
+        .modal_body {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+    }
+}

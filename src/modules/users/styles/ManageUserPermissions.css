@@ -1,0 +1,29 @@
+.manage_permissions_loading {
+    padding: 3rem 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.4rem;
+}
+
+.manage_permissions_module {
+    margin-bottom: 1.6rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    .manage_permissions_module_title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-soft);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: .8rem;
+    }
+
+    .manage_permissions_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: .6rem 1.2rem;
+    }
+}

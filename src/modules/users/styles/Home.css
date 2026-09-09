@@ -1,0 +1,16 @@
+.home_page {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+
+    h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    p {
+        font-size: 1.3rem;
+        color: var(--text-soft);
+    }
+}

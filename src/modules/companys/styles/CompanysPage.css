@@ -1,0 +1,114 @@
+.companys_page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+
+    .companys_toolbar {
+        display: flex;
+        align-items: flex-end;
+        gap: 1.5rem;
+        margin-top: 1rem;
+
+        .companys_toolbar_search {
+            flex: 1;
+            max-width: 320px;
+        }
+
+        .companys_toolbar_filter {
+            width: 180px;
+        }
+    }
+
+    /* Celda con dos líneas: dato principal arriba, secundario abajo — dueño y plan */
+    .company_stacked_cell {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .company_stacked_primary {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .company_stacked_secondary {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+    }
+
+    /* Sin dueño/plan asignado todavía — empresa recién creada */
+    .company_empty_value {
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* Vista en cards — super_admin, dueño de pocas empresas propias */
+    .companys_cards_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.2rem;
+    }
+
+    .company_card {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        padding: 1.4rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+
+        .company_card_header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+
+            .company_card_icon {
+                flex-shrink: 0;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--color-bg);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                color: var(--primary);
+            }
+
+            .company_card_title {
+                flex: 1;
+                min-width: 0;
+
+                h3 {
+                    margin: 0;
+                    font-size: 1.5rem;
+                    color: var(--text);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                span {
+                    font-size: 1.2rem;
+                    color: var(--text-muted);
+                }
+            }
+        }
+
+        .company_card_body {
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+
+            .company_card_row {
+                display: flex;
+                align-items: center;
+                gap: .6rem;
+                font-size: 1.3rem;
+                color: var(--text-soft);
+            }
+        }
+    }
+}

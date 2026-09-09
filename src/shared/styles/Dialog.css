@@ -1,0 +1,96 @@
+.dialog_overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    padding: 1.5rem;
+
+    .dialog_container {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-width: 420px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        --dialog-color: var(--primary);
+
+        &.dialog_primary { --dialog-color: var(--primary); }
+        &.dialog_warning { --dialog-color: var(--warning-text); }
+        &.dialog_alert { --dialog-color: var(--danger-text); }
+
+        .dialog_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+
+            .dialog_title {
+                display: flex;
+                align-items: center;
+                gap: .8rem;
+                font-size: 1.6rem;
+                font-weight: 700;
+                color: var(--text);
+
+                .dialog_icon {
+                    flex-shrink: 0;
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    background: color-mix(in srgb, var(--dialog-color) 15%, transparent);
+                    color: var(--dialog-color);
+                }
+            }
+
+            .dialog_close_btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 30px;
+                height: 30px;
+                flex-shrink: 0;
+                border: none;
+                border-radius: 8px;
+                background: transparent;
+                color: var(--text-soft);
+                cursor: pointer;
+                transition: background .15s, color .15s;
+
+                &:hover {
+                    background: var(--surface-2);
+                    color: var(--text);
+                }
+            }
+        }
+
+        .dialog_body {
+            padding: 1.5rem;
+
+            .dialog_description {
+                font-size: 1.4rem;
+                color: var(--text-soft);
+                line-height: 1.5;
+            }
+        }
+
+        .dialog_footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: .8rem;
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    }
+}

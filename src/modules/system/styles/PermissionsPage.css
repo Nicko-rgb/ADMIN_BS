@@ -1,0 +1,18 @@
+/* Key del permiso — identificador técnico (ej: system.full_access), tipografía monoespaciada para diferenciarla del resto de columnas */
+.permission_key {
+    font-family: 'Courier New', monospace;
+    font-size: 1.3rem;
+    color: var(--text-soft);
+}
+
+/* Módulo — pill neutro para agrupar visualmente por módulo (booking, companys, system, ...) */
+.permission_module_badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: var(--surface-2);
+    color: var(--text-soft);
+}
