@@ -23,10 +23,13 @@ interface HeaderProps {
     action?: HeaderAction;
     // Niveles entre "Home" y el título — sin esto, el breadcrumb queda como antes (Home > título).
     breadcrumbs?: BreadcrumbItem[];
+    // Páginas de entidad (ej. detalle de empresa) arman su propio diseño de encabezado —
+    // en `false` solo se muestra el breadcrumb, sin la card de ícono/título/subtítulo.
+    showCard?: boolean;
 }
 
 // Encabezado de página — breadcrumb (Home > ...breadcrumbs > título) + card con ícono/título/subtítulo y un botón de acción opcional (ej. "Nuevo Plan").
-export const Header = ({ title, subtitle, icon: Icon, action, breadcrumbs = [] }: HeaderProps) => (
+export const Header = ({ title, subtitle, icon: Icon, action, breadcrumbs = [], showCard = true }: HeaderProps) => (
     <div className="page_header">
         <nav className="breadcrumb" aria-label="breadcrumb">
             <Link to="/home">Home</Link>
@@ -40,21 +43,23 @@ export const Header = ({ title, subtitle, icon: Icon, action, breadcrumbs = [] }
             <span className="breadcrumb_current">{title}</span>
         </nav>
 
-        <div className="page_header_card card">
-            <div className="page_header_info">
-                {Icon && (
-                    <div className="page_header_icon">
-                        <Icon size={26} />
+        {showCard && (
+            <div className="page_header_card card">
+                <div className="page_header_info">
+                    {Icon && (
+                        <div className="page_header_icon">
+                            <Icon size={26} />
+                        </div>
+                    )}
+                    <div className="page_header_text">
+                        <h1>{title}</h1>
+                        {subtitle && <p>{subtitle}</p>}
                     </div>
-                )}
-                <div className="page_header_text">
-                    <h1>{title}</h1>
-                    {subtitle && <p>{subtitle}</p>}
                 </div>
-            </div>
 
-            {action && <Button text={action.label} icon={Plus} onClick={action.onClick} />}
-        </div>
+                {action && <Button text={action.label} icon={Plus} onClick={action.onClick} />}
+            </div>
+        )}
     </div>
 );
 

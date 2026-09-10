@@ -1,0 +1,159 @@
+.company_detail_state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    color: var(--text-muted);
+    font-size: 1.4rem;
+}
+
+.company_detail_page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+
+    /* Cabecera tipo perfil — avatar con la inicial, nombre y acciones, todo centrado. Sin
+       caja/borde/sombra a propósito, para no repetir la forma de .page_header_card (esto es
+       una página de entidad, no de catálogo). */
+    .company_profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .8rem;
+        padding: 1rem 0;
+
+        .company_avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--text-white);
+            font-size: 3.2rem;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .company_profile_actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: .6rem;
+        }
+    }
+
+    /* Información de empresa y del dueño, lado a lado — centrado, ancho máximo (la grid de
+       sucursales debajo sí queda a todo el ancho de la página) */
+    .company_detail_content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.2rem;
+        align-items: start;
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .company_info_card,
+    .company_subsidiaries_section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.6rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+    }
+
+    .company_detail_card_title {
+        display: flex;
+        align-items: center;
+        gap: .8rem;
+        padding-bottom: .8rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--primary-text);
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+    }
+
+    .company_detail_row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        font-size: 1.3rem;
+
+        .company_detail_label {
+            color: var(--text-muted);
+        }
+
+        span:not(.company_detail_label) {
+            color: var(--text);
+            font-weight: 500;
+            text-align: right;
+        }
+    }
+
+    .company_detail_country {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        color: var(--text);
+        font-weight: 500;
+    }
+
+    .company_subsidiaries_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+
+    .company_subsidiary_card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .6rem;
+        padding: 1.4rem 1rem;
+        background: var(--color-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        text-align: center;
+
+        .company_subsidiary_avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--surface-2);
+            color: var(--primary-text);
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        span {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+    }
+
+    .company_empty_value {
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 1.3rem;
+    }
+}

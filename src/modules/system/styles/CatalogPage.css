@@ -7,7 +7,6 @@
         display: flex;
         align-items: flex-end;
         gap: 1.5rem;
-        margin-top: 1rem;
 
         .catalog_toolbar_search {
             flex: 1;

@@ -2,7 +2,6 @@
     display: flex;
     gap: .4rem;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 1.6rem;
 }
 
 .tabs_bar_item {

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Building2, Search } from 'lucide-react';
-import { Table, TableImage } from '../../../shared/components/Table';
+import { Building2, Eye, Search } from 'lucide-react';
+import { Table, TableImage, TableActions } from '../../../shared/components/Table';
 import type { TableColumn } from '../../../shared/components/Table';
 import { Header } from '../../../shared/components/Header';
 import { Button } from '../../../shared/components/Button';
@@ -42,7 +42,7 @@ const CompanysPage = () => {
         isSuperAdmin,
     } = useCompanies();
 
-    const goToCompany = (company: CompanyAdmin) => navigate('/companys/company', { state: { companyId: company.id } });
+    const goToCompany = (company: CompanyAdmin) => navigate(`/companys/company/${company.tenantId}`);
 
     const columns: TableColumn<CompanyAdmin>[] = [
         { key: 'name', header: 'Empresa' },
@@ -78,6 +78,13 @@ const CompanysPage = () => {
             ) : '—'
         },
         { key: 'createdAt', header: 'Creado', render: (row) => formatDate(row.createdAt) },
+        {
+            key: 'actions', header: 'Acciones', render: (row) => (
+                <TableActions actions={[
+                    { label: 'Ver', icon: Eye, variant: 'view', onClick: () => goToCompany(row) },
+                ]} />
+            )
+        },
     ];
 
     return (

@@ -10,7 +10,6 @@ export interface CompanyStepForm {
     address: string;
     phone_cell: string;
     phone: string;
-    website: string;
 }
 
 // Paso 2 — datos del dueño (nuevo usuario, rol super_admin). A diferencia de la edición de

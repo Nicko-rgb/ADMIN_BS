@@ -75,9 +75,6 @@ const RegisterCompany = () => {
                                     <InputField name="phone_cell" label="Teléfono celular" value={companyForm.phone_cell} onChange={(e) => setCompanyField('phone_cell')(e.target.value)} required />
                                     <InputField name="phone" label="Teléfono fijo" value={companyForm.phone} onChange={(e) => setCompanyField('phone')(e.target.value)} />
                                 </FormRow>
-                                <FormRow>
-                                    <InputField name="website" label="Sitio web" value={companyForm.website} onChange={(e) => setCompanyField('website')(e.target.value)} placeholder="https://..." />
-                                </FormRow>
                             </FormSection>
 
                             <FormSection title="Ubigeo" icon={MapPin}>
@@ -134,7 +131,7 @@ const RegisterCompany = () => {
 
                             <FormSection title="Contacto y acceso" icon={Phone}>
                                 <FormRow>
-                                    <InputField name="email" label="Correo" type="email" value={ownerForm.email} onChange={(e) => setOwnerField('email')(e.target.value)} />
+                                    <InputField name="email" label="Correo" type="email" value={ownerForm.email} onChange={(e) => setOwnerField('email')(e.target.value)} required />
                                     <InputField name="password" label="Contraseña" type="password" value={ownerForm.password} onChange={(e) => setOwnerField('password')(e.target.value)} required />
                                 </FormRow>
                                 <FormRow>

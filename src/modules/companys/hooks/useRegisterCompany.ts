@@ -16,7 +16,6 @@ const EMPTY_COMPANY_FORM: CompanyStepForm = {
     address: '',
     phone_cell: '',
     phone: '',
-    website: '',
 };
 
 const EMPTY_OWNER_FORM: OwnerStepForm = {
@@ -47,7 +46,7 @@ export const useRegisterCompany = () => {
     const { countries, plans, loadUbigeoChildren } = useCatalogActive();
     const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
 
-    const [step, setStep] = useState<1 | 2 | 3>(3);
+    const [step, setStep] = useState<1 | 2 | 3>(1);
 
     const [companyForm, setCompanyForm] = useState<CompanyStepForm>(EMPTY_COMPANY_FORM);
     const [ownerForm, setOwnerForm] = useState<OwnerStepForm>(EMPTY_OWNER_FORM);
@@ -143,7 +142,7 @@ export const useRegisterCompany = () => {
     );
 
     const isOwnerStepValid = Boolean(
-        ownerForm.first_name.trim() && ownerForm.last_name.trim() && ownerForm.password.trim()
+        ownerForm.first_name.trim() && ownerForm.last_name.trim() && ownerForm.email.trim() && ownerForm.password.trim()
         && ownerForm.phone.trim() && ownerForm.country_id && ownerForm.document_type && ownerForm.document_number.trim()
     );
 
@@ -163,9 +162,8 @@ export const useRegisterCompany = () => {
         setStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3) : prev));
     };
 
-    // Alta de empresa — crea Company+User+Person+UserCompany+permisos+SaaSSubscription en el
-    // backend (una transacción, ver company.service.ts → register), pendiente de pago hasta
-    // que el dueño autorice el link de MercadoPago que se le manda por correo.
+    // Alta de empresa — crea Company+User+Person+UserCompany+SaaSSubscription ya activa en el
+    // backend (una transacción, ver company.service.ts → register).
     const handleRegister = async () => {
         setIsSubmitting(true);
         try {
