@@ -22,8 +22,10 @@ const useCompanies = () => {
     const role = useSessionStore((state) => state.user?.role);
     const isSuperAdmin = role === 'super_admin';
 
-    const { countries } = useCatalogActive();
+    const { countries, loadCountries } = useCatalogActive();
     const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
+
+    useEffect(() => { loadCountries(); }, [loadCountries]);
 
     const [items, setItems] = useState<CompanyAdmin[]>([]);
     const [isLoading, setIsLoading] = useState(true);

@@ -1,74 +1,124 @@
-.company_detail_state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem;
-    color: var(--text-muted);
-    font-size: 1.4rem;
-}
-
 .company_detail_page {
     display: flex;
     flex-direction: column;
-    gap: 1.6rem;
+    gap: 1.2rem;
 
-    /* Cabecera tipo perfil — avatar con la inicial, nombre y acciones, todo centrado. Sin
-       caja/borde/sombra a propósito, para no repetir la forma de .page_header_card (esto es
-       una página de entidad, no de catálogo). */
-    .company_profile {
+    /* ── Hero: identidad + acciones en una sola fila ─────────────────────────
+       Antes era un bloque centrado tipo perfil personal; una empresa encaja
+       mejor con el mismo lenguaje horizontal que .company_card en
+       CompanysPage.css (ícono/avatar + título + acción), así el detalle se
+       siente continuación del listado en vez de una plantilla genérica. */
+    .company_hero {
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: .8rem;
-        padding: 1rem 0;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.6rem;
+        max-width: 1000px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 1.6rem;
+        background: var(--surface);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+
+        .company_hero_identity {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            min-width: 0;
+        }
 
         .company_avatar {
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 88px;
-            height: 88px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: var(--primary);
             color: var(--text-white);
-            font-size: 3.2rem;
-            font-weight: 700;
-        }
-
-        h1 {
             font-size: 2.2rem;
             font-weight: 700;
-            color: var(--text);
-            text-align: center;
         }
 
-        .company_profile_actions {
+        .company_hero_text {
             display: flex;
-            gap: 1rem;
-            margin-top: .6rem;
+            flex-direction: column;
+            gap: .3rem;
+            min-width: 0;
+        }
+
+        .company_hero_title_row {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+
+            h1 {
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--text);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .company_hero_subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+        }
+
+        .company_hero_actions {
+            display: flex;
+            gap: .8rem;
+            flex-shrink: 0;
         }
     }
 
-    /* Información de empresa y del dueño, lado a lado — centrado, ancho máximo (la grid de
-       sucursales debajo sí queda a todo el ancho de la página) */
-    .company_detail_content {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 1.2rem;
-        align-items: start;
-        max-width: 900px;
+    /* ── Información: una sola card partida en dos columnas ──────────────────
+       Antes eran dos cards lado a lado (empresa: 7 filas, dueño: 5) — con
+       bordes/sombra propios cada una, la diferencia de alto quedaba a la
+       vista (bordes inferiores desalineados). Una sola card comparte un único
+       borde/sombra: la columna más corta simplemente termina antes, sin dejar
+       un borde suelto más arriba que el de al lado. */
+    .company_info_card {
+        max-width: 1000px;
         width: 100%;
         margin: 0 auto;
+        padding: 1.6rem;
+        background: var(--surface);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
     }
 
-    .company_info_card,
+    .company_info_columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+
+    .company_info_column {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0 2rem;
+
+        &:first-child { padding-left: 0; }
+
+        &:last-child {
+            padding-right: 0;
+            border-left: 1px solid var(--border);
+        }
+    }
+
     .company_subsidiaries_section {
         display: flex;
         flex-direction: column;
         gap: 1rem;
         padding: 1.6rem;
         background: var(--surface);
-        border: 1px solid var(--border);
         border-radius: 12px;
         box-shadow: var(--shadow);
     }
@@ -79,7 +129,7 @@
         gap: .8rem;
         padding-bottom: .8rem;
         border-bottom: 1px solid var(--border);
-        color: var(--primary-text);
+        color: var(--primary);
 
         h3 {
             font-size: 1.5rem;
@@ -96,6 +146,7 @@
         font-size: 1.3rem;
 
         .company_detail_label {
+            flex-shrink: 0;
             color: var(--text-muted);
         }
 
@@ -106,12 +157,25 @@
         }
     }
 
+    /* País + ubigeo en una sola línea ("Perú - Distrito, Provincia, Departamento") — con
+       min-width:0 en toda la cadena flex para que el texto largo trunque con ellipsis en vez
+       de estirar la fila o desbordar la card. */
     .company_detail_country {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         gap: .6rem;
+        min-width: 0;
+        flex: 1;
         color: var(--text);
         font-weight: 500;
+    }
+
+    .company_detail_ellipsis {
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     .company_subsidiaries_grid {
@@ -138,8 +202,8 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: var(--surface-2);
-            color: var(--primary-text);
+            background: var(--surface);
+            color: var(--primary);
             font-size: 1.6rem;
             font-weight: 700;
         }
@@ -151,9 +215,47 @@
         }
     }
 
+    /* Sin sucursales todavía — icono + texto centrados, en vez de una línea
+       itálica sola perdida dentro de la card. */
+    .company_empty_state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .6rem;
+        padding: 2.2rem 1rem;
+        color: var(--text-muted);
+
+        span {
+            font-size: 1.3rem;
+            font-style: italic;
+        }
+    }
+
     .company_empty_value {
         color: var(--text-muted);
         font-style: italic;
         font-size: 1.3rem;
+    }
+
+    @media (max-width: 768px) {
+        .company_hero {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .company_info_columns {
+            grid-template-columns: 1fr;
+            gap: 1.6rem;
+        }
+
+        .company_info_column {
+            padding: 0;
+
+            &:last-child {
+                border-left: none;
+                border-top: 1px solid var(--border);
+                padding-top: 1.6rem;
+            }
+        }
     }
 }

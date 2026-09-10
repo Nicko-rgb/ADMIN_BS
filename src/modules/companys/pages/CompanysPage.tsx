@@ -9,6 +9,7 @@ import { formatDate } from '../../../shared/utils/formatDate';
 import { formatPhone } from '../../../shared/utils/formatText';
 import useCompanies from '../hooks/useCompanies';
 import type { CompanyAdmin, CompanyEnabled } from '../interfaces/company.interface';
+import { usePermission } from '../../../shared/hooks/usePermission';
 import '../styles/CompanysPage.css';
 
 const ENABLED_LABELS: Record<CompanyEnabled, string> = {
@@ -41,6 +42,8 @@ const CompanysPage = () => {
         statusFilter, setStatusFilter,
         isSuperAdmin,
     } = useCompanies();
+
+    const canCreate = usePermission('company.create');
 
     const goToCompany = (company: CompanyAdmin) => navigate(`/companys/company/${company.tenantId}`);
 
@@ -93,7 +96,7 @@ const CompanysPage = () => {
                 title="Empresas"
                 subtitle="Empresas registradas en el sistema"
                 icon={Building2}
-                action={isSuperAdmin ? undefined : { label: 'Crear empresa', onClick: () => navigate('/companys/register-company') }}
+                action={canCreate ? { label: 'Crear empresa', onClick: () => navigate('/companys/register-company') } : undefined}
             />
 
             {isSuperAdmin ? (

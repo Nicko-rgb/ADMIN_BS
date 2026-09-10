@@ -225,6 +225,8 @@
     .app_section {
         flex: 1;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
 
         .app_header {
             height: 40px;
@@ -232,7 +234,14 @@
             border-bottom: 1px solid var(--border);
         }
 
+        /* flex column: una página normal (flex-grow 0 por defecto) ocupa solo lo
+           que mide su contenido, igual que antes — pero le da a un ScreenMessage
+           (flex: 1, ver ScreenMessage.css) un padre flex real del que estirarse
+           para llenar y centrar el alto disponible. */
         .app_main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             padding: 1rem;
         }
     }

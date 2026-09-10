@@ -9,11 +9,7 @@ class PaymentTypeService {
         return { data: res.data.data, pagination: res.data.pagination };
     }
 
-    // Solo habilitados, sin paginar — endpoint público, para selects/lógica de negocio en toda la app.
-    static async listActive(): Promise<PaymentType[]> {
-        const res = await apiService.get('/system/payment-types/active');
-        return res.data.data;
-    }
+    // Catálogo de tipos de pago activos: CatalogActiveService.listPaymentTypes() (shared/service).
 
     static async create(payload: CreatePaymentTypePayload): Promise<{ data: PaymentType; message: string }> {
         const res = await apiService.post('/system/payment-types', payload);

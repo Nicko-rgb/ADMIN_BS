@@ -1,113 +1,163 @@
-import { useCallback, useEffect, useState } from 'react';
-import CountryService from '../../modules/system/service/countryService';
-import SportTypeService from '../../modules/system/service/sportTypeService';
-import SportCategoryService from '../../modules/system/service/sportCategoryService';
-import SurfaceTypeService from '../../modules/system/service/surfaceTypeService';
-import PaymentTypeService from '../../modules/system/service/paymentTypeService';
-import PlanService from '../../modules/system/service/planService';
-import UbigeoService from '../../modules/system/service/ubigeoService';
+import { useCallback, useState } from 'react';
+import CatalogActiveService from '../service/catalogActiveService';
 import { handleApiError } from '../utils/errorHandler';
 import toast from '../utils/toast';
 import type {
-    Country, SportType, SportCategory, SurfaceType, PaymentType, Plan, UbigeoNode,
+    Country, SportType, SportCategory, SurfaceType, PaymentType, Plan,
 } from '../../modules/system/interfaces/catalog.interface';
 
-interface CatalogActiveState {
-    countries: Country[];
-    sportTypes: SportType[];
-    sportCategories: SportCategory[];
-    surfaceTypes: SurfaceType[];
-    paymentTypes: PaymentType[];
-    plans: Plan[];
-}
+// Cache a nivel de módulo, una por catálogo — se comparte entre todos los componentes que llaman
+// a su load*, así cada catálogo se pide una sola vez por sesión sin importar cuántas pantallas lo
+// usen (ni cuántas veces React.StrictMode monte el mismo componente en desarrollo).
+let countriesCache: Country[] | null = null;
+let countriesInFlight: Promise<Country[]> | null = null;
 
-const EMPTY_STATE: CatalogActiveState = {
-    countries: [], sportTypes: [], sportCategories: [], surfaceTypes: [], paymentTypes: [], plans: [],
-};
+let sportTypesCache: SportType[] | null = null;
+let sportTypesInFlight: Promise<SportType[]> | null = null;
 
-// Cache a nivel de módulo — se comparte entre todos los componentes que usan el hook, así los 6
-// catálogos solo se piden una vez por sesión, no una vez por cada componente que lo monta.
-let cache: CatalogActiveState | null = null;
-let inFlight: Promise<CatalogActiveState> | null = null;
+let sportCategoriesCache: SportCategory[] | null = null;
+let sportCategoriesInFlight: Promise<SportCategory[]> | null = null;
 
-const fetchAllActive = async (): Promise<CatalogActiveState> => {
-    const [countries, sportTypes, sportCategories, surfaceTypes, paymentTypes, plans] = await Promise.all([
-        CountryService.listActive(),
-        SportTypeService.listActive(),
-        SportCategoryService.listActive(),
-        SurfaceTypeService.listActive(),
-        PaymentTypeService.listActive(),
-        PlanService.listActive(),
-    ]);
-    return { countries, sportTypes, sportCategories, surfaceTypes, paymentTypes, plans };
-};
+let surfaceTypesCache: SurfaceType[] | null = null;
+let surfaceTypesInFlight: Promise<SurfaceType[]> | null = null;
+
+let paymentTypesCache: PaymentType[] | null = null;
+let paymentTypesInFlight: Promise<PaymentType[]> | null = null;
+
+let plansCache: Plan[] | null = null;
+let plansInFlight: Promise<Plan[]> | null = null;
 
 /**
- * Catálogos activos de `system` para lógica de negocio en toda la app (ej. selects de país al
- * registrar una empresa) — endpoints públicos, sin autenticación, así los puede usar tanto
- * ADMIN_APP como el futuro FRONTEND_BOOKING (usuarios sin sesión).
- *
- * Se piden 6 de los 7 catálogos en paralelo una sola vez por sesión (cache a nivel de módulo,
- * compartida entre todos los componentes que usan el hook — `reload()` la refresca a mano).
- * Ubigeo queda afuera de la carga automática: es potencialmente grande y se navega en cascada
- * (país → nivel 1 → nivel 2 → ...), nunca se trae completo — usar `loadUbigeoChildren`.
+ * Catálogos activos de `system` para selects/lógica de negocio en toda la app (ej. país al
+ * registrar una empresa). Cada catálogo tiene su propio estado y su propio load* — el hook no
+ * dispara ningún fetch por sí solo: cada pantalla llama, dentro de su propio useEffect, solo a
+ * los load* de los catálogos que realmente necesita, así no se piden catálogos que esa pantalla
+ * nunca usa. Cada load* está cacheado a nivel de módulo: si el catálogo ya se pidió en esta
+ * sesión (desde cualquier pantalla), no vuelve a golpear el backend.
  */
 export const useCatalogActive = () => {
-    const [data, setData] = useState<CatalogActiveState>(cache ?? EMPTY_STATE);
-    const [isLoading, setIsLoading] = useState(!cache);
+    const [countries, setCountries] = useState<Country[]>(countriesCache ?? []);
+    const [isLoadingCountries, setIsLoadingCountries] = useState(!countriesCache);
 
-    useEffect(() => {
-        // Ya reflejado en el estado inicial (useState lee `cache` directo) — nada que hacer.
-        if (cache) return;
-
-        let active = true;
-
-        const fetchAll = async () => {
-            if (!inFlight) inFlight = fetchAllActive();
-
-            try {
-                const result = await inFlight;
-                cache = result;
-                if (active) setData(result);
-            } catch (err) {
-                if (active) toast.error(handleApiError(err));
-            } finally {
-                if (active) setIsLoading(false);
-                inFlight = null;
-            }
-        };
-
-        fetchAll();
-
-        return () => { active = false; };
-    }, []);
-
-    // Refresca los 6 catálogos a mano (ej. después de editar uno desde el admin) — ignora la cache existente.
-    const reload = useCallback(async () => {
-        setIsLoading(true);
-        inFlight = fetchAllActive();
+    const loadCountries = useCallback(async () => {
+        if (countriesCache) return;
+        if (!countriesInFlight) countriesInFlight = CatalogActiveService.listCountries();
 
         try {
-            const result = await inFlight;
-            cache = result;
-            setData(result);
+            const result = await countriesInFlight;
+            countriesCache = result;
+            setCountries(result);
         } catch (err) {
             toast.error(handleApiError(err));
         } finally {
-            setIsLoading(false);
-            inFlight = null;
+            setIsLoadingCountries(false);
+            countriesInFlight = null;
         }
     }, []);
 
-    // Nivel 1 de un país o hijos directos de un nodo — bajo demanda, sin cache (el árbol se navega, no se guarda completo).
-    const loadUbigeoChildren = useCallback(async (params: { countryId?: number; parentId?: number }): Promise<UbigeoNode[]> => {
+    const [sportTypes, setSportTypes] = useState<SportType[]>(sportTypesCache ?? []);
+    const [isLoadingSportTypes, setIsLoadingSportTypes] = useState(!sportTypesCache);
+
+    const loadSportTypes = useCallback(async () => {
+        if (sportTypesCache) return;
+        if (!sportTypesInFlight) sportTypesInFlight = CatalogActiveService.listSportTypes();
+
         try {
-            return await UbigeoService.listChildren(params);
+            const result = await sportTypesInFlight;
+            sportTypesCache = result;
+            setSportTypes(result);
         } catch (err) {
             toast.error(handleApiError(err));
-            return [];
+        } finally {
+            setIsLoadingSportTypes(false);
+            sportTypesInFlight = null;
         }
     }, []);
 
-    return { ...data, isLoading, reload, loadUbigeoChildren };
+    const [sportCategories, setSportCategories] = useState<SportCategory[]>(sportCategoriesCache ?? []);
+    const [isLoadingSportCategories, setIsLoadingSportCategories] = useState(!sportCategoriesCache);
+
+    const loadSportCategories = useCallback(async () => {
+        if (sportCategoriesCache) return;
+        if (!sportCategoriesInFlight) sportCategoriesInFlight = CatalogActiveService.listSportCategories();
+
+        try {
+            const result = await sportCategoriesInFlight;
+            sportCategoriesCache = result;
+            setSportCategories(result);
+        } catch (err) {
+            toast.error(handleApiError(err));
+        } finally {
+            setIsLoadingSportCategories(false);
+            sportCategoriesInFlight = null;
+        }
+    }, []);
+
+    const [surfaceTypes, setSurfaceTypes] = useState<SurfaceType[]>(surfaceTypesCache ?? []);
+    const [isLoadingSurfaceTypes, setIsLoadingSurfaceTypes] = useState(!surfaceTypesCache);
+
+    const loadSurfaceTypes = useCallback(async () => {
+        if (surfaceTypesCache) return;
+        if (!surfaceTypesInFlight) surfaceTypesInFlight = CatalogActiveService.listSurfaceTypes();
+
+        try {
+            const result = await surfaceTypesInFlight;
+            surfaceTypesCache = result;
+            setSurfaceTypes(result);
+        } catch (err) {
+            toast.error(handleApiError(err));
+        } finally {
+            setIsLoadingSurfaceTypes(false);
+            surfaceTypesInFlight = null;
+        }
+    }, []);
+
+    const [paymentTypes, setPaymentTypes] = useState<PaymentType[]>(paymentTypesCache ?? []);
+    const [isLoadingPaymentTypes, setIsLoadingPaymentTypes] = useState(!paymentTypesCache);
+
+    const loadPaymentTypes = useCallback(async () => {
+        if (paymentTypesCache) return;
+        if (!paymentTypesInFlight) paymentTypesInFlight = CatalogActiveService.listPaymentTypes();
+
+        try {
+            const result = await paymentTypesInFlight;
+            paymentTypesCache = result;
+            setPaymentTypes(result);
+        } catch (err) {
+            toast.error(handleApiError(err));
+        } finally {
+            setIsLoadingPaymentTypes(false);
+            paymentTypesInFlight = null;
+        }
+    }, []);
+
+    const [plans, setPlans] = useState<Plan[]>(plansCache ?? []);
+    const [isLoadingPlans, setIsLoadingPlans] = useState(!plansCache);
+
+    const loadPlans = useCallback(async () => {
+        if (plansCache) return;
+        if (!plansInFlight) plansInFlight = CatalogActiveService.listPlans();
+
+        try {
+            const result = await plansInFlight;
+            plansCache = result;
+            setPlans(result);
+        } catch (err) {
+            toast.error(handleApiError(err));
+        } finally {
+            setIsLoadingPlans(false);
+            plansInFlight = null;
+        }
+    }, []);
+
+    return {
+        countries, isLoadingCountries, loadCountries,
+        sportTypes, isLoadingSportTypes, loadSportTypes,
+        sportCategories, isLoadingSportCategories, loadSportCategories,
+        surfaceTypes, isLoadingSurfaceTypes, loadSurfaceTypes,
+        paymentTypes, isLoadingPaymentTypes, loadPaymentTypes,
+        plans, isLoadingPlans, loadPlans,
+    };
 };
+
+export default useCatalogActive;

@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
+import { useUbigeoCascade } from '../../../shared/hooks/useUbigeoCascade';
 import toast from '../../../shared/utils/toast';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import CompanyService from '../service/companyService';
-import type { UbigeoNode } from '../../system/interfaces/catalog.interface';
 import type { DocumentType } from '../../users/interfaces/user.interface';
 import type { CompanyStepForm, OwnerStepForm, PlanStepForm } from '../interfaces/companyRegistration.interface';
 
@@ -37,14 +37,22 @@ const EMPTY_PLAN_FORM: PlanStepForm = {
 
 /**
  * Wizard de alta de empresa — 3 pasos (empresa, dueño, plan) en un solo hook. La ubicación de
- * la empresa se arma con una cascada departamento → provincia → distrito (`loadUbigeoChildren`
- * de useCatalogActive) porque `ubigeo_id` debe ser puntualmente un distrito (nivel 3), no
+ * la empresa se arma con una cascada departamento (nivel 1) → provincia (nivel 2) → distrito
+ * (nivel 3) vía useUbigeoCascade, porque `ubigeo_id` debe ser puntualmente un distrito, no
  * cualquier nodo del árbol.
  */
 export const useRegisterCompany = () => {
     const navigate = useNavigate();
-    const { countries, plans, loadUbigeoChildren } = useCatalogActive();
+    const { countries, loadCountries, plans, loadPlans } = useCatalogActive();
+    const {
+        level1Items: departments, level2Items: provinces, level3Items: districts,
+        isLoadingLevel1, isLoadingLevel2, isLoadingLevel3,
+        loadLevel, clearLevel,
+    } = useUbigeoCascade();
+
+    useEffect(() => { loadCountries(); loadPlans(); }, [loadCountries, loadPlans]);
     const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
+    const isLoadingUbigeo = isLoadingLevel1 || isLoadingLevel2 || isLoadingLevel3;
 
     const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -52,13 +60,9 @@ export const useRegisterCompany = () => {
     const [ownerForm, setOwnerForm] = useState<OwnerStepForm>(EMPTY_OWNER_FORM);
     const [planForm, setPlanForm] = useState<PlanStepForm>(EMPTY_PLAN_FORM);
 
-    // Cascada de ubicación — cada nivel se resetea cuando cambia el de arriba.
-    const [departments, setDepartments] = useState<UbigeoNode[]>([]);
-    const [provinces, setProvinces] = useState<UbigeoNode[]>([]);
-    const [districts, setDistricts] = useState<UbigeoNode[]>([]);
+    // Selección de cada nivel de la cascada — el nivel de abajo se resetea cuando cambia el de arriba.
     const [departmentId, setDepartmentId] = useState(0);
     const [provinceId, setProvinceId] = useState(0);
-    const [isLoadingUbigeo, setIsLoadingUbigeo] = useState(false);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -75,60 +79,33 @@ export const useRegisterCompany = () => {
     };
 
     // País de la empresa → primer nivel de la cascada de ubicación (departamento).
-    const selectCompanyCountry = async (countryId: number) => {
+    const selectCompanyCountry = (countryId: number) => {
         setCompanyForm((prev) => ({ ...prev, country_id: countryId, ubigeo_id: 0 }));
         setDepartmentId(0);
         setProvinceId(0);
-        setProvinces([]);
-        setDistricts([]);
+        clearLevel(2);
+        clearLevel(3);
 
-        if (!countryId) {
-            setDepartments([]);
-            return;
-        }
-
-        setIsLoadingUbigeo(true);
-        try {
-            setDepartments(await loadUbigeoChildren({ countryId }));
-        } finally {
-            setIsLoadingUbigeo(false);
-        }
+        if (countryId) loadLevel(1, { countryId });
+        else clearLevel(1);
     };
 
-    const selectDepartment = async (id: number) => {
+    const selectDepartment = (id: number) => {
         setDepartmentId(id);
         setProvinceId(0);
-        setDistricts([]);
         setCompanyForm((prev) => ({ ...prev, ubigeo_id: 0 }));
+        clearLevel(3);
 
-        if (!id) {
-            setProvinces([]);
-            return;
-        }
-
-        setIsLoadingUbigeo(true);
-        try {
-            setProvinces(await loadUbigeoChildren({ parentId: id }));
-        } finally {
-            setIsLoadingUbigeo(false);
-        }
+        if (id) loadLevel(2, { parentId: id });
+        else clearLevel(2);
     };
 
-    const selectProvince = async (id: number) => {
+    const selectProvince = (id: number) => {
         setProvinceId(id);
         setCompanyForm((prev) => ({ ...prev, ubigeo_id: 0 }));
 
-        if (!id) {
-            setDistricts([]);
-            return;
-        }
-
-        setIsLoadingUbigeo(true);
-        try {
-            setDistricts(await loadUbigeoChildren({ parentId: id }));
-        } finally {
-            setIsLoadingUbigeo(false);
-        }
+        if (id) loadLevel(3, { parentId: id });
+        else clearLevel(3);
     };
 
     const selectDistrict = (id: number) => {

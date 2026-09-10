@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import UserService from '../service/userService';
 import UserPermissionService from '../service/userPermissionService';
-import CountryService from '../../system/service/countryService';
 import PermissionService from '../../system/service/permissionService';
+import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
@@ -43,7 +43,8 @@ const useUsers = () => {
     const [roleFilter, setRoleFilter] = useState('');
     const [countryFilter, setCountryFilter] = useState('');
 
-    const [countryOptions, setCountryOptions] = useState<{ value: number; label: string }[]>([]);
+    const { countries, loadCountries } = useCatalogActive();
+    const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
 
     const [editingId, setEditingId] = useState<number | null>(null);
     const [form, setForm] = useState<Required<UpdateUserPayload> | null>(null);
@@ -69,18 +70,8 @@ const useUsers = () => {
         setPage(1);
     }, [debouncedSearch, roleFilter, countryFilter]);
 
-    // Países activos, para los selects de filtro y de edición — se cargan una sola vez.
-    useEffect(() => {
-        let active = true;
-
-        CountryService.listActive()
-            .then((countries) => {
-                if (active) setCountryOptions(countries.map((country) => ({ value: country.id, label: country.country })));
-            })
-            .catch((err) => { if (active) toast.error(handleApiError(err)); });
-
-        return () => { active = false; };
-    }, []);
+    // Países activos, para los selects de filtro y de edición.
+    useEffect(() => { loadCountries(); }, [loadCountries]);
 
     // Catálogo completo de permisos, para el picker de ManageUserPermissions — se carga una sola vez.
     useEffect(() => {

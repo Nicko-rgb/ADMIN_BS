@@ -9,11 +9,7 @@ class CountryService {
         return res.data.data;
     }
 
-    // Solo activos, sin paginar — endpoint público, para selects/lógica de negocio en toda la app.
-    static async listActive(): Promise<Country[]> {
-        const res = await apiService.get('/system/countries/active');
-        return res.data.data;
-    }
+    // Catálogo de países activos: CatalogActiveService.listCountries() (shared/service).
 
     static async create(payload: CreateCountryPayload): Promise<{ data: Country; message: string }> {
         const res = await apiService.post('/system/countries', payload);

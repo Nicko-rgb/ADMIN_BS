@@ -59,8 +59,10 @@ const toEditForm = (paymentType: PaymentType): Required<UpdatePaymentTypePayload
 
 /** Listado de tipos de pago (búsqueda/filtro/paginación en el front) + edición: todo se maneja íntegramente acá. */
 export const usePaymentTypes = () => {
-    const { countries } = useCatalogActive();
+    const { countries, loadCountries } = useCatalogActive();
     const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
+
+    useEffect(() => { loadCountries(); }, [loadCountries]);
 
     const [allItems, setAllItems] = useState<PaymentType[]>([]);
     const [isLoading, setIsLoading] = useState(true);

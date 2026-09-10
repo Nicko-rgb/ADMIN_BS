@@ -9,11 +9,7 @@ class SportTypeService {
         return { data: res.data.data, pagination: res.data.pagination };
     }
 
-    // Solo activos, sin paginar — endpoint público, para selects/lógica de negocio en toda la app.
-    static async listActive(): Promise<SportType[]> {
-        const res = await apiService.get('/system/sport-types/active');
-        return res.data.data;
-    }
+    // Catálogo de tipos de deporte activos: CatalogActiveService.listSportTypes() (shared/service).
 
     static async create(payload: CreateSportTypePayload): Promise<{ data: SportType; message: string }> {
         const res = await apiService.post('/system/sport-types', payload);

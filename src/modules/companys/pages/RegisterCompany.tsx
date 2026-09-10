@@ -2,7 +2,8 @@ import { Fragment } from 'react';
 import { Building2, Check, MapPin, UserPlus, IdCard, Phone, CreditCard, ArrowLeft, ArrowRight, UploadCloud } from 'lucide-react';
 import { Header } from '../../../shared/components/Header';
 import { Button } from '../../../shared/components/Button';
-import { InputField, SelectField, FormSection, FormRow } from '../../../shared/components';
+import { InputField, SelectField, FormSection, FormRow, ForbiddenScreen } from '../../../shared/components';
+import { usePermission } from '../../../shared/hooks/usePermission';
 import { DOCUMENT_TYPE_OPTIONS } from '../../users/utils/userConstants';
 import useRegisterCompany from '../hooks/useRegisterCompany';
 import type { DocumentType } from '../../users/interfaces/user.interface';
@@ -35,6 +36,11 @@ const RegisterCompany = () => {
         selectCompanyCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
         isSubmitting, handleRegister,
     } = useRegisterCompany();
+
+    const canCreate = usePermission('company.create');
+    if (!canCreate) {
+        return <ForbiddenScreen />;
+    }
 
     return (
         <div className="register_company">

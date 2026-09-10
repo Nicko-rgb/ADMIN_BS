@@ -9,11 +9,7 @@ class PlanService {
         return res.data.data;
     }
 
-    // Solo activos, sin paginar — endpoint público, para selects/lógica de negocio en toda la app.
-    static async listActive(): Promise<Plan[]> {
-        const res = await apiService.get('/system/plans/active');
-        return res.data.data;
-    }
+    // Catálogo de planes activos: CatalogActiveService.listPlans() (shared/service).
 
     static async update(id: number, payload: UpdatePlanPayload): Promise<{ data: Plan; message: string }> {
         const res = await apiService.put(`/system/plans/${id}`, payload);

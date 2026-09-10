@@ -1,0 +1,79 @@
+.screen_message {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+
+    h2 {
+        color: var(--text);
+        margin: 0;
+    }
+
+    p {
+        color: var(--text-soft);
+        max-width: 40ch;
+        margin: 0;
+    }
+}
+
+.screen_message_spinner {
+    display: inline-block;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: screen_message_spin .8s linear infinite;
+}
+
+.screen_message_icon {
+    color: var(--text-muted);
+}
+
+.screen_message_icon_danger {
+    color: var(--danger-text);
+}
+
+.screen_message_actions {
+    display: flex;
+    gap: .8rem;
+}
+
+/* ── Tamaños ───────────────────────────────────────────────────────────────
+   Escalan spinner/ícono/tipografía/espaciado juntos — `sm` para un slot chico
+   (modal, card), `md` (default) para una sección de página, `lg` para página
+   completa. ────────────────────────────────────────────────────────────── */
+.screen_message_sm {
+    gap: .6rem;
+    padding: 1.6rem;
+
+    .screen_message_spinner { width: 1.8rem; height: 1.8rem; border-width: 2px; }
+    .screen_message_icon { width: 28px; height: 28px; }
+    h2 { font-size: 1.4rem; }
+    p { font-size: 1.1rem; }
+}
+
+.screen_message_md {
+    gap: .8rem;
+    padding: 3.2rem;
+
+    .screen_message_spinner { width: 2.6rem; height: 2.6rem; border-width: 3px; }
+    .screen_message_icon { width: 42px; height: 42px; }
+    h2 { font-size: 1.8rem; }
+    p { font-size: 1.3rem; }
+}
+
+.screen_message_lg {
+    gap: 1rem;
+    padding: 5rem;
+
+    .screen_message_spinner { width: 3.4rem; height: 3.4rem; border-width: 4px; }
+    .screen_message_icon { width: 56px; height: 56px; }
+    h2 { font-size: 2.2rem; }
+    p { font-size: 1.4rem; }
+}
+
+@keyframes screen_message_spin {
+    to { transform: rotate(360deg); }
+}

@@ -9,11 +9,7 @@ class SurfaceTypeService {
         return { data: res.data.data, pagination: res.data.pagination };
     }
 
-    // Sin paginar — endpoint público, para selects/lógica de negocio en toda la app (el modelo no tiene is_active).
-    static async listActive(): Promise<SurfaceType[]> {
-        const res = await apiService.get('/system/surface-types/active');
-        return res.data.data;
-    }
+    // Catálogo de tipos de superficie activos: CatalogActiveService.listSurfaceTypes() (shared/service).
 
     static async create(payload: CreateSurfaceTypePayload): Promise<{ data: SurfaceType; message: string }> {
         const res = await apiService.post('/system/surface-types', payload);
