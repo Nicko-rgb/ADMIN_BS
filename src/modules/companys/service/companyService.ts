@@ -1,6 +1,6 @@
 import { apiService } from '../../../shared/utils/apiService';
 import type { PaginatedResponse } from '../../../shared/interfaces/pagination.interface';
-import type { CompanyAdmin, CompanyDetail, CompanyEnabled } from '../interfaces/company.interface';
+import type { CompanyAdmin, CompanyDetail, CompanyEnabled, UpdateCompanyPayload } from '../interfaces/company.interface';
 import type { RegisterCompanyPayload } from '../interfaces/companyRegistration.interface';
 
 // Catálogo de empresas principales del sistema — listado paginado, con búsqueda por nombre o documento y filtros por país y estado.
@@ -20,6 +20,12 @@ class CompanyService {
     static async getByTenantId(tenantId: string): Promise<CompanyDetail> {
         const res = await apiService.get(`/companys/${tenantId}`);
         return res.data.data;
+    }
+
+    // Autoedición de la propia empresa — sin `document` (RUC).
+    static async updateByTenantId(tenantId: string, payload: UpdateCompanyPayload): Promise<{ data: CompanyDetail; message: string }> {
+        const res = await apiService.put(`/companys/${tenantId}`, payload);
+        return { data: res.data.data, message: res.data.message };
     }
 }
 

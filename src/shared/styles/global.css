@@ -70,6 +70,13 @@ body {
 
 /* ── Utilidades globales reutilizables ────────────────────── */
 
+/* Cards UI */
+.card {
+    background: var(--surface);
+    border-radius: 10px;
+    box-shadow: var(--shadow), var(--shadow);
+}
+
 /* Badge de estado activo/inactivo — usado en tablas y listas.
    Los pares soft + text vienen resueltos por modo desde colors.css, así el color
    no depende de qué haya detrás. */

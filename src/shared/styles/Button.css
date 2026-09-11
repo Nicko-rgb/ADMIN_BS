@@ -40,10 +40,10 @@ button {
     }
 
     &.btn_app_secondary {
-        background-color: transparent;
+        background-color: var(--gray-medium);
         border: 1px solid var(--border-strong);
         color: var(--text-soft);
-        &:hover:not(:disabled) { background-color: var(--surface-2); color: var(--text); }
+        &:hover:not(:disabled) { background-color: var(--color-bg); color: var(--text); }
     }
 
     &.btn_app_danger {

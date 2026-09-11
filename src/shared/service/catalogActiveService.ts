@@ -2,6 +2,7 @@ import { apiService } from '../utils/apiService';
 import type {
     Country, SportType, SportCategory, SurfaceType, PaymentType, Plan,
 } from '../../modules/system/interfaces/catalog.interface';
+import type { RoleAdmin } from '../../modules/system/interfaces/role.interface';
 
 /**
  * Endpoints públicos "/active" de los catálogos de `system` — se agrupan acá porque los consume
@@ -38,6 +39,11 @@ class CatalogActiveService {
 
     static async listPlans(): Promise<Plan[]> {
         const res = await apiService.get('/system/plans/active');
+        return res.data.data;
+    }
+
+    static async listRoles(): Promise<RoleAdmin[]> {
+        const res = await apiService.get('/system/roles');
         return res.data.data;
     }
 }

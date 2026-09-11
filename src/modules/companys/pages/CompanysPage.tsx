@@ -62,7 +62,7 @@ const CompanysPage = () => {
         {
             key: 'owner', header: 'Dueño', render: (row) => row.owner ? (
                 <div className="company_stacked_cell">
-                    <span className="company_stacked_primary">{row.owner.name}</span>
+                    <span className="company_stacked_primary">{`${row.owner.firstName} ${row.owner.lastName}`}</span>
                     <span className="company_stacked_secondary">{row.owner.email ?? '—'}</span>
                 </div>
             ) : <span className="company_empty_value">Sin dueño asignado</span>

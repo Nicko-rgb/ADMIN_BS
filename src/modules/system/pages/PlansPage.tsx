@@ -15,7 +15,6 @@ const formatPlanLimit = (value: number) => (value >= UNLIMITED_LIMIT ? '∞' : v
 
 const NOTIFICATIONS_TIER_LABELS: Record<string, string> = {
     basic: 'Notif. básicas',
-    automated: 'Notif. automatizadas',
     full: 'Notif. full',
 };
 

@@ -209,7 +209,7 @@ export interface UbigeoNode {
 
 // Niveles conocidos hoy por el backend (Joi .valid()) — la columna es STRING libre, no ENUM de DB,
 // así que un nivel nuevo es agregar acá + al Joi, nunca una migración.
-export type PlanNotificationsTier = 'basic' | 'automated' | 'full';
+export type PlanNotificationsTier = 'basic' | 'full';
 
 export interface Plan {
     id: number;

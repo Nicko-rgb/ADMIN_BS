@@ -44,3 +44,6 @@ export interface UpdateUserPayload {
     document_number?: string | null;
     date_birth?: string | null;
 }
+
+// Autoedición del propio perfil — igual a UpdateUserPayload sin `role` ni `is_enabled` (administrativos, nunca los toca el propio usuario).
+export type UpdateOwnProfilePayload = Omit<UpdateUserPayload, 'role' | 'is_enabled'>;

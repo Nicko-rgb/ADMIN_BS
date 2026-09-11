@@ -5,33 +5,20 @@ import UserPermissionService from '../service/userPermissionService';
 import PermissionService from '../../system/service/permissionService';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import { handleApiError } from '../../../shared/utils/errorHandler';
-import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
+import useUserEdit from './useUserEdit';
 import type { PaginationMeta } from '../../../shared/interfaces/pagination.interface';
 import type { PermissionAdmin } from '../../system/interfaces/permission.interface';
-import type { UserAdmin, UserDetail, UpdateUserPayload } from '../interfaces/user.interface';
+import type { UserAdmin } from '../interfaces/user.interface';
 
 const PAGE_LIMIT = 20; // igual al default de paginationQuerySchema en el backend
 const SEARCH_DEBOUNCE_MS = 500;
 
 const EMPTY_PAGINATION: PaginationMeta = { page: 1, limit: PAGE_LIMIT, total: 0, totalPages: 1 };
 
-// Estado del formulario de edición — claves iguales al payload de escritura (snake_case).
-const toEditForm = (detail: UserDetail): Required<UpdateUserPayload> => ({
-    first_name: detail.firstName ?? '',
-    last_name: detail.lastName ?? '',
-    email: detail.email ?? '',
-    role: detail.role,
-    is_enabled: detail.isEnabled,
-    phone: detail.phone,
-    country_id: detail.countryId ?? 0,
-    document_type: detail.documentType,
-    document_number: detail.documentNumber,
-    date_birth: detail.dateBirth,
-});
-
 // Listado de usuarios, paginado en el backend, con búsqueda (nombre o correo), filtros por rol y
-// país, edición (todo menos password) vía UserEdit, y gestión de permisos directos vía ManageUserPermissions.
+// país, edición (todo menos password) vía UserEdit (useUserEdit, compartido con useCompany para
+// la edición del dueño), y gestión de permisos directos vía ManageUserPermissions.
 const useUsers = () => {
     const [items, setItems] = useState<UserAdmin[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -46,10 +33,7 @@ const useUsers = () => {
     const { countries, loadCountries } = useCatalogActive();
     const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
 
-    const [editingId, setEditingId] = useState<number | null>(null);
-    const [form, setForm] = useState<Required<UpdateUserPayload> | null>(null);
-    const [isLoadingDetail, setIsLoadingDetail] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
+    const userEdit = useUserEdit();
 
     const [permissionCatalog, setPermissionCatalog] = useState<PermissionAdmin[]>([]);
     const [managingUser, setManagingUser] = useState<UserAdmin | null>(null);
@@ -111,47 +95,7 @@ const useUsers = () => {
 
     const reload = () => setReloadToken((token) => token + 1);
 
-    // Abre el modal y trae el detalle completo por id — el listado no trae todos los campos editables.
-    const openEdit = async (id: number) => {
-        setEditingId(id);
-        setIsLoadingDetail(true);
-        try {
-            const detail = await UserService.getById(id);
-            setForm(toEditForm(detail));
-        } catch (err) {
-            toast.error(handleApiError(err));
-            setEditingId(null);
-        } finally {
-            setIsLoadingDetail(false);
-        }
-    };
-
-    const closeEdit = () => {
-        setEditingId(null);
-        setForm(null);
-    };
-
-    const setField = (name: keyof UpdateUserPayload) => (value: string | number | boolean | null) => {
-        setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (editingId === null || !form) return;
-
-        setIsSaving(true);
-        toast.loading('Guardando cambios...');
-        try {
-            const result = await UserService.update(editingId, trimValues(form));
-            toast.success(result.message);
-            closeEdit();
-            reload();
-        } catch (err) {
-            toast.error(handleApiError(err));
-        } finally {
-            setIsSaving(false);
-        }
-    };
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => userEdit.submit(e, reload);
 
     // Abre el modal de permisos y trae los directos que ya tiene asignados este usuario.
     const openManagePermissions = async (row: UserAdmin) => {
@@ -200,7 +144,8 @@ const useUsers = () => {
         search, setSearch,
         roleFilter, setRoleFilter,
         countryFilter, setCountryFilter, countryOptions,
-        isEditOpen: editingId !== null, form, isLoadingDetail, openEdit, closeEdit, setField, handleSubmit, isSaving,
+        isEditOpen: userEdit.isEditOpen, form: userEdit.form, isLoadingDetail: userEdit.isLoadingDetail,
+        openEdit: userEdit.openEdit, closeEdit: userEdit.closeEdit, setField: userEdit.setField, handleSubmit, isSaving: userEdit.isSaving,
         permissionCatalog,
         isManagePermissionsOpen: managingUser !== null, managingUser, assignedKeys, isLoadingPermissions, isSavingPermissions,
         openManagePermissions, closeManagePermissions, togglePermission, saveManagePermissions,

@@ -8,7 +8,6 @@ import '../styles/PlanEdit.css';
 
 const NOTIFICATIONS_TIER_OPTIONS = [
     { value: 'basic', label: 'Básico' },
-    { value: 'automated', label: 'Automatizado' },
     { value: 'full', label: 'Full' },
 ];
 

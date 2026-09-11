@@ -1,34 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
-import { useUbigeoCascade } from '../../../shared/hooks/useUbigeoCascade';
 import toast from '../../../shared/utils/toast';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import CompanyService from '../service/companyService';
+import useCompanyFormFields from './useCompanyFormFields';
+import useOwnerFormFields from './useOwnerFormFields';
 import type { DocumentType } from '../../users/interfaces/user.interface';
-import type { CompanyStepForm, OwnerStepForm, PlanStepForm } from '../interfaces/companyRegistration.interface';
-
-const EMPTY_COMPANY_FORM: CompanyStepForm = {
-    name: '',
-    document: '',
-    country_id: 0,
-    ubigeo_id: 0,
-    address: '',
-    phone_cell: '',
-    phone: '',
-};
-
-const EMPTY_OWNER_FORM: OwnerStepForm = {
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    phone: '',
-    country_id: 0,
-    document_type: '',
-    document_number: '',
-    date_birth: '',
-};
+import type { PlanStepForm } from '../interfaces/companyRegistration.interface';
 
 const EMPTY_PLAN_FORM: PlanStepForm = {
     plan_id: 0,
@@ -36,94 +15,35 @@ const EMPTY_PLAN_FORM: PlanStepForm = {
 };
 
 /**
- * Wizard de alta de empresa — 3 pasos (empresa, dueño, plan) en un solo hook. La ubicación de
- * la empresa se arma con una cascada departamento (nivel 1) → provincia (nivel 2) → distrito
- * (nivel 3) vía useUbigeoCascade, porque `ubigeo_id` debe ser puntualmente un distrito, no
- * cualquier nodo del árbol.
+ * Wizard de alta de empresa — 3 pasos (empresa, dueño, plan) en un solo hook. Los pasos
+ * "empresa" y "dueño" reusan useCompanyFormFields/useOwnerFormFields (mismo estado que la
+ * edición individual de cada uno usa en useCompany), acá solo se agrega el paso "plan" y el
+ * envío final (transacción completa en el backend).
  */
 export const useRegisterCompany = () => {
     const navigate = useNavigate();
     const { countries, loadCountries, plans, loadPlans } = useCatalogActive();
-    const {
-        level1Items: departments, level2Items: provinces, level3Items: districts,
-        isLoadingLevel1, isLoadingLevel2, isLoadingLevel3,
-        loadLevel, clearLevel,
-    } = useUbigeoCascade();
 
     useEffect(() => { loadCountries(); loadPlans(); }, [loadCountries, loadPlans]);
     const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
-    const isLoadingUbigeo = isLoadingLevel1 || isLoadingLevel2 || isLoadingLevel3;
 
     const [step, setStep] = useState<1 | 2 | 3>(1);
 
-    const [companyForm, setCompanyForm] = useState<CompanyStepForm>(EMPTY_COMPANY_FORM);
-    const [ownerForm, setOwnerForm] = useState<OwnerStepForm>(EMPTY_OWNER_FORM);
+    const {
+        companyForm, setCompanyField, isCompanyStepValid,
+        departments, provinces, districts, departmentId, provinceId,
+        selectCompanyCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
+    } = useCompanyFormFields();
+
+    const { ownerForm, setOwnerField, isOwnerStepValid } = useOwnerFormFields(true);
+
     const [planForm, setPlanForm] = useState<PlanStepForm>(EMPTY_PLAN_FORM);
-
-    // Selección de cada nivel de la cascada — el nivel de abajo se resetea cuando cambia el de arriba.
-    const [departmentId, setDepartmentId] = useState(0);
-    const [provinceId, setProvinceId] = useState(0);
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const setCompanyField = (name: keyof CompanyStepForm) => (value: string | number | boolean) => {
-        setCompanyForm((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const setOwnerField = (name: keyof OwnerStepForm) => (value: string | number) => {
-        setOwnerForm((prev) => ({ ...prev, [name]: value }));
-    };
-
     const setPlanField = (name: keyof PlanStepForm) => (value: string | number) => {
         setPlanForm((prev) => ({ ...prev, [name]: value }));
     };
-
-    // País de la empresa → primer nivel de la cascada de ubicación (departamento).
-    const selectCompanyCountry = (countryId: number) => {
-        setCompanyForm((prev) => ({ ...prev, country_id: countryId, ubigeo_id: 0 }));
-        setDepartmentId(0);
-        setProvinceId(0);
-        clearLevel(2);
-        clearLevel(3);
-
-        if (countryId) loadLevel(1, { countryId });
-        else clearLevel(1);
-    };
-
-    const selectDepartment = (id: number) => {
-        setDepartmentId(id);
-        setProvinceId(0);
-        setCompanyForm((prev) => ({ ...prev, ubigeo_id: 0 }));
-        clearLevel(3);
-
-        if (id) loadLevel(2, { parentId: id });
-        else clearLevel(2);
-    };
-
-    const selectProvince = (id: number) => {
-        setProvinceId(id);
-        setCompanyForm((prev) => ({ ...prev, ubigeo_id: 0 }));
-
-        if (id) loadLevel(3, { parentId: id });
-        else clearLevel(3);
-    };
-
-    const selectDistrict = (id: number) => {
-        setCompanyForm((prev) => ({ ...prev, ubigeo_id: id }));
-    };
-
-    // Validación mínima por paso — habilita "Siguiente" recién con lo indispensable cargado.
-    const isCompanyStepValid = Boolean(
-        companyForm.name.trim() && companyForm.document.trim() && companyForm.phone_cell.trim()
-        && companyForm.address.trim() && companyForm.country_id && companyForm.ubigeo_id
-    );
-
-    const isOwnerStepValid = Boolean(
-        ownerForm.first_name.trim() && ownerForm.last_name.trim() && ownerForm.email.trim() && ownerForm.password.trim()
-        && ownerForm.phone.trim() && ownerForm.country_id && ownerForm.document_type && ownerForm.document_number.trim()
-    );
-
     const isPlanStepValid = Boolean(planForm.plan_id);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Dirección de la última navegación — la página la usa para animar el paso entrante desde
     // la derecha (avanzar) o desde la izquierda (retroceder), efecto de hoja de libro.

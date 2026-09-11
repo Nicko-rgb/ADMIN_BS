@@ -1,12 +1,18 @@
-import { Settings, Pencil, Store, Building2, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Settings, Pencil, Store, Building2, User, Plus, Users } from 'lucide-react';
 import { Header } from '../../../shared/components/Header';
 import { Button } from '../../../shared/components/Button';
 import { TableImage } from '../../../shared/components/Table';
 import { LoadingScreen, NotFoundScreen, ForbiddenScreen } from '../../../shared/components';
+import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { DOCUMENT_TYPE_LABELS } from '../../users/utils/userConstants';
+import UserEdit from '../../users/components/UserEdit';
+import CompanyEdit from '../components/CompanyEdit';
+import UserAsingSucursal from '../components/UserAsingSucursal';
 import useCompany from '../hooks/useCompany';
+import useUserAsingSucursal from '../hooks/useUserAsingSucursal';
 import '../styles/Company.css';
 
 const ENABLED_LABELS = { A: 'Activo', I: 'Inactivo', P: 'Pendiente' } as const;
@@ -18,7 +24,28 @@ const ENABLED_CLASSNAMES = { A: 'active', I: 'inactive', P: 'pending' } as const
 // Company.css::.company_info_columns) y las sucursales al final en grid (solo nombre, la
 // vista de detalle de sucursal todavía no existe). El fetch vive en useCompany.
 const Company = () => {
-    const { company, isLoading, errorStatus, errorMessage, retry } = useCompany();
+    const navigate = useNavigate();
+    const {
+        tenantId, company, isLoading, errorStatus, errorMessage, retry, countryOptions,
+        isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit,
+        companyEditForm, setCompanyEditField,
+        companyEditDepartments, companyEditProvinces, companyEditDistricts, companyEditDepartmentId, companyEditProvinceId,
+        selectCompanyEditCountry, selectCompanyEditDepartment, selectCompanyEditProvince, selectCompanyEditDistrict, isLoadingCompanyEditUbigeo,
+        isEditOwnerOpen, openEditOwner, closeEditOwner, isLoadingOwnerDetail, isSavingOwner, handleSubmitOwnerEdit,
+        ownerEditForm, setOwnerEditField,
+    } = useCompany();
+
+    const {
+        isOpen: isUserModalOpen, open: openUserModal, close: closeUserModal,
+        roleOptions, roleKey, setRoleKey, sucursalTenantId, setSucursalTenantId,
+        ownerForm: newUserForm, setOwnerField: setNewUserField, countryOptions: newUserCountryOptions,
+    } = useUserAsingSucursal();
+
+    // Editar al dueño desde acá es editar un usuario cualquiera (PUT /api/users/:id) — solo
+    // `system` lo puede hacer. Un super_admin edita su propio perfil desde /home/profile.
+    const canEditOwner = usePermission('user.manage_all');
+    const canManageSucursales = usePermission('sucursal.manage');
+    const canManageCompanyUsers = usePermission('user.administrator_manage') || usePermission('user.employee_manage');
 
     if (isLoading) {
         return <LoadingScreen message="Cargando empresa..." size="lg" />;
@@ -58,17 +85,17 @@ const Company = () => {
                     </div>
                 </div>
                 <div className="company_hero_actions">
-                    <Button text="Configurar" size="sm" icon={Settings} color="secondary" onClick={() => {}} />
-                    <Button text="Editar datos" size="sm" icon={Pencil} onClick={() => {}} />
+                    <Button text="Configurar" size="sm" icon={Settings} color="secondary" onClick={() => { }} />
                 </div>
             </div>
 
-            <div className="company_info_card">
+            <div className="card company_info_card">
                 <div className="company_info_columns">
                     <div className="company_info_column">
                         <div className="company_detail_card_title">
-                            <Building2 size={18} />
+                            <Building2 size={22} />
                             <h3>Información de la empresa</h3>
+                            <Button text="Editar" size="sm" icon={Pencil} onClick={openEditCompany} />
                         </div>
                         <div className="company_detail_row">
                             <span className="company_detail_label">Nombre completo</span>
@@ -109,14 +136,15 @@ const Company = () => {
 
                     <div className="company_info_column">
                         <div className="company_detail_card_title">
-                            <User size={18} />
+                            <User size={22} />
                             <h3>Información del dueño</h3>
+                            {company.owner && canEditOwner && <Button text="Editar" size="sm" icon={Pencil} onClick={openEditOwner} />}
                         </div>
                         {company.owner ? (
                             <>
                                 <div className="company_detail_row">
                                     <span className="company_detail_label">Nombre</span>
-                                    <span>{company.owner.name}</span>
+                                    <span>{`${company.owner.firstName} ${company.owner.lastName}`}</span>
                                 </div>
                                 <div className="company_detail_row">
                                     <span className="company_detail_label">Correo</span>
@@ -155,13 +183,32 @@ const Company = () => {
                 <div className="company_detail_card_title">
                     <Store size={18} />
                     <h3>Sucursales</h3>
+                    {canManageSucursales && (
+                        <Button text="Nueva Sucursal" size="sm" icon={Plus} onClick={() => navigate(`/companys/company/${tenantId}/sucursal/register`)} />
+                    )}
                 </div>
                 {company.subsidiaries.length > 0 ? (
                     <div className="company_subsidiaries_grid">
-                        {company.subsidiaries.map((subsidiary, index) => (
-                            <div className="company_subsidiary_card" key={index}>
-                                <div className="company_subsidiary_avatar">{subsidiary.name.charAt(0).toUpperCase()}</div>
-                                <span>{subsidiary.name}</span>
+                        {company.subsidiaries.map((subsidiary) => (
+                            <div className="company_subsidiary_card" key={subsidiary.tenantId}>
+                                <div className="company_subsidiary_header">
+                                    <div className="company_subsidiary_avatar">{subsidiary.name.charAt(0).toUpperCase()}</div>
+                                    <span className="company_subsidiary_name">{subsidiary.name}</span>
+                                </div>
+                                <div className="company_subsidiary_info">
+                                    <span>{subsidiary.address}</span>
+                                    {subsidiary.ubigeo && <span>{subsidiary.ubigeo}</span>}
+                                </div>
+                                {canManageSucursales && (
+                                    <Button
+                                        text="Administrar"
+                                        size="sm"
+                                        icon={Settings}
+                                        color="secondary"
+                                        className="company_subsidiary_action"
+                                        onClick={() => navigate(`/companys/company/${tenantId}/sucursal/${subsidiary.tenantId}/edit`)}
+                                    />
+                                )}
                             </div>
                         ))}
                     </div>
@@ -172,6 +219,69 @@ const Company = () => {
                     </div>
                 )}
             </div>
+
+            <div className="company_subsidiaries_section">
+                <div className="company_detail_card_title">
+                    <Users size={18} />
+                    <h3>Usuarios</h3>
+                    {canManageCompanyUsers && (
+                        <Button text="Nuevo Usuario" size="sm" icon={Plus} onClick={openUserModal} />
+                    )}
+                </div>
+                <div className="company_empty_state">
+                    <Users size={26} />
+                    <span>Todavía no hay usuarios</span>
+                </div>
+            </div>
+
+            <CompanyEdit
+                isOpen={isEditCompanyOpen}
+                onClose={closeEditCompany}
+                onSubmit={handleSubmitCompanyEdit}
+                form={companyEditForm}
+                setField={setCompanyEditField}
+                countryOptions={countryOptions}
+                departments={companyEditDepartments}
+                provinces={companyEditProvinces}
+                districts={companyEditDistricts}
+                departmentId={companyEditDepartmentId}
+                provinceId={companyEditProvinceId}
+                selectCompanyCountry={selectCompanyEditCountry}
+                selectDepartment={selectCompanyEditDepartment}
+                selectProvince={selectCompanyEditProvince}
+                selectDistrict={selectCompanyEditDistrict}
+                isLoadingUbigeo={isLoadingCompanyEditUbigeo}
+                isSaving={isSavingCompany}
+            />
+
+            {canEditOwner && (
+                <UserEdit
+                    isOpen={isEditOwnerOpen}
+                    onClose={closeEditOwner}
+                    onSubmit={handleSubmitOwnerEdit}
+                    form={ownerEditForm}
+                    isLoadingDetail={isLoadingOwnerDetail}
+                    setField={setOwnerEditField}
+                    countryOptions={countryOptions}
+                    isSaving={isSavingOwner}
+                />
+            )}
+
+            {canManageCompanyUsers && (
+                <UserAsingSucursal
+                    isOpen={isUserModalOpen}
+                    onClose={closeUserModal}
+                    roleOptions={roleOptions}
+                    roleKey={roleKey}
+                    setRoleKey={setRoleKey}
+                    subsidiaries={company.subsidiaries}
+                    sucursalTenantId={sucursalTenantId}
+                    setSucursalTenantId={setSucursalTenantId}
+                    ownerForm={newUserForm}
+                    setOwnerField={setNewUserField}
+                    countryOptions={newUserCountryOptions}
+                />
+            )}
         </div>
     );
 };

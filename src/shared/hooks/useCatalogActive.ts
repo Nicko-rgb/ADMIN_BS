@@ -5,6 +5,7 @@ import toast from '../utils/toast';
 import type {
     Country, SportType, SportCategory, SurfaceType, PaymentType, Plan,
 } from '../../modules/system/interfaces/catalog.interface';
+import type { RoleAdmin } from '../../modules/system/interfaces/role.interface';
 
 // Cache a nivel de módulo, una por catálogo — se comparte entre todos los componentes que llaman
 // a su load*, así cada catálogo se pide una sola vez por sesión sin importar cuántas pantallas lo
@@ -26,6 +27,9 @@ let paymentTypesInFlight: Promise<PaymentType[]> | null = null;
 
 let plansCache: Plan[] | null = null;
 let plansInFlight: Promise<Plan[]> | null = null;
+
+let rolesCache: RoleAdmin[] | null = null;
+let rolesInFlight: Promise<RoleAdmin[]> | null = null;
 
 /**
  * Catálogos activos de `system` para selects/lógica de negocio en toda la app (ej. país al
@@ -150,6 +154,25 @@ export const useCatalogActive = () => {
         }
     }, []);
 
+    const [roles, setRoles] = useState<RoleAdmin[]>(rolesCache ?? []);
+    const [isLoadingRoles, setIsLoadingRoles] = useState(!rolesCache);
+
+    const loadRoles = useCallback(async () => {
+        if (rolesCache) return;
+        if (!rolesInFlight) rolesInFlight = CatalogActiveService.listRoles();
+
+        try {
+            const result = await rolesInFlight;
+            rolesCache = result;
+            setRoles(result);
+        } catch (err) {
+            toast.error(handleApiError(err));
+        } finally {
+            setIsLoadingRoles(false);
+            rolesInFlight = null;
+        }
+    }, []);
+
     return {
         countries, isLoadingCountries, loadCountries,
         sportTypes, isLoadingSportTypes, loadSportTypes,
@@ -157,6 +180,7 @@ export const useCatalogActive = () => {
         surfaceTypes, isLoadingSurfaceTypes, loadSurfaceTypes,
         paymentTypes, isLoadingPaymentTypes, loadPaymentTypes,
         plans, isLoadingPlans, loadPlans,
+        roles, isLoadingRoles, loadRoles,
     };
 };
 

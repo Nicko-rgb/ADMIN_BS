@@ -88,9 +88,6 @@
         width: 100%;
         margin: 0 auto;
         padding: 1.6rem;
-        background: var(--surface);
-        border-radius: 12px;
-        box-shadow: var(--shadow);
     }
 
     .company_info_columns {
@@ -132,9 +129,10 @@
         color: var(--primary);
 
         h3 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 600;
             color: var(--text);
+            flex: 1;
         }
     }
 
@@ -180,38 +178,67 @@
 
     .company_subsidiaries_grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         gap: 1rem;
     }
 
     .company_subsidiary_card {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: .6rem;
-        padding: 1.4rem 1rem;
+        gap: 1rem;
+        padding: 1.2rem;
         background: var(--color-bg);
         border: 1px solid var(--border);
         border-radius: 10px;
-        text-align: center;
+
+        .company_subsidiary_header {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            min-width: 0;
+        }
 
         .company_subsidiary_avatar {
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--surface);
             color: var(--primary);
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
         }
 
-        span {
-            font-size: 1.3rem;
-            font-weight: 500;
+        .company_subsidiary_name {
+            min-width: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
             color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .company_subsidiary_info {
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+
+            span {
+                font-size: 1.2rem;
+                color: var(--text-muted);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .company_subsidiary_action {
+            width: 100%;
+            justify-content: center;
         }
     }
 

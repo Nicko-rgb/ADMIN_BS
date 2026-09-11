@@ -16,6 +16,8 @@
   --color-bg:   #f5f8f7;  /* Lienzo de la app y cuerpo del modal */
   --surface:    #ffffff;  /* Cards, sidebar, tabla, secciones de formulario */
   --input-bg:   #ffffff;  /* Inputs */
+  --gray-light: #faf6f6;
+  --gray-medium: #e3e9e7;
 
   /* ── Bordes ─────────────────────────────────────────────────────────────── */
   --border:        #e3e9e7;  /* Hairline: cards, filas, divisores */
@@ -62,8 +64,10 @@
   --primary-dark:  #1b7353;
 
   --color-bg:   #0d1110;
-  --surface:    #151a18;
+  --surface:    #1c1b1b;
   --input-bg:   #101514;
+  --gray-light: #1c1b1b;
+  --gray-medium: #151a18;
 
   --border:        #232b28;
   --border-strong: #2e3835;
