@@ -43,7 +43,8 @@ const CompanysPage = () => {
         isSuperAdmin,
     } = useCompanies();
 
-    const canCreate = usePermission('company.create');
+    const can = usePermission();
+    const canCreate = can('company.create');
 
     const goToCompany = (company: CompanyAdmin) => navigate(`/companys/company/${company.tenantId}`);
 

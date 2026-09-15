@@ -20,9 +20,8 @@ const toProfileForm = (detail: UserDetail): Required<UpdateOwnProfilePayload> =>
 });
 
 /**
- * Autoedición del propio perfil (`GET`/`PUT /api/users/me`, `user.profile_edit`) — a diferencia
- * de useUserEdit (system editando a cualquiera por id), acá no hay id: siempre es el usuario
- * autenticado. Refresca el nombre/correo cacheados en la sesión al guardar (ver sessionStore).
+ * Autoedición del propio perfil (`GET`/`PUT /api/users/me`, `user.profile_edit`) — sin id: siempre
+ * es el usuario autenticado. Refresca el nombre/correo cacheados en la sesión al guardar (ver sessionStore).
  */
 export const useProfile = () => {
     const { countries, loadCountries } = useCatalogActive();

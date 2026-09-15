@@ -5,9 +5,9 @@ import toast from '../../../shared/utils/toast';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import CompanyService from '../service/companyService';
 import useCompanyFormFields from './useCompanyFormFields';
-import useOwnerFormFields from './useOwnerFormFields';
-import type { DocumentType } from '../../users/interfaces/user.interface';
+import { createEmptyUserForm, isUserFormValid, toUserPayload } from '../../users/utils/userForm';
 import type { PlanStepForm } from '../interfaces/companyRegistration.interface';
+import type { UserFormValues } from '../../users/interfaces/user.interface';
 
 const EMPTY_PLAN_FORM: PlanStepForm = {
     plan_id: 0,
@@ -15,10 +15,10 @@ const EMPTY_PLAN_FORM: PlanStepForm = {
 };
 
 /**
- * Wizard de alta de empresa — 3 pasos (empresa, dueño, plan) en un solo hook. Los pasos
- * "empresa" y "dueño" reusan useCompanyFormFields/useOwnerFormFields (mismo estado que la
- * edición individual de cada uno usa en useCompany), acá solo se agrega el paso "plan" y el
- * envío final (transacción completa en el backend).
+ * Wizard de alta de empresa — 3 pasos (empresa, dueño, plan) en un solo hook. El paso "empresa"
+ * reusa useCompanyFormFields (mismo estado que la edición de empresa en useCompany); el paso
+ * "dueño" usa los helpers de FormUserManage con rol super_admin en modo alta. El envío final es
+ * una sola transacción en el backend.
  */
 export const useRegisterCompany = () => {
     const navigate = useNavigate();
@@ -35,7 +35,11 @@ export const useRegisterCompany = () => {
         selectCompanyCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
     } = useCompanyFormFields();
 
-    const { ownerForm, setOwnerField, isOwnerStepValid } = useOwnerFormFields(true);
+    const [ownerValues, setOwnerValues] = useState<UserFormValues>(() => createEmptyUserForm('super_admin'));
+    const setOwnerField = <K extends keyof UserFormValues>(field: K, value: UserFormValues[K]) => {
+        setOwnerValues((prev) => ({ ...prev, [field]: value }));
+    };
+    const isOwnerStepValid = isUserFormValid('super_admin', 'register', ownerValues);
 
     const [planForm, setPlanForm] = useState<PlanStepForm>(EMPTY_PLAN_FORM);
     const setPlanField = (name: keyof PlanStepForm) => (value: string | number) => {
@@ -66,7 +70,7 @@ export const useRegisterCompany = () => {
         try {
             const result = await CompanyService.register({
                 company: companyForm,
-                owner: { ...ownerForm, document_type: ownerForm.document_type as DocumentType },
+                owner: toUserPayload('super_admin', 'register', ownerValues),
                 plan: planForm,
             });
             toast.success(result.message);
@@ -81,7 +85,7 @@ export const useRegisterCompany = () => {
     return {
         step, direction, goNext, goBack,
         companyForm, setCompanyField, isCompanyStepValid,
-        ownerForm, setOwnerField, isOwnerStepValid,
+        ownerValues, setOwnerField, isOwnerStepValid,
         planForm, setPlanField, isPlanStepValid,
         countryOptions, plans,
         departments, provinces, districts, departmentId, provinceId,

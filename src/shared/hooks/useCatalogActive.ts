@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import CatalogActiveService from '../service/catalogActiveService';
+import { useSessionStore } from '../store/sessionStore';
 import { handleApiError } from '../utils/errorHandler';
 import toast from '../utils/toast';
 import type {
@@ -30,6 +31,15 @@ let plansInFlight: Promise<Plan[]> | null = null;
 
 let rolesCache: RoleAdmin[] | null = null;
 let rolesInFlight: Promise<RoleAdmin[]> | null = null;
+
+// Los roles dependen del usuario autenticado (el backend los filtra según su rol) — un cambio de
+// sesión descarta esa cache para no mostrarle al siguiente usuario los roles del anterior.
+useSessionStore.subscribe((state, prev) => {
+    if (state.token !== prev.token) {
+        rolesCache = null;
+        rolesInFlight = null;
+    }
+});
 
 /**
  * Catálogos activos de `system` para selects/lógica de negocio en toda la app (ej. país al

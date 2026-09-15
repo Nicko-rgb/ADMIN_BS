@@ -1,14 +1,21 @@
+import { useCallback } from 'react';
 import { useSessionStore } from '../store/sessionStore';
 
 /**
- * Chequea si el usuario autenticado tiene el permiso indicado — mismo
- * criterio que el backend (verificarPermiso): system.full_access bypasea
- * cualquier chequeo. Uso: condicionar qué se renderiza, nunca seguridad real
- * (esa la sigue garantizando el backend).
- *   const canConfirm = usePermission('booking.confirm');
- *   return canConfirm && <Button text="Confirmar" onClick={handleConfirm} />;
+ * Devuelve `can(...permissions)`: true si el usuario autenticado tiene al menos uno de los
+ * permisos indicados — mismo criterio que verificarPermiso en el backend (system.full_access
+ * bypasea cualquier chequeo). Solo condiciona qué se renderiza; la seguridad real la garantiza el
+ * backend.
+ *   const can = usePermission();
+ *   const canConfirm = can('booking.confirm');
+ *   const canManageUsers = can('user.administrator_manage', 'user.employee_manage');
+ *   rows.map((row) => can(ROLE_MANAGE_PERMISSIONS[row.role]) && ...);
  */
-export const usePermission = (permission: string): boolean => {
+export const usePermission = () => {
     const permissions = useSessionStore((state) => state.permissions);
-    return permissions.includes('system.full_access') || permissions.includes(permission);
+
+    return useCallback(
+        (...required: string[]) => permissions.includes('system.full_access') || required.some((permission) => permissions.includes(permission)),
+        [permissions],
+    );
 };

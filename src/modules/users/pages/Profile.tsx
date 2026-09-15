@@ -7,10 +7,11 @@ import UserProfileFields from '../components/UserProfileFields';
 import useProfile from '../hooks/useProfile';
 import '../styles/Profile.css';
 
-// Autoedición del propio perfil — reusa UserProfileFields (mismos campos que UserEdit.tsx, sin
-// rol ni habilitado, esos son administrativos). El estado y el fetch viven en useProfile.
+// Autoedición del propio perfil — reusa UserProfileFields (sin rol ni habilitado, esos son
+// administrativos). El estado y el fetch viven en useProfile.
 const Profile = () => {
-    const canEdit = usePermission('user.profile_edit');
+    const can = usePermission();
+    const canEdit = can('user.profile_edit');
     const { form, isLoading, isSaving, setField, handleSubmit, countryOptions } = useProfile();
 
     if (!canEdit) {

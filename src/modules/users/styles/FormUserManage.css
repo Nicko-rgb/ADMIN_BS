@@ -1,0 +1,11 @@
+.form_user_manage_sucursales {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: .8rem;
+}
+
+.form_user_manage_empty {
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--text-muted);
+}

@@ -1,14 +1,15 @@
 import { useNavigate } from 'react-router-dom';
-import { Settings, Pencil, Store, Building2, User, Plus, Users } from 'lucide-react';
+import { Settings, Pencil, Store, Building2, User, Plus, Users, UploadCloud, UserCog, X } from 'lucide-react';
 import { Header } from '../../../shared/components/Header';
 import { Button } from '../../../shared/components/Button';
+import { Modal } from '../../../shared/components/Modal';
 import { TableImage } from '../../../shared/components/Table';
-import { LoadingScreen, NotFoundScreen, ForbiddenScreen } from '../../../shared/components';
+import { LoadingScreen, NotFoundScreen, ForbiddenScreen, FormActions } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
-import { DOCUMENT_TYPE_LABELS } from '../../users/utils/userConstants';
-import UserEdit from '../../users/components/UserEdit';
+import { DOCUMENT_TYPE_LABELS, ROLE_MANAGE_PERMISSIONS } from '../../users/utils/userConstants';
+import FormUserManage from '../../users/components/FormUserManage';
 import CompanyEdit from '../components/CompanyEdit';
 import UserAsingSucursal from '../components/UserAsingSucursal';
 import useCompany from '../hooks/useCompany';
@@ -31,21 +32,20 @@ const Company = () => {
         companyEditForm, setCompanyEditField,
         companyEditDepartments, companyEditProvinces, companyEditDistricts, companyEditDepartmentId, companyEditProvinceId,
         selectCompanyEditCountry, selectCompanyEditDepartment, selectCompanyEditProvince, selectCompanyEditDistrict, isLoadingCompanyEditUbigeo,
-        isEditOwnerOpen, openEditOwner, closeEditOwner, isLoadingOwnerDetail, isSavingOwner, handleSubmitOwnerEdit,
-        ownerEditForm, setOwnerEditField,
+        isEditOwnerOpen, openEditOwner, closeEditOwner, isLoadingOwnerDetail, isSavingOwner, isOwnerEditValid, handleSubmitOwnerEdit,
+        ownerEditValues, setOwnerEditField,
     } = useCompany();
 
     const {
         isOpen: isUserModalOpen, open: openUserModal, close: closeUserModal,
-        roleOptions, roleKey, setRoleKey, sucursalTenantId, setSucursalTenantId,
-        ownerForm: newUserForm, setOwnerField: setNewUserField, countryOptions: newUserCountryOptions,
+        values: newUserValues, setField: setNewUserField,
     } = useUserAsingSucursal();
 
-    // Editar al dueño desde acá es editar un usuario cualquiera (PUT /api/users/:id) — solo
-    // `system` lo puede hacer. Un super_admin edita su propio perfil desde /home/profile.
-    const canEditOwner = usePermission('user.manage_all');
-    const canManageSucursales = usePermission('sucursal.manage');
-    const canManageCompanyUsers = usePermission('user.administrator_manage') || usePermission('user.employee_manage');
+    // Un super_admin edita su propio perfil desde /home/profile, no desde acá.
+    const can = usePermission();
+    const canEditOwner = can(ROLE_MANAGE_PERMISSIONS.super_admin);
+    const canManageSucursales = can('sucursal.manage');
+    const canManageCompanyUsers = can(ROLE_MANAGE_PERMISSIONS.administrador, ROLE_MANAGE_PERMISSIONS.empleado);
 
     if (isLoading) {
         return <LoadingScreen message="Cargando empresa..." size="lg" />;
@@ -255,31 +255,28 @@ const Company = () => {
             />
 
             {canEditOwner && (
-                <UserEdit
-                    isOpen={isEditOwnerOpen}
-                    onClose={closeEditOwner}
-                    onSubmit={handleSubmitOwnerEdit}
-                    form={ownerEditForm}
-                    isLoadingDetail={isLoadingOwnerDetail}
-                    setField={setOwnerEditField}
-                    countryOptions={countryOptions}
-                    isSaving={isSavingOwner}
-                />
+                <Modal isOpen={isEditOwnerOpen} onClose={closeEditOwner} title="Editar dueño" icon={UserCog} size="lg">
+                    {isLoadingOwnerDetail || !ownerEditValues ? (
+                        <LoadingScreen message="Cargando datos del dueño..." size="sm" />
+                    ) : (
+                        <form onSubmit={handleSubmitOwnerEdit}>
+                            <FormUserManage role="super_admin" mode="edit" values={ownerEditValues} onChange={setOwnerEditField} />
+                            <FormActions>
+                                <Button text="Cancelar" icon={X} size="lg" color="secondary" type="button" onClick={closeEditOwner} />
+                                <Button text="Guardar" icon={UploadCloud} size="lg" type="submit" loading={isSavingOwner} disabled={!isOwnerEditValid} />
+                            </FormActions>
+                        </form>
+                    )}
+                </Modal>
             )}
 
             {canManageCompanyUsers && (
                 <UserAsingSucursal
                     isOpen={isUserModalOpen}
                     onClose={closeUserModal}
-                    roleOptions={roleOptions}
-                    roleKey={roleKey}
-                    setRoleKey={setRoleKey}
                     subsidiaries={company.subsidiaries}
-                    sucursalTenantId={sucursalTenantId}
-                    setSucursalTenantId={setSucursalTenantId}
-                    ownerForm={newUserForm}
-                    setOwnerField={setNewUserField}
-                    countryOptions={newUserCountryOptions}
+                    values={newUserValues}
+                    setField={setNewUserField}
                 />
             )}
         </div>

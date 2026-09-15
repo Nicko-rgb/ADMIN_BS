@@ -1,14 +1,17 @@
-import type { UserRole, DocumentType } from '../interfaces/user.interface';
+import type { DocumentType, ManagedRole } from '../interfaces/user.interface';
 
-export const ROLE_LABELS: Record<UserRole, string> = {
-    cliente: 'Cliente',
-    empleado: 'Empleado',
-    administrador: 'Administrador',
-    super_admin: 'Super admin',
-    system: 'Sistema',
+// Permiso que exige gestionar un usuario de cada rol — mismo mapa que roleHierarchy.ts del backend.
+// Solo decide qué acciones se muestran; la validación real (jerarquía y alcance) la hace el backend.
+export const ROLE_MANAGE_PERMISSIONS: Record<ManagedRole, string> = {
+    system: 'system.full_access',
+    super_admin: 'user.manage_all',
+    administrador: 'user.administrator_manage',
+    empleado: 'user.employee_manage',
+    cliente: 'user.client_manage',
 };
 
-export const ROLE_OPTIONS = Object.entries(ROLE_LABELS).map(([value, label]) => ({ value, label }));
+export const isManagedRole = (role: string): role is ManagedRole =>
+    Object.prototype.hasOwnProperty.call(ROLE_MANAGE_PERMISSIONS, role);
 
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
     IDENTITY_CARD: 'DNI',

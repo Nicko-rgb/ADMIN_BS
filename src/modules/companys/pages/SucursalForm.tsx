@@ -9,7 +9,8 @@ import '../styles/SucursalForm.css';
 // Alta y edición de sucursal — una sola página para los dos modos (ver useSucursalForm). El
 // título/subtítulo cambian según el modo, el resto del formulario es idéntico.
 const SucursalForm = () => {
-    const canManage = usePermission('sucursal.manage');
+    const can = usePermission();
+    const canManage = can('sucursal.manage');
     const {
         isEditMode, isLoading, isSubmitting, parentError,
         companyTenantId, companyName,

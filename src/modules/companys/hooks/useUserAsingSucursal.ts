@@ -1,41 +1,25 @@
-import { useEffect, useState } from 'react';
-import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
-import useOwnerFormFields from './useOwnerFormFields';
+import { useState } from 'react';
+import { createEmptyUserForm } from '../../users/utils/userForm';
+import type { UserFormValues } from '../../users/interfaces/user.interface';
 
-const ASSIGNABLE_ROLE_KEYS = ['administrador', 'empleado'];
-
-// Modal de alta de un administrador/empleado asignado a una sucursal puntual de la empresa —
-// datos personales vía useOwnerFormFields (mismos campos que el dueño en el wizard de alta).
+// Modal de alta de un administrador/empleado de las sucursales de la empresa — estado de
+// FormUserManage en modo alta; el rol elegido (values.role) define el endpoint (/users/manage/:role).
 export const useUserAsingSucursal = () => {
-    const { roles, loadRoles, countries, loadCountries } = useCatalogActive();
-    const { ownerForm, setOwnerField, isOwnerStepValid, reset: resetOwnerForm } = useOwnerFormFields(true);
     const [isOpen, setIsOpen] = useState(false);
-    const [roleKey, setRoleKey] = useState('');
-    const [sucursalTenantId, setSucursalTenantId] = useState('');
+    const [values, setValues] = useState<UserFormValues>(() => createEmptyUserForm('administrador'));
 
-    useEffect(() => { loadRoles(); loadCountries(); }, [loadRoles, loadCountries]);
-
-    const roleOptions = roles
-        .filter((role) => ASSIGNABLE_ROLE_KEYS.includes(role.key))
-        .map((role) => ({ value: role.key, label: role.label }));
-
-    const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
+    const setField = <K extends keyof UserFormValues>(field: K, value: UserFormValues[K]) => {
+        setValues((prev) => ({ ...prev, [field]: value }));
+    };
 
     const open = () => setIsOpen(true);
 
     const close = () => {
         setIsOpen(false);
-        setRoleKey('');
-        setSucursalTenantId('');
-        resetOwnerForm();
+        setValues(createEmptyUserForm('administrador'));
     };
 
-    return {
-        isOpen, open, close,
-        roleOptions, roleKey, setRoleKey,
-        sucursalTenantId, setSucursalTenantId,
-        ownerForm, setOwnerField, isOwnerStepValid, countryOptions,
-    };
+    return { isOpen, open, close, values, setField };
 };
 
 export default useUserAsingSucursal;

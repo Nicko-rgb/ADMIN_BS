@@ -5,22 +5,21 @@ import { Button } from '../../../shared/components/Button';
 import { ForbiddenScreen } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import CompanyStepForm from '../components/CompanyStepForm';
-import OwnerStepForm from '../components/OwnerStepForm';
 import PlanStepForm from '../components/PlanStepForm';
+import FormUserManage from '../../users/components/FormUserManage';
 import useRegisterCompany from '../hooks/useRegisterCompany';
 import '../styles/RegisterCompany.css';
 
 const STEP_LABELS = ['Empresa', 'Dueño', 'Plan'] as const;
 
 // Alta de empresa — wizard de 3 pasos (empresa, dueño, plan). Todo el estado y la validación
-// viven en useRegisterCompany; esta página solo arma el paso actual con los componentes de
-// CompanyStepForm/OwnerStepForm/PlanStepForm (los mismos que reusa la edición individual desde
-// Company.tsx) según el step actual.
+// viven en useRegisterCompany; esta página solo arma el paso actual con CompanyStepForm,
+// FormUserManage (dueño, rol super_admin) y PlanStepForm según el step actual.
 const RegisterCompany = () => {
     const {
         step, direction, goNext, goBack,
         companyForm, setCompanyField, isCompanyStepValid,
-        ownerForm, setOwnerField, isOwnerStepValid,
+        ownerValues, setOwnerField, isOwnerStepValid,
         planForm, setPlanField, isPlanStepValid,
         countryOptions, plans,
         departments, provinces, districts, departmentId, provinceId,
@@ -28,8 +27,8 @@ const RegisterCompany = () => {
         isSubmitting, handleRegister,
     } = useRegisterCompany();
 
-    const canCreate = usePermission('company.create');
-    if (!canCreate) {
+    const can = usePermission();
+    if (!can('company.create')) {
         return <ForbiddenScreen />;
     }
 
@@ -80,7 +79,7 @@ const RegisterCompany = () => {
                     )}
 
                     {step === 2 && (
-                        <OwnerStepForm form={ownerForm} setField={setOwnerField} countryOptions={countryOptions} />
+                        <FormUserManage role="super_admin" mode="register" values={ownerValues} onChange={setOwnerField} />
                     )}
 
                     {step === 3 && (

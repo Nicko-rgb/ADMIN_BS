@@ -10,6 +10,7 @@ import AuthRoutes from './modules/auth/index.routes';
 import { companyRoutes } from './modules/companys/index.routes';
 import { systemRoutes } from './modules/system/index.routes';
 import { usersRoutes } from './modules/users/index.routes';
+import { bookingsRoutes } from './modules/bookings/index.routes';
 import AppLayout from './shared/components/AppLayout';
 import ProtectedRoute from './shared/components/ProtectedRoute';
 import NotFoundPage from './shared/pages/NotFoundPage';
@@ -28,7 +29,7 @@ function App() {
                     <Route path="" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{usersRoutes}</Route>
                     <Route path="companys" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{companyRoutes}</Route>
                     <Route path="system" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{systemRoutes}</Route>
-
+                    <Route path="bookings" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{bookingsRoutes}</Route>
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </Suspense>

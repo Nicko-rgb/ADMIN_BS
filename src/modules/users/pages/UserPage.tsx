@@ -1,29 +1,45 @@
-import { Pencil, Search, ShieldCheck, Users as UsersIcon } from 'lucide-react';
+import { Pencil, Search, ShieldCheck, UploadCloud, UserCog, Users as UsersIcon, X } from 'lucide-react';
 import { Table, TableActions, TableImage } from '../../../shared/components/Table';
-import type { TableColumn } from '../../../shared/components/Table';
+import type { TableAction, TableColumn } from '../../../shared/components/Table';
 import { Header } from '../../../shared/components/Header';
-import { InputField, SelectField } from '../../../shared/components';
+import { Modal } from '../../../shared/components/Modal';
+import { Button } from '../../../shared/components/Button';
+import { InputField, SelectField, FormActions, ForbiddenScreen, LoadingScreen } from '../../../shared/components';
+import { usePermission } from '../../../shared/hooks/usePermission';
 import useUsers from '../hooks/useUsers';
 import { formatPhone } from '../../../shared/utils/formatText';
-import { ROLE_LABELS, ROLE_OPTIONS, DOCUMENT_TYPE_LABELS } from '../utils/userConstants';
-import { UserEdit } from '../components/UserEdit';
+import { DOCUMENT_TYPE_LABELS, ROLE_MANAGE_PERMISSIONS, isManagedRole } from '../utils/userConstants';
+import { FormUserManage } from '../components/FormUserManage';
 import { ManageUserPermissions } from '../components/ManageUserPermissions';
 import type { UserAdmin, DocumentType } from '../interfaces/user.interface';
 import '../styles/UserPage.css';
 
 // Listado, búsqueda, filtros (rol, país), edición y gestión de permisos de los usuarios del sistema.
-const UserPage = () => {
+const UserCatalog = () => {
+    const can = usePermission();
     const {
         items, isLoading,
         pagination, setPage,
         search, setSearch,
-        roleFilter, setRoleFilter,
+        roleFilter, setRoleFilter, roleOptions, roleLabel,
         countryFilter, setCountryFilter, countryOptions,
-        isEditOpen, form, isLoadingDetail, openEdit, closeEdit, setField, handleSubmit, isSaving,
-        permissionCatalog,
+        editing, editValues, isLoadingDetail, isSaving, isEditValid, openEdit, closeEdit, setEditField, handleSubmitEdit,
+        canManagePermissions, permissionCatalog,
         isManagePermissionsOpen, managingUser, assignedKeys, isLoadingPermissions, isSavingPermissions,
         openManagePermissions, closeManagePermissions, togglePermission, saveManagePermissions,
     } = useUsers();
+
+    // Editar exige el permiso de gestión del rol de esa fila.
+    const rowActions = (row: UserAdmin): TableAction[] => {
+        const actions: TableAction[] = [];
+        if (isManagedRole(row.role) && can(ROLE_MANAGE_PERMISSIONS[row.role])) {
+            actions.push({ label: 'Editar', icon: Pencil, variant: 'edit', onClick: () => openEdit(row) });
+        }
+        if (canManagePermissions) {
+            actions.push({ label: 'Gestionar permisos', icon: ShieldCheck, variant: 'view', onClick: () => openManagePermissions(row) });
+        }
+        return actions;
+    };
 
     const columns: TableColumn<UserAdmin>[] = [
         { key: 'name', header: 'Nombre' },
@@ -37,20 +53,18 @@ const UserPage = () => {
                 </div>
             ) : '—'
         },
-        { key: 'role', header: 'Rol', render: (row) => ROLE_LABELS[row.role] ?? row.role },
-        { key: 'isEnabled', header: 'Estado', render: (row) => <span className={`status_badge ${row.isEnabled ? 'active' : 'inactive'}`}>{row.isEnabled ? 'Activo' : 'Inactivo'}</span> },
         {
             key: 'document', header: 'Documento', render: (row) => row.documentNumber
-                ? `${DOCUMENT_TYPE_LABELS[row.documentType as DocumentType] ?? row.documentType} · ${row.documentNumber}`
-                : '—'
+            ? `${DOCUMENT_TYPE_LABELS[row.documentType as DocumentType] ?? row.documentType} · ${row.documentNumber}`
+            : '—'
         },
+        { key: 'role', header: 'Rol', render: (row) => roleLabel(row.role) },
+        { key: 'isEnabled', header: 'Estado', render: (row) => <span className={`status_badge ${row.isEnabled ? 'active' : 'inactive'}`}>{row.isEnabled ? 'Activo' : 'Inactivo'}</span> },
         {
-            key: 'actions', header: 'Acciones', render: (row) => (
-                <TableActions actions={[
-                    { label: 'Editar', icon: Pencil, variant: 'edit', onClick: () => openEdit(row.id) },
-                    { label: 'Gestionar permisos', icon: ShieldCheck, variant: 'view', onClick: () => openManagePermissions(row) },
-                ]} />
-            )
+            key: 'actions', header: 'Acciones', render: (row) => {
+                const actions = rowActions(row);
+                return actions.length > 0 ? <TableActions actions={actions} /> : '—';
+            }
         },
     ];
 
@@ -74,7 +88,7 @@ const UserPage = () => {
                         name="roleFilter"
                         value={roleFilter}
                         onChange={(e) => setRoleFilter(String(e.target.value))}
-                        options={ROLE_OPTIONS}
+                        options={roleOptions}
                         showDefaultOption
                     />
                 </div>
@@ -98,29 +112,40 @@ const UserPage = () => {
                 pagination={pagination}
                 onPageChange={setPage}
             />
-            <UserEdit
-                isOpen={isEditOpen}
-                onClose={closeEdit}
-                onSubmit={handleSubmit}
-                form={form}
-                isLoadingDetail={isLoadingDetail}
-                setField={setField}
-                isSaving={isSaving}
-                countryOptions={countryOptions}
-            />
-            <ManageUserPermissions
-                isOpen={isManagePermissionsOpen}
-                onClose={closeManagePermissions}
-                userName={managingUser?.name ?? ''}
-                catalog={permissionCatalog}
-                assignedKeys={assignedKeys}
-                onToggle={togglePermission}
-                onSave={saveManagePermissions}
-                isLoading={isLoadingPermissions}
-                isSaving={isSavingPermissions}
-            />
+            <Modal isOpen={editing !== null} onClose={closeEdit} title="Editar usuario" icon={UserCog} size="lg">
+                {isLoadingDetail || !editing || !editValues ? (
+                    <LoadingScreen message="Cargando datos del usuario..." size="sm" />
+                ) : (
+                    <form onSubmit={handleSubmitEdit}>
+                        <FormUserManage role={editing.role} mode="edit" values={editValues} onChange={setEditField} />
+                        <FormActions>
+                            <Button text="Cancelar" icon={X} size="lg" color="secondary" type="button" onClick={closeEdit} />
+                            <Button text="Guardar" icon={UploadCloud} size="lg" type="submit" loading={isSaving} disabled={!isEditValid} />
+                        </FormActions>
+                    </form>
+                )}
+            </Modal>
+            {canManagePermissions && (
+                <ManageUserPermissions
+                    isOpen={isManagePermissionsOpen}
+                    onClose={closeManagePermissions}
+                    userName={managingUser?.name ?? ''}
+                    catalog={permissionCatalog}
+                    assignedKeys={assignedKeys}
+                    onToggle={togglePermission}
+                    onSave={saveManagePermissions}
+                    isLoading={isLoadingPermissions}
+                    isSaving={isSavingPermissions}
+                />
+            )}
         </div>
     );
+};
+
+// Catálogo global de usuarios — exclusivo de `user.manage_all` (mismo permiso que GET /users/manage).
+const UserPage = () => {
+    const can = usePermission();
+    return can('user.manage_all') ? <UserCatalog /> : <ForbiddenScreen />;
 };
 
 export default UserPage;

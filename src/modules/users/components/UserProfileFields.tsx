@@ -8,7 +8,7 @@ interface UserProfileFieldsProps {
     countryOptions: { value: number; label: string }[];
 }
 
-/** Datos personales de un usuario — nombre, correo, contacto y documento. Reusado por UserEdit.tsx (system edita a cualquiera, con su propia sección de Acceso aparte) y Profile.tsx (autoedición, sin esa sección). */
+/** Datos personales de un usuario — nombre, correo, contacto y documento. Usado por Profile.tsx (autoedición del propio perfil). */
 export const UserProfileFields = ({ form, setField, countryOptions }: UserProfileFieldsProps) => (
     <>
         <FormSection title="Identificación">

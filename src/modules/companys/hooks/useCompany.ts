@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { isAxiosError } from 'axios';
@@ -7,9 +7,11 @@ import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import CompanyService from '../service/companyService';
-import useUserEdit from '../../users/hooks/useUserEdit';
+import ManageUserService from '../../users/service/manageUserService';
+import { isUserFormValid, toUserPayload, userFormFromDetail } from '../../users/utils/userForm';
 import useCompanyFormFields from './useCompanyFormFields';
 import type { CompanyDetail } from '../interfaces/company.interface';
+import type { UserFormValues } from '../../users/interfaces/user.interface';
 
 export type CompanyErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 
@@ -22,9 +24,9 @@ export type CompanyErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 // También agrupa la edición de empresa y de dueño (botones "Editar" de Company.tsx) — mismo
 // patrón que useUsers.ts (un hook por página, listado+edición juntos). La edición de empresa
 // reusa useCompanyFormFields (mismo que el paso 1 del wizard de alta), precargado con los datos
-// ya traídos acá, sin fetch adicional. La edición de dueño reusa useUserEdit (PUT /users/:id,
-// solo `system`) — trae el detalle completo por id, la autoedición del propio perfil vive aparte
-// en /home/profile (useProfile).
+// ya traídos acá, sin fetch adicional. La edición de dueño usa FormUserManage (rol super_admin) —
+// trae el detalle completo por id, la autoedición del propio perfil vive aparte en /home/profile
+// (useProfile).
 export const useCompany = () => {
     const { tenantId } = useParams<{ tenantId: string }>();
     const { countries, loadCountries } = useCatalogActive();
@@ -33,30 +35,37 @@ export const useCompany = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [errorStatus, setErrorStatus] = useState<CompanyErrorStatus | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
+    const [reloadToken, setReloadToken] = useState(0);
 
     useEffect(() => { loadCountries(); }, [loadCountries]);
     const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
 
-    const fetchCompany = useCallback(async (id: string) => {
-        setIsLoading(true);
-        setErrorStatus(null);
-        try {
-            const data = await CompanyService.getByTenantId(id);
-            setCompany(data);
-        } catch (err) {
-            const status = isAxiosError(err) ? err.response?.status : undefined;
-            setErrorStatus(status === 404 ? 'not_found' : status === 403 ? 'forbidden' : 'unknown');
-            setErrorMessage(handleApiError(err));
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
     useEffect(() => {
-        if (tenantId) fetchCompany(tenantId);
-    }, [tenantId, fetchCompany]);
+        if (!tenantId) return;
+        let active = true;
 
-    const retry = () => tenantId && fetchCompany(tenantId);
+        const fetchCompany = async () => {
+            setIsLoading(true);
+            setErrorStatus(null);
+            try {
+                const data = await CompanyService.getByTenantId(tenantId);
+                if (active) setCompany(data);
+            } catch (err) {
+                if (!active) return;
+                const status = isAxiosError(err) ? err.response?.status : undefined;
+                setErrorStatus(status === 404 ? 'not_found' : status === 403 ? 'forbidden' : 'unknown');
+                setErrorMessage(handleApiError(err));
+            } finally {
+                if (active) setIsLoading(false);
+            }
+        };
+
+        fetchCompany();
+
+        return () => { active = false; };
+    }, [tenantId, reloadToken]);
+
+    const reload = () => setReloadToken((token) => token + 1);
 
     // Edición de empresa ────────────────────────────────────────────────────────────────────
     const companyFields = useCompanyFormFields();
@@ -109,22 +118,60 @@ export const useCompany = () => {
     };
 
     // Edición de dueño ───────────────────────────────────────────────────────────────────────
-    // Reusa useUserEdit (PUT /api/users/:id, `user.manage_all`) — la misma edición que usa
-    // useUsers.ts en el listado de usuarios. Solo `system` la ve (Company.tsx la gatea con
-    // usePermission), un super_admin edita su propio perfil desde /home/profile en cambio.
-    const ownerEdit = useUserEdit();
+    // FormUserManage sobre el rol super_admin (GET/PUT /users/manage/super_admin/:id).
+    const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false);
+    const [ownerEditValues, setOwnerEditValues] = useState<UserFormValues | null>(null);
+    const [isLoadingOwnerDetail, setIsLoadingOwnerDetail] = useState(false);
+    const [isSavingOwner, setIsSavingOwner] = useState(false);
 
-    const openEditOwner = () => {
+    const openEditOwner = async () => {
         if (!company?.owner) return;
-        ownerEdit.openEdit(company.owner.id);
+
+        setIsEditOwnerOpen(true);
+        setOwnerEditValues(null);
+        setIsLoadingOwnerDetail(true);
+        try {
+            const detail = await ManageUserService.getById('super_admin', company.owner.id);
+            setOwnerEditValues(userFormFromDetail('super_admin', detail, false));
+        } catch (err) {
+            toast.error(handleApiError(err));
+            setIsEditOwnerOpen(false);
+        } finally {
+            setIsLoadingOwnerDetail(false);
+        }
     };
 
-    const handleSubmitOwnerEdit = (e: FormEvent<HTMLFormElement>) => {
-        ownerEdit.submit(e, () => tenantId && fetchCompany(tenantId));
+    const closeEditOwner = () => {
+        setIsEditOwnerOpen(false);
+        setOwnerEditValues(null);
+    };
+
+    const setOwnerEditField = <K extends keyof UserFormValues>(field: K, value: UserFormValues[K]) => {
+        setOwnerEditValues((prev) => (prev ? { ...prev, [field]: value } : prev));
+    };
+
+    const isOwnerEditValid = ownerEditValues !== null && isUserFormValid('super_admin', 'edit', ownerEditValues);
+
+    const handleSubmitOwnerEdit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!company?.owner || !ownerEditValues || !isOwnerEditValid) return;
+
+        setIsSavingOwner(true);
+        toast.loading('Guardando cambios...');
+        try {
+            const result = await ManageUserService.update('super_admin', company.owner.id, toUserPayload('super_admin', 'edit', ownerEditValues));
+            toast.success(result.message);
+            closeEditOwner();
+            reload();
+        } catch (err) {
+            toast.error(handleApiError(err));
+        } finally {
+            setIsSavingOwner(false);
+        }
     };
 
     return {
-        tenantId, company, isLoading, errorStatus, errorMessage, retry,
+        tenantId, company, isLoading, errorStatus, errorMessage, retry: reload,
         countryOptions,
 
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit,
@@ -135,9 +182,8 @@ export const useCompany = () => {
         selectCompanyEditProvince: companyFields.selectProvince, selectCompanyEditDistrict: companyFields.selectDistrict,
         isLoadingCompanyEditUbigeo: companyFields.isLoadingUbigeo,
 
-        isEditOwnerOpen: ownerEdit.isEditOpen, openEditOwner, closeEditOwner: ownerEdit.closeEdit,
-        isLoadingOwnerDetail: ownerEdit.isLoadingDetail, isSavingOwner: ownerEdit.isSaving,
-        ownerEditForm: ownerEdit.form, setOwnerEditField: ownerEdit.setField, handleSubmitOwnerEdit,
+        isEditOwnerOpen, openEditOwner, closeEditOwner, isLoadingOwnerDetail, isSavingOwner, isOwnerEditValid, handleSubmitOwnerEdit,
+        ownerEditValues, setOwnerEditField,
     };
 };
 
