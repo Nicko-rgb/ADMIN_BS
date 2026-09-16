@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useUbigeoCascade } from '../../../shared/hooks/useUbigeoCascade';
+import { hasErrors } from '../../../shared/utils/formErrors';
+import { validateCompanyStep } from '../utils/companyForm';
 import type { CompanyStepForm } from '../interfaces/companyRegistration.interface';
 
 const EMPTY_COMPANY_FORM: CompanyStepForm = {
@@ -84,13 +86,11 @@ export const useCompanyFormFields = () => {
         if (ids.provinceId) loadLevel(3, { parentId: ids.provinceId });
     }, [loadLevel]);
 
-    const isCompanyStepValid = Boolean(
-        companyForm.name.trim() && companyForm.document.trim() && companyForm.phone_cell.trim()
-        && companyForm.address.trim() && companyForm.country_id && companyForm.ubigeo_id
-    );
+    const companyErrors = validateCompanyStep(companyForm, departmentId, provinceId);
+    const isCompanyStepValid = !hasErrors(companyErrors);
 
     return {
-        companyForm, setCompanyField, isCompanyStepValid,
+        companyForm, setCompanyField, companyErrors, isCompanyStepValid,
         departments, provinces, districts, departmentId, provinceId,
         selectCompanyCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
         preload,

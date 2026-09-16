@@ -22,7 +22,9 @@ export interface InputFieldProps extends Omit<InputHTMLAttributes<HTMLInputEleme
     isPhone?: boolean;
     phoneCode?: string;
     mayus?: boolean;
-    numberOnly?: boolean;
+    // `true` acepta decimales (montos); `'integer'` solo dígitos (documento, teléfono, código).
+    numberOnly?: boolean | 'integer';
+    textOnly?: boolean;
 }
 
 export interface SelectFieldProps {

@@ -1,3 +1,4 @@
+import { hasErrors, requiredErrors, type FormErrors } from '../../../shared/utils/formErrors';
 import type {
     CreateManagedUserPayload, ManagedRole, ManagedUserDetail, SucursalRole, UpdateManagedUserPayload, UserFormMode, UserFormValues,
 } from '../interfaces/user.interface';
@@ -5,10 +6,22 @@ import type {
 const SUCURSAL_ROLES: readonly SucursalRole[] = ['administrador', 'empleado'];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_NAME_LENGTH = 2;
+const MIN_PASSWORD_LENGTH = 8;
+
+export type UserFormErrors = FormErrors<UserFormValues>;
 
 export const isSucursalRole = (role: string): role is SucursalRole => SUCURSAL_ROLES.includes(role as SucursalRole);
 
-export type UserFormFields = Partial<Record<keyof UserFormValues, { required: boolean }>>;
+// Reglas de un campo — mismas props que InputField, para volcarlas con spread en el componente.
+export interface UserFieldRules {
+    required: boolean;
+    maxLength?: number;
+    textOnly?: boolean;
+    numberOnly?: boolean | 'integer';
+}
+
+export type UserFormFields = Partial<Record<keyof UserFormValues, UserFieldRules>>;
 
 /**
  * Campos visibles del formulario y si son obligatorios, según el rol y el modo — alineado con
@@ -20,17 +33,19 @@ export type UserFormFields = Partial<Record<keyof UserFormValues, { required: bo
 export const getUserFormFields = (role: ManagedRole, mode: UserFormMode, values: UserFormValues): UserFormFields => {
     const panelAccess = role !== 'cliente';
     const sucursalRole = isSucursalRole(role);
+    // Solo el DNI es numérico — pasaporte, licencia y "otro" son alfanuméricos.
+    const numericDocument = values.document_type === 'IDENTITY_CARD';
 
     return {
-        first_name: { required: true },
-        last_name: { required: true },
+        first_name: { required: true, textOnly: true, maxLength: 100 },
+        last_name: { required: true, textOnly: true, maxLength: 100 },
         date_birth: { required: false },
-        phone: { required: true },
+        phone: { required: true, numberOnly: 'integer', maxLength: 20 },
         email: { required: panelAccess },
-        ...(mode === 'register' ? { password: { required: panelAccess } } : {}),
+        ...(mode === 'register' ? { password: { required: panelAccess, maxLength: 100 } } : {}),
         country_id: { required: true },
         document_type: { required: panelAccess },
-        document_number: { required: panelAccess },
+        document_number: { required: panelAccess, numberOnly: numericDocument && 'integer', maxLength: 50 },
         ...(mode === 'edit' ? { is_enabled: { required: false } } : {}),
         ...(sucursalRole ? { role: { required: true } } : {}),
         ...(sucursalRole && values.sucursales !== null ? { sucursales: { required: true } } : {}),
@@ -70,26 +85,26 @@ export const userFormFromDetail = (role: ManagedRole, detail: ManagedUserDetail,
     sucursales: isSucursalRole(role) && manageSucursales ? detail.assignments.map((assignment) => assignment.tenantId) : null,
 });
 
-const isFilled = (value: UserFormValues[keyof UserFormValues]) => {
-    if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === 'string') return value.trim() !== '';
-    if (typeof value === 'number') return value > 0;
-    return value !== null;
+/**
+ * Mensaje de error por campo — obligatorios según getUserFormFields, más el formato de nombres,
+ * correo y contraseña. Un campo sin entrada en el mapa está correcto.
+ */
+export const validateUserForm = (role: ManagedRole, mode: UserFormMode, values: UserFormValues): UserFormErrors => {
+    const fields = getUserFormFields(role, mode, values);
+    const required = (Object.keys(fields) as (keyof UserFormValues)[]).filter((field) => fields[field]?.required);
+    const errors: UserFormErrors = requiredErrors(values, required);
+
+    if (!errors.first_name && values.first_name.trim().length < MIN_NAME_LENGTH) errors.first_name = `Mínimo ${MIN_NAME_LENGTH} caracteres`;
+    if (!errors.last_name && values.last_name.trim().length < MIN_NAME_LENGTH) errors.last_name = `Mínimo ${MIN_NAME_LENGTH} caracteres`;
+    if (!errors.email && values.email.trim() && !EMAIL_PATTERN.test(values.email.trim())) errors.email = 'Correo inválido';
+    if (fields.password && values.password && values.password.length < MIN_PASSWORD_LENGTH) errors.password = `Mínimo ${MIN_PASSWORD_LENGTH} caracteres`;
+
+    return errors;
 };
 
 // ¿El formulario puede enviarse? Solo habilita el botón de guardar — el backend revalida todo.
-export const isUserFormValid = (role: ManagedRole, mode: UserFormMode, values: UserFormValues): boolean => {
-    const fields = getUserFormFields(role, mode, values);
-    const missingRequired = (Object.keys(fields) as (keyof UserFormValues)[])
-        .some((field) => fields[field]?.required && !isFilled(values[field]));
-
-    if (missingRequired) return false;
-    if (values.first_name.trim().length < 2 || values.last_name.trim().length < 2) return false;
-    if (values.email.trim() && !EMAIL_PATTERN.test(values.email.trim())) return false;
-    if (fields.password && values.password && values.password.length < 8) return false;
-
-    return true;
-};
+export const isUserFormValid = (role: ManagedRole, mode: UserFormMode, values: UserFormValues): boolean =>
+    !hasErrors(validateUserForm(role, mode, values));
 
 // Payload para POST (register) o PUT (edit) de /users/manage/:role.
 export function toUserPayload(role: ManagedRole, mode: 'register', values: UserFormValues): CreateManagedUserPayload;

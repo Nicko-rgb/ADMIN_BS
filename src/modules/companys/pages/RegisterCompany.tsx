@@ -18,8 +18,8 @@ const STEP_LABELS = ['Empresa', 'Dueño', 'Plan'] as const;
 const RegisterCompany = () => {
     const {
         step, direction, goNext, goBack,
-        companyForm, setCompanyField, isCompanyStepValid,
-        ownerValues, setOwnerField, isOwnerStepValid,
+        companyForm, setCompanyField, companyErrors,
+        ownerValues, setOwnerField, ownerErrors,
         planForm, setPlanField, isPlanStepValid,
         countryOptions, plans,
         departments, provinces, districts, departmentId, provinceId,
@@ -64,6 +64,7 @@ const RegisterCompany = () => {
                         <CompanyStepForm
                             form={companyForm}
                             setField={setCompanyField}
+                            errors={companyErrors}
                             countryOptions={countryOptions}
                             departments={departments}
                             provinces={provinces}
@@ -79,7 +80,7 @@ const RegisterCompany = () => {
                     )}
 
                     {step === 2 && (
-                        <FormUserManage role="super_admin" mode="register" values={ownerValues} onChange={setOwnerField} />
+                        <FormUserManage role="super_admin" mode="register" values={ownerValues} onChange={setOwnerField} errors={ownerErrors} />
                     )}
 
                     {step === 3 && (
@@ -95,7 +96,6 @@ const RegisterCompany = () => {
                             icon={ArrowRight}
                             iconPosition="right"
                             onClick={goNext}
-                            disabled={step === 1 ? !isCompanyStepValid : !isOwnerStepValid}
                         />
                     ) : (
                         <Button

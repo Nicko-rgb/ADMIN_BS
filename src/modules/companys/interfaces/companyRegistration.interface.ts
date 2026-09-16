@@ -12,6 +12,10 @@ export interface CompanyStepForm {
     phone: string;
 }
 
+// Mensaje de error por campo del paso 1 — incluye los niveles intermedios de la cascada de
+// ubigeo (department_id, province_id), que son estado aparte del form.
+export type CompanyStepErrors = Partial<Record<keyof CompanyStepForm | 'department_id' | 'province_id', string>>;
+
 export type BillingPeriod = 'monthly' | 'yearly';
 
 // Paso 3 — plan elegido y periodicidad de facturación.

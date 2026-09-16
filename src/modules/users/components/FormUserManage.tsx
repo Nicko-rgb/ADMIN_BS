@@ -3,7 +3,7 @@ import { IdCard, Store, UserPlus } from 'lucide-react';
 import { InputField, SelectField, CheckboxField, ToggleField, FormSection, FormRow } from '../../../shared/components';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import { DOCUMENT_TYPE_OPTIONS } from '../utils/userConstants';
-import { getUserFormFields, isSucursalRole } from '../utils/userForm';
+import { getUserFormFields, isSucursalRole, type UserFormErrors } from '../utils/userForm';
 import type { DocumentType, ManagedRole, UserFormMode, UserFormValues } from '../interfaces/user.interface';
 import '../styles/FormUserManage.css';
 
@@ -15,6 +15,8 @@ interface FormUserManageProps {
     onChange: <K extends keyof UserFormValues>(field: K, value: UserFormValues[K]) => void;
     // Sucursales elegibles para administrador/empleado — se muestran si `values.sucursales` no es null.
     sucursalOptions?: { value: string; label: string }[];
+    // Mensaje a mostrar bajo cada campo — lo arma validateUserForm en el hook que lo usa.
+    errors?: UserFormErrors;
 }
 
 /**
@@ -22,7 +24,7 @@ interface FormUserManageProps {
  * renderiza y emite cada cambio; el estado, la validación y el envío los maneja el hook del módulo
  * que lo usa (isUserFormValid, toUserPayload). Países y roles salen de useCatalogActive.
  */
-export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions = [] }: FormUserManageProps) => {
+export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions = [], errors = {} }: FormUserManageProps) => {
     const { countries, loadCountries, roles, loadRoles } = useCatalogActive();
     const fields = getUserFormFields(role, mode, values);
     const showRole = Boolean(fields.role);
@@ -45,28 +47,28 @@ export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions =
         <>
             <FormSection title="Datos personales" icon={UserPlus}>
                 <FormRow>
-                    <InputField name="first_name" label="Nombres" value={values.first_name} onChange={(e) => onChange('first_name', e.target.value)} required={fields.first_name?.required} />
-                    <InputField name="last_name" label="Apellidos" value={values.last_name} onChange={(e) => onChange('last_name', e.target.value)} required={fields.last_name?.required} />
+                    <InputField name="first_name" label="Nombres" value={values.first_name} onChange={(e) => onChange('first_name', e.target.value)} error={errors.first_name} {...fields.first_name} />
+                    <InputField name="last_name" label="Apellidos" value={values.last_name} onChange={(e) => onChange('last_name', e.target.value)} error={errors.last_name} {...fields.last_name} />
                 </FormRow>
                 <FormRow>
-                    <InputField name="date_birth" label="Fecha de nacimiento" type="date" value={values.date_birth} onChange={(e) => onChange('date_birth', e.target.value)} required={fields.date_birth?.required} />
-                    <InputField name="phone" label="Teléfono celular" isPhone phoneCode={phoneCode} value={values.phone} onChange={(e) => onChange('phone', e.target.value)} required={fields.phone?.required} />
+                    <InputField name="date_birth" label="Fecha de nacimiento (opcional)" type="date" value={values.date_birth} onChange={(e) => onChange('date_birth', e.target.value)} error={errors.date_birth} />
+                    <InputField name="phone" label="Teléfono celular" isPhone phoneCode={phoneCode} value={values.phone} onChange={(e) => onChange('phone', e.target.value)} error={errors.phone} {...fields.phone} />
                 </FormRow>
             </FormSection>
 
             <FormSection title="Acceso y contacto" icon={IdCard}>
                 <FormRow>
-                    <InputField name="email" label="Correo" type="email" value={values.email} onChange={(e) => onChange('email', e.target.value)} required={fields.email?.required} />
+                    <InputField name="email" label="Correo" type="email" value={values.email} onChange={(e) => onChange('email', e.target.value)} error={errors.email} {...fields.email} />
                     {fields.password && (
-                        <InputField name="password" label="Contraseña" type="password" autoComplete="new-password" value={values.password} onChange={(e) => onChange('password', e.target.value)} required={fields.password.required} />
+                        <InputField name="password" label="Contraseña" type="password" autoComplete="new-password" value={values.password} onChange={(e) => onChange('password', e.target.value)} error={errors.password} {...fields.password} />
                     )}
                 </FormRow>
                 <FormRow>
-                    <SelectField name="country_id" label="País" value={values.country_id || ''} onChange={(e) => onChange('country_id', Number(e.target.value))} options={countryOptions} required={fields.country_id?.required} />
-                    <SelectField name="document_type" label="Tipo de documento" value={values.document_type} onChange={(e) => onChange('document_type', e.target.value as DocumentType)} options={DOCUMENT_TYPE_OPTIONS} required={fields.document_type?.required} />
+                    <SelectField name="country_id" label="País" value={values.country_id || ''} onChange={(e) => onChange('country_id', Number(e.target.value))} options={countryOptions} required={fields.country_id?.required} error={errors.country_id} />
+                    <SelectField name="document_type" label="Tipo de documento" value={values.document_type} onChange={(e) => onChange('document_type', e.target.value as DocumentType)} options={DOCUMENT_TYPE_OPTIONS} required={fields.document_type?.required} error={errors.document_type} />
                 </FormRow>
                 <FormRow>
-                    <InputField name="document_number" label="Número de documento" value={values.document_number} onChange={(e) => onChange('document_number', e.target.value)} required={fields.document_number?.required} />
+                    <InputField name="document_number" label="Número de documento" value={values.document_number} onChange={(e) => onChange('document_number', e.target.value)} error={errors.document_number} {...fields.document_number} />
                     {fields.is_enabled && (
                         <ToggleField name="is_enabled" label="Habilitado" checked={values.is_enabled} onChange={(e) => onChange('is_enabled', e.target.checked)} />
                     )}
@@ -76,7 +78,7 @@ export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions =
             {showRole && (
                 <FormSection title="Acceso a sucursal" icon={Store}>
                     <FormRow>
-                        <SelectField name="role" label="Rol" value={values.role} onChange={(e) => onChange('role', e.target.value as ManagedRole)} options={roleOptions} required />
+                        <SelectField name="role" label="Rol" value={values.role} onChange={(e) => onChange('role', e.target.value as ManagedRole)} options={roleOptions} required error={errors.role} />
                     </FormRow>
                     {fields.sucursales && (
                         sucursalOptions.length > 0 ? (

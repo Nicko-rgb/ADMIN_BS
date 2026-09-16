@@ -14,13 +14,21 @@ import type {
 } from '../interfaces/forms.interface';
 import '../styles/FormComponents.css';
 
-// Deja solo dígitos y un único punto decimal — descarta comas y cualquier otro punto de más (conserva el primero).
-const sanitizeNumberOnly = (value: string): string => {
+/**
+ * Deja solo dígitos. Con `allowDecimal`, conserva además el primer punto y descarta los
+ * siguientes; sin él, ni siquiera el punto pasa.
+ */
+const sanitizeNumber = (value: string, allowDecimal: boolean): string => {
     const digitsAndDots = value.replace(/[^0-9.]/g, '');
+    if (!allowDecimal) return digitsAndDots.replace(/\./g, '');
+
     const firstDotIndex = digitsAndDots.indexOf('.');
     if (firstDotIndex === -1) return digitsAndDots;
     return digitsAndDots.slice(0, firstDotIndex + 1) + digitsAndDots.slice(firstDotIndex + 1).replace(/\./g, '');
 };
+
+// Deja solo letras (con tildes y ñ), espacios, apóstrofo y guion — descarta dígitos y símbolos.
+const sanitizeTextOnly = (value: string): string => value.replace(/[^\p{L}\s'-]/gu, '');
 
 /**
  * Campo de texto con label estático encima. Soporta ícono opcional
@@ -44,13 +52,18 @@ export const InputField = ({
     phoneCode,
     mayus = false,
     numberOnly = false,
+    textOnly = false,
     ...rest
 }: InputFieldProps) => {
-    // Con `mayus`, convierte a mayúsculas en cada tecleo — para campos como códigos ISO que el backend también normaliza.
-    // Con `numberOnly`, descarta cualquier caracter que no sea dígito o punto decimal — nunca coma — para no quemar la validación Joi del backend con formatos inválidos.
+    /**
+     * Normaliza lo tecleado antes de emitirlo: `mayus` pasa a mayúsculas, `textOnly` descarta
+     * dígitos y símbolos, `numberOnly` descarta todo lo que no sea dígito (y el punto decimal
+     * salvo que sea `'integer'`).
+     */
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (mayus) e.target.value = e.target.value.toUpperCase();
-        if (numberOnly) e.target.value = sanitizeNumberOnly(e.target.value);
+        if (textOnly) e.target.value = sanitizeTextOnly(e.target.value);
+        if (numberOnly) e.target.value = sanitizeNumber(e.target.value, numberOnly !== 'integer');
         onChange(e);
     };
 
@@ -89,7 +102,7 @@ export const InputField = ({
                     className={`form_input ${error ? 'error' : ''}`}
                     required={required}
                     disabled={disabled}
-                    inputMode={numberOnly ? 'decimal' : undefined}
+                    inputMode={numberOnly ? (numberOnly === 'integer' ? 'numeric' : 'decimal') : undefined}
                     {...rest}
                 />
             </div>
