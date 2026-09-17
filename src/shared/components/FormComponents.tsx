@@ -15,16 +15,17 @@ import type {
 import '../styles/FormComponents.css';
 
 /**
- * Deja solo dígitos. Con `allowDecimal`, conserva además el primer punto y descarta los
- * siguientes; sin él, ni siquiera el punto pasa.
+ * Deja solo dígitos, con un `-` inicial si `allowNegative`. Con `allowDecimal` conserva además
+ * el primer punto y descarta los siguientes; sin él, ni siquiera el punto pasa.
  */
-const sanitizeNumber = (value: string, allowDecimal: boolean): string => {
+const sanitizeNumber = (value: string, allowDecimal: boolean, allowNegative: boolean): string => {
+    const sign = allowNegative && value.startsWith('-') ? '-' : '';
     const digitsAndDots = value.replace(/[^0-9.]/g, '');
-    if (!allowDecimal) return digitsAndDots.replace(/\./g, '');
+    if (!allowDecimal) return sign + digitsAndDots.replace(/\./g, '');
 
     const firstDotIndex = digitsAndDots.indexOf('.');
-    if (firstDotIndex === -1) return digitsAndDots;
-    return digitsAndDots.slice(0, firstDotIndex + 1) + digitsAndDots.slice(firstDotIndex + 1).replace(/\./g, '');
+    if (firstDotIndex === -1) return sign + digitsAndDots;
+    return sign + digitsAndDots.slice(0, firstDotIndex + 1) + digitsAndDots.slice(firstDotIndex + 1).replace(/\./g, '');
 };
 
 // Deja solo letras (con tildes y ñ), espacios, apóstrofo y guion — descarta dígitos y símbolos.
@@ -52,18 +53,19 @@ export const InputField = ({
     phoneCode,
     mayus = false,
     numberOnly = false,
+    allowNegative = false,
     textOnly = false,
     ...rest
 }: InputFieldProps) => {
     /**
      * Normaliza lo tecleado antes de emitirlo: `mayus` pasa a mayúsculas, `textOnly` descarta
-     * dígitos y símbolos, `numberOnly` descarta todo lo que no sea dígito (y el punto decimal
-     * salvo que sea `'integer'`).
+     * dígitos y símbolos, `numberOnly` descarta todo lo que no sea dígito (más el punto decimal
+     * salvo que sea `'integer'`, y el signo si `allowNegative`).
      */
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (mayus) e.target.value = e.target.value.toUpperCase();
         if (textOnly) e.target.value = sanitizeTextOnly(e.target.value);
-        if (numberOnly) e.target.value = sanitizeNumber(e.target.value, numberOnly !== 'integer');
+        if (numberOnly) e.target.value = sanitizeNumber(e.target.value, numberOnly !== 'integer', allowNegative);
         onChange(e);
     };
 

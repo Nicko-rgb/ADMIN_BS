@@ -4,7 +4,8 @@ import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import toast from '../../../shared/utils/toast';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import CompanyService from '../service/companyService';
-import useCompanyFormFields from './useCompanyFormFields';
+import { COMPANY_REQUIRED_FIELDS, EMPTY_COMPANY_FORM } from '../utils/tenantForm';
+import useTenantForm from './useTenantForm';
 import { hasErrors } from '../../../shared/utils/formErrors';
 import { createEmptyUserForm, toUserPayload, validateUserForm } from '../../users/utils/userForm';
 import type { PlanStepForm } from '../interfaces/companyRegistration.interface';
@@ -17,24 +18,22 @@ const EMPTY_PLAN_FORM: PlanStepForm = {
 
 /**
  * Wizard de alta de empresa — 3 pasos (empresa, dueño, plan) en un solo hook. El paso "empresa"
- * reusa useCompanyFormFields (mismo estado que la edición de empresa en useCompany); el paso
- * "dueño" usa los helpers de FormUserManage con rol super_admin en modo alta. El envío final es
- * una sola transacción en el backend.
+ * reusa useTenantForm (mismo estado que la edición de empresa y que el modal de sucursal); el
+ * paso "dueño" usa los helpers de FormUserManage con rol super_admin en modo alta.
  */
 export const useRegisterCompany = () => {
     const navigate = useNavigate();
-    const { countries, loadCountries, plans, loadPlans } = useCatalogActive();
+    const { plans, loadPlans } = useCatalogActive();
 
-    useEffect(() => { loadCountries(); loadPlans(); }, [loadCountries, loadPlans]);
-    const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
+    useEffect(() => { loadPlans(); }, [loadPlans]);
 
     const [step, setStep] = useState<1 | 2 | 3>(1);
 
     const {
-        companyForm, setCompanyField, companyErrors, isCompanyStepValid,
-        departments, provinces, districts, departmentId, provinceId,
-        selectCompanyCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
-    } = useCompanyFormFields();
+        form: companyForm, setField: setCompanyField, errors: companyErrors, isValid: isCompanyStepValid,
+        countryOptions, departments, provinces, districts, departmentId, provinceId, isLoadingUbigeo,
+        selectCountry, selectDepartment, selectProvince, selectDistrict,
+    } = useTenantForm(EMPTY_COMPANY_FORM, COMPANY_REQUIRED_FIELDS);
 
     const [ownerValues, setOwnerValues] = useState<UserFormValues>(() => createEmptyUserForm('super_admin'));
     const setOwnerField = <K extends keyof UserFormValues>(field: K, value: UserFormValues[K]) => {
@@ -104,7 +103,7 @@ export const useRegisterCompany = () => {
         planForm, setPlanField, isPlanStepValid,
         countryOptions, plans,
         departments, provinces, districts, departmentId, provinceId,
-        selectCompanyCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
+        selectCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
         isSubmitting, handleRegister,
     };
 };

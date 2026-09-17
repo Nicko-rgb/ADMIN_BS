@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { isAxiosError } from 'axios';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
-import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import CompanyService from '../service/companyService';
 import ManageUserService from '../../users/service/manageUserService';
 import { isUserFormValid, toUserPayload, userFormFromDetail } from '../../users/utils/userForm';
-import useCompanyFormFields from './useCompanyFormFields';
+import { COMPANY_REQUIRED_FIELDS, EMPTY_COMPANY_FORM } from '../utils/tenantForm';
+import useTenantForm from './useTenantForm';
 import type { CompanyDetail } from '../interfaces/company.interface';
 import type { UserFormValues } from '../../users/interfaces/user.interface';
 
@@ -23,22 +23,18 @@ export type CompanyErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 //
 // También agrupa la edición de empresa y de dueño (botones "Editar" de Company.tsx) — mismo
 // patrón que useUsers.ts (un hook por página, listado+edición juntos). La edición de empresa
-// reusa useCompanyFormFields (mismo que el paso 1 del wizard de alta), precargado con los datos
+// reusa useTenantForm (mismo que el paso 1 del wizard de alta), precargado con los datos
 // ya traídos acá, sin fetch adicional. La edición de dueño usa FormUserManage (rol super_admin) —
 // trae el detalle completo por id, la autoedición del propio perfil vive aparte en /home/profile
 // (useProfile).
 export const useCompany = () => {
     const { tenantId } = useParams<{ tenantId: string }>();
-    const { countries, loadCountries } = useCatalogActive();
 
     const [company, setCompany] = useState<CompanyDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorStatus, setErrorStatus] = useState<CompanyErrorStatus | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [reloadToken, setReloadToken] = useState(0);
-
-    useEffect(() => { loadCountries(); }, [loadCountries]);
-    const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
 
     useEffect(() => {
         if (!tenantId) return;
@@ -68,13 +64,17 @@ export const useCompany = () => {
     const reload = () => setReloadToken((token) => token + 1);
 
     // Edición de empresa ────────────────────────────────────────────────────────────────────
-    const companyFields = useCompanyFormFields();
+    const { preload, isValid: isCompanyEditValid, errors: companyEditErrors, ...companyEditFields } = useTenantForm(EMPTY_COMPANY_FORM, COMPANY_REQUIRED_FIELDS);
     const [isEditCompanyOpen, setIsEditCompanyOpen] = useState(false);
     const [isSavingCompany, setIsSavingCompany] = useState(false);
 
+    // Los errores por campo recién se pintan cuando se intenta guardar con el form incompleto.
+    const [showCompanyEditErrors, setShowCompanyEditErrors] = useState(false);
+
     const openEditCompany = () => {
         if (!company) return;
-        companyFields.preload(
+        setShowCompanyEditErrors(false);
+        preload(
             {
                 name: company.name,
                 document: company.document,
@@ -95,17 +95,15 @@ export const useCompany = () => {
         e.preventDefault();
         if (!tenantId) return;
 
+        if (!isCompanyEditValid) {
+            setShowCompanyEditErrors(true);
+            toast.error('Completa los campos obligatorios para continuar');
+            return;
+        }
+
         setIsSavingCompany(true);
         try {
-            const payload = trimValues({
-                name: companyFields.companyForm.name,
-                document: companyFields.companyForm.document,
-                country_id: companyFields.companyForm.country_id,
-                ubigeo_id: companyFields.companyForm.ubigeo_id,
-                address: companyFields.companyForm.address,
-                phone_cell: companyFields.companyForm.phone_cell,
-                phone: companyFields.companyForm.phone,
-            });
+            const payload = trimValues(companyEditFields.form);
             const result = await CompanyService.updateByTenantId(tenantId, payload);
             setCompany(result.data);
             toast.success(result.message);
@@ -116,6 +114,19 @@ export const useCompany = () => {
             setIsSavingCompany(false);
         }
     };
+
+    // Modal de sucursal ──────────────────────────────────────────────────────────────────────
+    // Solo apertura/cierre y cuál se edita (null = alta); su data la trae el propio modal.
+    const [sucursalModal, setSucursalModal] = useState<{ isOpen: boolean; tenantId: string | null }>({ isOpen: false, tenantId: null });
+
+    const openRegisterSucursal = () => setSucursalModal({ isOpen: true, tenantId: null });
+    const openEditSucursal = (sucursalTenantId: string) => setSucursalModal({ isOpen: true, tenantId: sucursalTenantId });
+    const closeSucursal = useCallback(() => setSucursalModal({ isOpen: false, tenantId: null }), []);
+
+    // Modal de alta de usuario de sucursal — su estado y su envío viven en useUserAsingSucursal.
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const openUserModal = () => setIsUserModalOpen(true);
+    const closeUserModal = () => setIsUserModalOpen(false);
 
     // Edición de dueño ───────────────────────────────────────────────────────────────────────
     // FormUserManage sobre el rol super_admin (GET/PUT /users/manage/super_admin/:id).
@@ -172,15 +183,17 @@ export const useCompany = () => {
 
     return {
         tenantId, company, isLoading, errorStatus, errorMessage, retry: reload,
-        countryOptions,
 
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit,
-        companyEditForm: companyFields.companyForm, setCompanyEditField: companyFields.setCompanyField,
-        companyEditDepartments: companyFields.departments, companyEditProvinces: companyFields.provinces, companyEditDistricts: companyFields.districts,
-        companyEditDepartmentId: companyFields.departmentId, companyEditProvinceId: companyFields.provinceId,
-        selectCompanyEditCountry: companyFields.selectCompanyCountry, selectCompanyEditDepartment: companyFields.selectDepartment,
-        selectCompanyEditProvince: companyFields.selectProvince, selectCompanyEditDistrict: companyFields.selectDistrict,
-        isLoadingCompanyEditUbigeo: companyFields.isLoadingUbigeo,
+        companyEditProps: {
+            ...companyEditFields,
+            errors: showCompanyEditErrors ? companyEditErrors : {},
+        },
+
+        isSucursalOpen: sucursalModal.isOpen, editingSucursalId: sucursalModal.tenantId,
+        openRegisterSucursal, openEditSucursal, closeSucursal,
+
+        isUserModalOpen, openUserModal, closeUserModal,
 
         isEditOwnerOpen, openEditOwner, closeEditOwner, isLoadingOwnerDetail, isSavingOwner, isOwnerEditValid, handleSubmitOwnerEdit,
         ownerEditValues, setOwnerEditField,

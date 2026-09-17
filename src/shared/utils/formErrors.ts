@@ -11,6 +11,16 @@ export const isFilled = (value: unknown): boolean => {
     return value !== null && value !== undefined;
 };
 
+// ¿Es una URL http(s) completa? Mismo criterio que el `.uri({ scheme: ['http', 'https'] })` de Joi.
+export const isValidUrl = (value: string): boolean => {
+    try {
+        const { protocol } = new URL(value.trim());
+        return protocol === 'http:' || protocol === 'https:';
+    } catch {
+        return false;
+    }
+};
+
 // Marca con REQUIRED_MESSAGE cada campo obligatorio que esté vacío.
 export const requiredErrors = <T extends object>(values: T, fields: (keyof T)[]): FormErrors<T> => {
     const errors: FormErrors<T> = {};

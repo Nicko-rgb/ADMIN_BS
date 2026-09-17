@@ -23,7 +23,7 @@ const RegisterCompany = () => {
         planForm, setPlanField, isPlanStepValid,
         countryOptions, plans,
         departments, provinces, districts, departmentId, provinceId,
-        selectCompanyCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
+        selectCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
         isSubmitting, handleRegister,
     } = useRegisterCompany();
 
@@ -71,7 +71,7 @@ const RegisterCompany = () => {
                             districts={districts}
                             departmentId={departmentId}
                             provinceId={provinceId}
-                            selectCompanyCountry={selectCompanyCountry}
+                            selectCountry={selectCountry}
                             selectDepartment={selectDepartment}
                             selectProvince={selectProvince}
                             selectDistrict={selectDistrict}

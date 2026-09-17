@@ -1,4 +1,5 @@
 import type { CompanyDetailCountry, CompanyUbigeo } from './company.interface';
+import type { TenantFormErrors } from '../utils/tenantForm';
 
 export type SucursalStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
 
@@ -13,6 +14,7 @@ export interface SucursalDetail {
     latitude: string | null;
     longitude: string | null;
     description: string | null;
+    website: string | null;
     status: SucursalStatus | null;
     country: CompanyDetailCountry | null;
     ubigeo: CompanyUbigeo | null;
@@ -31,7 +33,10 @@ export interface SucursalFormData {
     latitude: string;
     longitude: string;
     description: string;
+    website: string;
 }
+
+export type SucursalFormErrors = TenantFormErrors<SucursalFormData>;
 
 // Payload de alta/edición — mismo shape que valida el backend (registerSucursalSchema/updateSucursalSchema).
 // Sin `document`: la sucursal lo hereda de la empresa padre, no se pide acá.
@@ -45,4 +50,5 @@ export interface SucursalPayload {
     latitude?: number | null;
     longitude?: number | null;
     description?: string | null;
+    website?: string | null;
 }

@@ -24,6 +24,8 @@ export interface InputFieldProps extends Omit<InputHTMLAttributes<HTMLInputEleme
     mayus?: boolean;
     // `true` acepta decimales (montos); `'integer'` solo dígitos (documento, teléfono, código).
     numberOnly?: boolean | 'integer';
+    // Permite un `-` inicial junto a `numberOnly` — coordenadas, saldos, ajustes.
+    allowNegative?: boolean;
     textOnly?: boolean;
 }
 

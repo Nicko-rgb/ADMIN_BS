@@ -102,7 +102,9 @@
         gap: 1rem;
         padding: 0 2rem;
 
-        &:first-child { padding-left: 0; }
+        &:first-child {
+            padding-left: 0;
+        }
 
         &:last-child {
             padding-right: 0;
@@ -178,67 +180,162 @@
 
     .company_subsidiaries_grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1rem;
-    }
 
-    .company_subsidiary_card {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1.2rem;
-        background: var(--color-bg);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-
-        .company_subsidiary_header {
-            display: flex;
-            align-items: center;
-            gap: .8rem;
-            min-width: 0;
-        }
-
-        .company_subsidiary_avatar {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--surface);
-            color: var(--primary);
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .company_subsidiary_name {
-            min-width: 0;
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .company_subsidiary_info {
+        .subsidiary_card {
             display: flex;
             flex-direction: column;
-            gap: .3rem;
+            gap: 1rem;
+            padding: 1.2rem;
+            background: var(--color-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
 
-            span {
-                font-size: 1.2rem;
-                color: var(--text-muted);
+            .header {
+                display: flex;
+                align-items: center;
+                gap: .8rem;
+                min-width: 0;
+            }
+
+            .avatar {
+                flex-shrink: 0;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: var(--primary);
+                color: var(--text-white);
+                font-size: 2rem;
+                font-weight: 700;
+            }
+
+            .name {
+                min-width: 0;
+                font-size: 1.6rem;
+                font-weight: 600;
+                color: var(--text);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
-        }
 
-        .company_subsidiary_action {
-            width: 100%;
-            justify-content: center;
+            .info {
+                display: flex;
+                flex-direction: column;
+                gap: .3rem;
+
+                p {
+                    display: flex;
+                    align-items: center;
+                    gap: .5rem;
+                    color: var(--text-muted);
+
+                    svg {
+                        width: 20px;
+                        height: 22px;
+                        flex-shrink: 0;
+                    }
+
+                    span {
+                        font-size: 1.4rem;
+                        text-wrap: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+            }
+
+            .action {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    }
+
+    .users_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            gap: .8rem;
+            padding: 1.2rem;
+            background: var(--color-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            .header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: .8rem;
+                min-width: 0;
+            }
+
+            .name {
+                min-width: 0;
+                font-size: 1.6rem;
+                font-weight: 600;
+                color: var(--text);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .role {
+                flex-shrink: 0;
+                padding: 3px 10px;
+                border-radius: 20px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                background: var(--gray-medium);
+                color: var(--text-soft);
+
+                &.administrador {
+                    background: var(--purple-soft);
+                    color: var(--purple-text);
+                }
+
+                &.empleado {
+                    background: var(--info-soft);
+                    color: var(--info-text);
+                }
+            }
+
+            .info {
+                display: flex;
+                flex-direction: column;
+                gap: .3rem;
+
+                span {
+                    font-size: 1.4rem;
+                    color: var(--text-muted);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+
+            .user_sucursales {
+                display: flex;
+                flex-wrap: wrap;
+                gap: .4rem;
+
+                .sucursal_pill {
+                    display: flex;
+                    align-items: center;
+                    gap: .3rem;
+                    padding: 2px 8px;
+                    border-radius: 20px;
+                    font-size: 1.4rem;
+                    font-weight: 500;
+                    background: var(--gray-medium);
+                    color: var(--text-soft);
+                }
+            }
         }
     }
 

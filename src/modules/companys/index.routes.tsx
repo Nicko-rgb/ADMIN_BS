@@ -5,7 +5,6 @@ import { Route } from 'react-router-dom';
 const CompanysPage = lazy(() => import('./pages/CompanysPage'));
 const Company = lazy(() => import('./pages/Company'));
 const RegisterCompany = lazy(() => import('./pages/RegisterCompany'));
-const SucursalForm = lazy(() => import('./pages/SucursalForm'));
 
 
 /**
@@ -19,8 +18,6 @@ export const companyRoutes = (
     <>
         <Route index element={<CompanysPage />} />
         <Route path="company/:tenantId" element={<Company />} />
-        <Route path="company/:tenantId/sucursal/register" element={<SucursalForm />} />
-        <Route path="company/:tenantId/sucursal/:sucursalTenantId/edit" element={<SucursalForm />} />
         <Route path="register-company" element={<RegisterCompany />} />
     </>
 );

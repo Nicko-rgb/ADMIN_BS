@@ -3,10 +3,10 @@ import { InputField, SelectField, FormSection, FormRow } from '../../../shared/c
 import type { CompanyStepErrors, CompanyStepForm as CompanyStepFormData } from '../interfaces/companyRegistration.interface';
 import type { UbigeoNode } from '../../system/interfaces/catalog.interface';
 
-interface CompanyStepFormProps {
+// Misma forma que devuelve useTenantForm, para volcarla con spread desde el hook que lo usa.
+export interface CompanyStepFormProps {
     form: CompanyStepFormData;
     setField: (name: keyof CompanyStepFormData) => (value: string | number | boolean) => void;
-    // Mensaje a mostrar bajo cada campo — lo arma validateCompanyStep en el hook que lo usa.
     errors?: CompanyStepErrors;
     countryOptions: { value: number; label: string }[];
     departments: UbigeoNode[];
@@ -14,18 +14,18 @@ interface CompanyStepFormProps {
     districts: UbigeoNode[];
     departmentId: number;
     provinceId: number;
-    selectCompanyCountry: (countryId: number) => void;
+    selectCountry: (countryId: number) => void;
     selectDepartment: (id: number) => void;
     selectProvince: (id: number) => void;
     selectDistrict: (id: number) => void;
     isLoadingUbigeo: boolean;
 }
 
-/** Paso "empresa" del alta — datos generales y ubigeo. Reusado tal cual por la edición de empresa (ver companys/hooks/useCompanyFormFields). */
+/** Paso "empresa" del alta — datos generales y ubigeo. Reusado tal cual por la edición de empresa (ver companys/hooks/useTenantForm). */
 export const CompanyStepForm = ({
     form, setField, errors = {}, countryOptions,
     departments, provinces, districts, departmentId, provinceId,
-    selectCompanyCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
+    selectCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
 }: CompanyStepFormProps) => (
     <>
         <FormSection title="Información general de la empresa" icon={Building2}>
@@ -41,7 +41,7 @@ export const CompanyStepForm = ({
 
         <FormSection title="Ubigeo" icon={MapPin}>
             <FormRow>
-                <SelectField name="country_id" label="País" value={form.country_id || ''} onChange={(e) => selectCompanyCountry(Number(e.target.value))} options={countryOptions} required error={errors.country_id} />
+                <SelectField name="country_id" label="País" value={form.country_id || ''} onChange={(e) => selectCountry(Number(e.target.value))} options={countryOptions} required error={errors.country_id} />
                 <SelectField
                     name="department_id"
                     label="Departamento"

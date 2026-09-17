@@ -66,9 +66,9 @@ export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions =
                 <FormRow>
                     <SelectField name="country_id" label="País" value={values.country_id || ''} onChange={(e) => onChange('country_id', Number(e.target.value))} options={countryOptions} required={fields.country_id?.required} error={errors.country_id} />
                     <SelectField name="document_type" label="Tipo de documento" value={values.document_type} onChange={(e) => onChange('document_type', e.target.value as DocumentType)} options={DOCUMENT_TYPE_OPTIONS} required={fields.document_type?.required} error={errors.document_type} />
+                    <InputField name="document_number" label="Número de documento" value={values.document_number} onChange={(e) => onChange('document_number', e.target.value)} error={errors.document_number} {...fields.document_number} />
                 </FormRow>
                 <FormRow>
-                    <InputField name="document_number" label="Número de documento" value={values.document_number} onChange={(e) => onChange('document_number', e.target.value)} error={errors.document_number} {...fields.document_number} />
                     {fields.is_enabled && (
                         <ToggleField name="is_enabled" label="Habilitado" checked={values.is_enabled} onChange={(e) => onChange('is_enabled', e.target.checked)} />
                     )}
@@ -81,21 +81,24 @@ export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions =
                         <SelectField name="role" label="Rol" value={values.role} onChange={(e) => onChange('role', e.target.value as ManagedRole)} options={roleOptions} required error={errors.role} />
                     </FormRow>
                     {fields.sucursales && (
-                        sucursalOptions.length > 0 ? (
-                            <div className="form_user_manage_sucursales">
-                                {sucursalOptions.map((sucursal) => (
-                                    <CheckboxField
-                                        key={sucursal.value}
-                                        name={`sucursal_${sucursal.value}`}
-                                        label={sucursal.label}
-                                        checked={(values.sucursales ?? []).includes(sucursal.value)}
-                                        onChange={() => toggleSucursal(sucursal.value)}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <span className="form_user_manage_empty">No hay sucursales disponibles</span>
-                        )
+                        <div className="input_group">
+                            {sucursalOptions.length > 0 ? (
+                                <div className="form_user_manage_sucursales">
+                                    {sucursalOptions.map((sucursal) => (
+                                        <CheckboxField
+                                            key={sucursal.value}
+                                            name={`sucursal_${sucursal.value}`}
+                                            label={sucursal.label}
+                                            checked={(values.sucursales ?? []).includes(sucursal.value)}
+                                            onChange={() => toggleSucursal(sucursal.value)}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="form_user_manage_empty">No hay sucursales disponibles</span>
+                            )}
+                            {errors.sucursales && <span className="error_message">{errors.sucursales}</span>}
+                        </div>
                     )}
                 </FormSection>
             )}

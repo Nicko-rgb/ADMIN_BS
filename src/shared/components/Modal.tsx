@@ -40,7 +40,7 @@ export const Modal = ({ isOpen, onClose, title, icon: Icon, children, size = 'md
     if (!isOpen) return null;
 
     return (
-        <div className="modal_overlay" onClick={onClose}>
+        <div className="modal_overlay">
             <div className={`modal_container modal_${size}`} onClick={(e) => e.stopPropagation()}>
                 <header className="modal_header">
                     <h2 className="modal_title">

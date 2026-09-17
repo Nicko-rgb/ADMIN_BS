@@ -1,4 +1,5 @@
 import type { CreateManagedUserPayload } from '../../users/interfaces/user.interface';
+import type { TenantFormErrors } from '../utils/tenantForm';
 
 // Paso 1 — datos de la empresa. ubigeo_id es el distrito (nivel 3) final, resuelto por la
 // cascada departamento → provincia → distrito, no un campo que el admin tipee directo.
@@ -12,9 +13,7 @@ export interface CompanyStepForm {
     phone: string;
 }
 
-// Mensaje de error por campo del paso 1 — incluye los niveles intermedios de la cascada de
-// ubigeo (department_id, province_id), que son estado aparte del form.
-export type CompanyStepErrors = Partial<Record<keyof CompanyStepForm | 'department_id' | 'province_id', string>>;
+export type CompanyStepErrors = TenantFormErrors<CompanyStepForm>;
 
 export type BillingPeriod = 'monthly' | 'yearly';
 

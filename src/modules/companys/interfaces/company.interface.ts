@@ -1,5 +1,5 @@
 import type { CountryDisplay } from '../../../shared/interfaces/country.interface';
-import type { DocumentType } from '../../users/interfaces/user.interface';
+import type { DocumentType, ManagedRole } from '../../users/interfaces/user.interface';
 
 export type CompanyEnabled = 'A' | 'I' | 'P';
 
@@ -70,6 +70,18 @@ export interface CompanySubsidiary {
     ubigeo: string | null;
 }
 
+// Usuario asignado a la empresa o a alguna de sus sucursales — el dueño no entra acá, viene
+// aparte en `owner`. `sucursales` trae una entrada por asignación (puede estar en varias).
+export interface CompanyUser {
+    id: number;
+    firstName: string | null;
+    lastName: string | null;
+    email: string | null;
+    phone: string | null;
+    role: ManagedRole;
+    sucursales: { tenantId: string; name: string | null }[];
+}
+
 // Detalle de una empresa (página "Ver empresa") — se busca por tenantId, no por id.
 export interface CompanyDetail {
     id: number;
@@ -83,6 +95,7 @@ export interface CompanyDetail {
     ubigeo: CompanyUbigeo | null;
     owner: CompanyOwner | null;
     subsidiaries: CompanySubsidiary[];
+    users: CompanyUser[];
     createdAt: string;
 }
 

@@ -13,6 +13,15 @@ export const ROLE_MANAGE_PERMISSIONS: Record<ManagedRole, string> = {
 export const isManagedRole = (role: string): role is ManagedRole =>
     Object.prototype.hasOwnProperty.call(ROLE_MANAGE_PERMISSIONS, role);
 
+// Etiqueta visible de cada rol — para mostrar sin depender del catálogo del backend (useCatalogActive).
+export const ROLE_LABELS: Record<ManagedRole, string> = {
+    system: 'Sistema',
+    super_admin: 'Dueño',
+    administrador: 'Administrador',
+    empleado: 'Empleado',
+    cliente: 'Cliente',
+};
+
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
     IDENTITY_CARD: 'DNI',
     PASSPORT: 'Pasaporte',
