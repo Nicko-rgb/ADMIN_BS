@@ -13,6 +13,7 @@ export const useLogin = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
     const setSession = useSessionStore((state) => state.setSession);
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -29,5 +30,9 @@ export const useLogin = () => {
         }
     };
 
-    return { email, setEmail, password, setPassword, isSubmitting, handleSubmit };
+    const handlePasswordFoget = () => {
+        setIsOpen((prev) => !prev);
+    };
+
+    return { email, setEmail, password, setPassword, isSubmitting, handleSubmit, handlePasswordFoget, isOpen };
 };

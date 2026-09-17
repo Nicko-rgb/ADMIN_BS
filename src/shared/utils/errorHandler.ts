@@ -1,4 +1,4 @@
-import { isAxiosError } from 'axios';
+import { AxiosError, isAxiosError } from 'axios';
 
 interface ApiErrorObject {
     code: string;
@@ -35,6 +35,10 @@ export const handleApiError = (err: unknown): string => {
 
         if (typeof serverError === 'string' && serverError) {
             return serverError;
+        }
+
+        if (err.code === AxiosError.ETIMEDOUT) {
+            return 'El servidor tardó demasiado en responder. Inténtelo nuevamente.';
         }
 
         if (err.request) {

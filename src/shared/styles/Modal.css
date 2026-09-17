@@ -8,12 +8,22 @@
     z-index: 1000;
     padding: 1.5rem;
     backdrop-filter: blur(2px);
+    animation: modal_overlay_in .25s ease-out both;
+
+    &.is_closing {
+        pointer-events: none;
+        animation: modal_overlay_out .25s ease-in both;
+
+        .modal_container {
+            animation: modal_container_out .25s ease-in both;
+        }
+    }
 
     /* El cuerpo del modal usa el lienzo de la app y las .form_section de adentro
        usan --surface: la misma relación fondo/card que en una página, así los
        grupos del formulario se separan igual de claro en ambos modos. */
     .modal_container {
-        background: var(--color-bg);
+        background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 10px;
         box-shadow: var(--shadow-lg);
@@ -22,6 +32,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        animation: modal_container_in .3s cubic-bezier(.2, .8, .2, 1) both;
 
         &.modal_sm {
             max-width: 450px;
@@ -79,4 +90,24 @@
             overflow-y: auto;
         }
     }
+}
+
+@keyframes modal_overlay_in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modal_overlay_out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes modal_container_in {
+    from { opacity: 0; transform: translateY(16px) scale(.97); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes modal_container_out {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translateY(12px) scale(.97); }
 }

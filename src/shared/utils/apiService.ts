@@ -9,6 +9,9 @@ import { useSessionStore } from '../store/sessionStore';
  */
 export const apiService = axios.create({
     baseURL: import.meta.env.VITE_API_URL || '/api',
+    timeout: 15000,
+    // Timeout con código propio (ETIMEDOUT) en vez del genérico ECONNABORTED
+    transitional: { clarifyTimeoutError: true },
 });
 
 // Adjunta el Bearer token de la sesión activa a cada request saliente.

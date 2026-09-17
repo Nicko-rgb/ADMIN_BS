@@ -5,6 +5,19 @@ export interface LoginAdminPayload {
     password: string;
 }
 
+export interface PasswordRequestPayload {
+    email: string;
+}
+
+export interface PasswordRequestResponse {
+    expiresInMinutes: number;
+}
+
+export interface PasswordResetPayload {
+    token: string;
+    password: string;
+}
+
 export interface LoginAdminResponse {
     token: string;
     user: SessionUser;
