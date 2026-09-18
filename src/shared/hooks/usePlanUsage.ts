@@ -8,20 +8,20 @@ import type { PlanUsage } from '../interfaces/planUsage.interface';
  * Plan de una empresa y el uso de cada límite. `planUsage` es null mientras carga;
  * `reloadPlanUsage` lo vuelve a pedir (ej. después de crear una sucursal o un usuario).
  */
-export const usePlanUsage = (tenantId?: string) => {
+export const usePlanUsage = (companyId?: number) => {
     const [planUsage, setPlanUsage] = useState<PlanUsage | null>(null);
     const [reloadToken, setReloadToken] = useState(0);
 
     useEffect(() => {
-        if (!tenantId) return;
+        if (!companyId) return;
 
         let isCurrent = true;
-        PlanUsageService.getByTenantId(tenantId)
+        PlanUsageService.getByCompanyId(companyId)
             .then((data) => isCurrent && setPlanUsage(data))
             .catch((err) => isCurrent && toast.error(handleApiError(err)));
 
         return () => { isCurrent = false; };
-    }, [tenantId, reloadToken]);
+    }, [companyId, reloadToken]);
 
     const reloadPlanUsage = useCallback(() => setReloadToken((token) => token + 1), []);
 

@@ -62,7 +62,7 @@ export const useCompany = () => {
         return () => { active = false; };
     }, [tenantId, reloadToken]);
 
-    const { planUsage, reloadPlanUsage } = usePlanUsage(tenantId);
+    const { planUsage, reloadPlanUsage } = usePlanUsage(company?.id);
 
     const reload = () => {
         setReloadToken((token) => token + 1);
