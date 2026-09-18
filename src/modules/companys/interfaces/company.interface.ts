@@ -1,4 +1,4 @@
-import type { CountryDisplay } from '../../../shared/interfaces/country.interface';
+import type { CountryDisplay } from '../../../shared/interfaces/catalog.interface';
 import type { DocumentType, ManagedRole } from '../../users/interfaces/user.interface';
 
 export type CompanyEnabled = 'A' | 'I' | 'P';

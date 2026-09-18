@@ -1,15 +1,12 @@
 import { apiService } from '../utils/apiService';
 import type {
-    Country, SportType, SportCategory, SurfaceType, PaymentType, Plan,
-} from '../../modules/system/interfaces/catalog.interface';
-import type { RoleAdmin } from '../../modules/system/interfaces/role.interface';
+    Country, SportType, SportCategory, SurfaceType, PaymentType, Plan, RoleAdmin, UbigeoNode,
+} from '../interfaces/catalog.interface';
 
 /**
- * Endpoints públicos "/active" de los catálogos de `system` — se agrupan acá porque los consume
- * código de varios módulos (companys, users, system) para selects/lógica de negocio en toda la
- * app, no la administración de cada catálogo (eso sigue viviendo en el service de cada entidad:
- * list/create/update/delete paginado). Cada método es un fetch simple, sin cache — la cache vive
- * en el hook que lo consume (ver shared/hooks/createActiveCatalogHook.ts).
+ * Catálogos activos de `system` para selects en toda la app — la administración de cada catálogo
+ * (listado paginado, alta, edición, baja) vive en el service de su entidad dentro de `system`.
+ * Sin cache: la cache vive en useCatalogActive.
  */
 class CatalogActiveService {
     static async listCountries(): Promise<Country[]> {
@@ -38,12 +35,20 @@ class CatalogActiveService {
     }
 
     static async listPlans(): Promise<Plan[]> {
-        const res = await apiService.get('/system/plans/active');
+        const res = await apiService.get('/saas/plans/active');
         return res.data.data;
     }
 
     static async listRoles(): Promise<RoleAdmin[]> {
         const res = await apiService.get('/system/roles');
+        return res.data.data;
+    }
+
+    // Un nivel del ubigeo: `countryId` trae el nivel 1 de ese país, `parentId` los hijos directos de ese nodo.
+    static async listUbigeoChildren(params: { countryId?: number; parentId?: number }): Promise<UbigeoNode[]> {
+        const res = await apiService.get('/system/ubigeo', {
+            params: { country_id: params.countryId, parent_id: params.parentId },
+        });
         return res.data.data;
     }
 }

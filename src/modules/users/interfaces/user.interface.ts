@@ -1,4 +1,4 @@
-import type { CountryDisplay } from '../../../shared/interfaces/country.interface';
+import type { CountryDisplay } from '../../../shared/interfaces/catalog.interface';
 
 // Roles base gestionables desde la app — mismos que MANAGED_ROLES del backend (roleHierarchy.ts).
 export type ManagedRole = 'system' | 'super_admin' | 'administrador' | 'empleado' | 'cliente';

@@ -8,7 +8,7 @@ import { formatDate } from '../../../shared/utils/formatDate';
 import { useSurfaceTypes } from '../hooks/useSurfaceTypes';
 import { EditCatalogo } from '../components/EditCatalogo';
 import { CreateSurfaceType } from '../components/CreateSurfaceType';
-import type { SurfaceType } from '../interfaces/catalog.interface';
+import type { SurfaceType } from '../../../shared/interfaces/catalog.interface';
 import '../styles/CatalogPage.css';
 
 // Listado, búsqueda, edición y eliminación de tipos de superficie.

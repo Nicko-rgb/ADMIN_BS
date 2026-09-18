@@ -1,5 +1,6 @@
 import { apiService } from '../../../shared/utils/apiService';
-import type { Country, CreateCountryPayload, UpdateCountryPayload } from '../interfaces/catalog.interface';
+import type { Country } from '../../../shared/interfaces/catalog.interface';
+import type { CreateCountryPayload, UpdateCountryPayload } from '../interfaces/catalog.interface';
 
 // Catálogo de países — un método por endpoint.
 class CountryService {

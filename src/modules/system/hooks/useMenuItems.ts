@@ -6,7 +6,7 @@ import { handleApiError } from '../../../shared/utils/errorHandler';
 import { trimValues } from '../../../shared/utils/trimValues';
 import { normalizeStr } from '../../../shared/utils/formatText';
 import toast from '../../../shared/utils/toast';
-import type { RoleAdmin } from '../interfaces/role.interface';
+import type { RoleAdmin } from '../../../shared/interfaces/catalog.interface';
 import type { CreateMenuItemPayload, MenuItemAdmin, UpdateMenuItemPayload } from '../interfaces/menu.interface';
 
 const FETCH_LIMIT = 100; // catálogo pequeño — se trae completo una vez, sin paginación, y se busca/filtra en el front

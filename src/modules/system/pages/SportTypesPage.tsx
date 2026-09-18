@@ -8,7 +8,7 @@ import { formatDate } from '../../../shared/utils/formatDate';
 import { useSportTypes } from '../hooks/useSportTypes';
 import { EditCatalogo } from '../components/EditCatalogo';
 import { CreateSportType } from '../components/CreateSportType';
-import type { SportType } from '../interfaces/catalog.interface';
+import type { SportType } from '../../../shared/interfaces/catalog.interface';
 import '../styles/CatalogPage.css';
 
 const STATUS_OPTIONS = [

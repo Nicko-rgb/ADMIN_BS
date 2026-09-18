@@ -1,7 +1,8 @@
 import { apiService } from '../../../shared/utils/apiService';
 import type { PaginatedResponse } from '../../../shared/interfaces/pagination.interface';
 import type { CreatePermissionPayload, PermissionAdmin, PermissionFilters, UpdatePermissionPayload } from '../interfaces/permission.interface';
-import type { CreateRolePayload, RoleAdmin, UpdateRolePayload } from '../interfaces/role.interface';
+import type { RoleAdmin } from '../../../shared/interfaces/catalog.interface';
+import type { CreateRolePayload, UpdateRolePayload } from '../interfaces/role.interface';
 
 /**
  * Service único de la página Permisos (dos tabs: catálogo de permisos y roles — ver

@@ -1,20 +1,4 @@
-export interface Country {
-    id: number;
-    country: string;
-    isoCountry: string;
-    phoneCode: string;
-    isoCurrency: string;
-    currency: string;
-    currencySimbol: string;
-    timeZone: string;
-    language: string;
-    dateFormat: string;
-    flagUrl: string;
-    isActive: boolean;
-    referencesCount: number;
-    createdAt: string;
-    updatedAt: string;
-}
+import type { PlanNotificationsTier } from '../../../shared/interfaces/catalog.interface';
 
 // Payload de actualización — claves snake_case, iguales a las columnas del modelo (contrato de escritura del backend).
 export interface UpdateCountryPayload {
@@ -46,16 +30,6 @@ export interface CreateCountryPayload {
     is_active: boolean;
 }
 
-export interface SportType {
-    id: number;
-    code: string;
-    name: string;
-    isActive: boolean;
-    referencesCount: number;
-    createdAt: string;
-    updatedAt: string;
-}
-
 export interface UpdateSportTypePayload {
     code?: string;
     name?: string;
@@ -69,15 +43,6 @@ export interface CreateSportTypePayload {
     is_active: boolean;
 }
 
-export interface SportCategory {
-    id: number;
-    code: string;
-    name: string;
-    referencesCount: number;
-    createdAt: string;
-    updatedAt: string;
-}
-
 export interface UpdateSportCategoryPayload {
     code?: string;
     name?: string;
@@ -89,15 +54,6 @@ export interface CreateSportCategoryPayload {
     name: string;
 }
 
-export interface SurfaceType {
-    id: number;
-    code: string;
-    name: string;
-    referencesCount: number;
-    createdAt: string;
-    updatedAt: string;
-}
-
 export interface UpdateSurfaceTypePayload {
     code?: string;
     name?: string;
@@ -107,27 +63,6 @@ export interface UpdateSurfaceTypePayload {
 export interface CreateSurfaceTypePayload {
     code: string;
     name: string;
-}
-
-export interface PaymentType {
-    id: number;
-    countryId: number;
-    countryName: string | null;
-    name: string;
-    code: string;
-    category: string;
-    provider: string | null;
-    description: string | null;
-    iconUrl: string | null;
-    isActive: boolean;
-    processingTime: string | null;
-    commissionPercentage: string | null;
-    fixedCommission: string | null;
-    minAmount: string | null;
-    maxAmount: string | null;
-    referencesCount: number;
-    createdAt: string;
-    updatedAt: string;
 }
 
 export interface UpdatePaymentTypePayload {
@@ -192,44 +127,6 @@ export interface CreateUbigeoPayload {
     code: string;
     country_id: number;
     parent_id: number | null;
-}
-
-// Un nodo del árbol de ubigeo para selects en cascada (endpoint público /ubigeo/active) — sin
-// ancestros resueltos, ya que el consumidor los conoce por haber seleccionado cada nivel en orden.
-// `hasChildren` indica si conviene pedir el siguiente nivel pasando `id` como parentId.
-export interface UbigeoNode {
-    id: number;
-    code: string;
-    name: string;
-    level: number;
-    parentId: number | null;
-    countryId: number;
-    hasChildren: boolean;
-}
-
-// Niveles conocidos hoy por el backend (Joi .valid()) — la columna es STRING libre, no ENUM de DB,
-// así que un nivel nuevo es agregar acá + al Joi, nunca una migración.
-export type PlanNotificationsTier = 'basic' | 'full';
-
-export interface Plan {
-    id: number;
-    name: string;
-    code: string;
-    priceMonthly: string;
-    priceYearly: string;
-    maxSubsidiaries: number;
-    maxSpaces: number;
-    maxUsers: number;
-    hasStripeConnect: boolean;
-    maxInvoicesMonthly: number;
-    notificationsTier: PlanNotificationsTier;
-    hasAdvancedReports: boolean;
-    allowsMultiCompany: boolean;
-    features: string[];
-    isActive: boolean;
-    referencesCount: number;
-    createdAt: string;
-    updatedAt: string;
 }
 
 export interface UpdatePlanPayload {

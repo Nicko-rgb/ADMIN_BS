@@ -1,7 +1,7 @@
 import { Building2, MapPin } from 'lucide-react';
 import { InputField, SelectField, FormSection, FormRow } from '../../../shared/components';
 import type { CompanyStepErrors, CompanyStepForm as CompanyStepFormData } from '../interfaces/companyRegistration.interface';
-import type { UbigeoNode } from '../../system/interfaces/catalog.interface';
+import type { UbigeoNode } from '../../../shared/interfaces/catalog.interface';
 
 // Misma forma que devuelve useTenantForm, para volcarla con spread desde el hook que lo usa.
 export interface CompanyStepFormProps {

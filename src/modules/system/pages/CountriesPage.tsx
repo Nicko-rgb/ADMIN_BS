@@ -9,7 +9,7 @@ import { formatDate } from '../../../shared/utils/formatDate';
 import { useCountries } from '../hooks/useCountries';
 import { EditCatalogo } from '../components/EditCatalogo';
 import { CreateCountry } from '../components/CreateCountry';
-import type { Country } from '../interfaces/catalog.interface';
+import type { Country } from '../../../shared/interfaces/catalog.interface';
 
 const STATUS_OPTIONS = [
     { value: 'all', label: 'Todos' },

@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
-import UbigeoService from '../../modules/system/service/ubigeoService';
+import CatalogActiveService from '../service/catalogActiveService';
 import { handleApiError } from '../utils/errorHandler';
 import toast from '../utils/toast';
-import type { UbigeoNode } from '../../modules/system/interfaces/catalog.interface';
+import type { UbigeoNode } from '../interfaces/catalog.interface';
 
 type UbigeoLevel = 1 | 2 | 3;
 
@@ -30,7 +30,7 @@ export const useUbigeoCascade = () => {
 
         setLoading(true);
         try {
-            setItems(await UbigeoService.listChildren(params));
+            setItems(await CatalogActiveService.listUbigeoChildren(params));
         } catch (err) {
             toast.error(handleApiError(err));
         } finally {

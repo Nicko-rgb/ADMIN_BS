@@ -6,7 +6,8 @@ import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
 import type { PaginationMeta } from '../../../shared/interfaces/pagination.interface';
 import type { CreatePermissionPayload, PermissionAdmin, PermissionModule, UpdatePermissionPayload } from '../interfaces/permission.interface';
-import type { CreateRolePayload, RoleAdmin, UpdateRolePayload } from '../interfaces/role.interface';
+import type { RoleAdmin } from '../../../shared/interfaces/catalog.interface';
+import type { CreateRolePayload, UpdateRolePayload } from '../interfaces/role.interface';
 
 const PAGE_LIMIT = 20; // igual al default de paginationQuerySchema en el backend
 const SEARCH_DEBOUNCE_MS = 500;

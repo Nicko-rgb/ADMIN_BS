@@ -4,7 +4,7 @@ import { Modal } from '../../../shared/components/Modal';
 import { Button } from '../../../shared/components/Button';
 import { InputField, SelectField, ToggleField, CheckboxField, FormSection, FormRow, FormActions } from '../../../shared/components';
 import type { RawOption } from '../../../shared/interfaces/forms.interface';
-import type { RoleAdmin } from '../interfaces/role.interface';
+import type { RoleAdmin } from '../../../shared/interfaces/catalog.interface';
 import type { CreateMenuItemPayload, MenuAppAccess } from '../interfaces/menu.interface';
 
 const APP_ACCESS_OPTIONS = [

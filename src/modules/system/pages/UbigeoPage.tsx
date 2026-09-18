@@ -3,7 +3,7 @@ import { Header } from '../../../shared/components/Header';
 import { Dialog } from '../../../shared/components/Dialog';
 import { useUbigeo } from '../hooks/useUbigeo';
 import { CreateEditUbigeo } from '../components/CreateEditUbigeo';
-import type { Country, UbigeoNode } from '../interfaces/catalog.interface';
+import type { Country, UbigeoNode } from '../../../shared/interfaces/catalog.interface';
 import '../styles/UbigeoPage.css';
 
 type TreeAccent = 'country' | 'level1' | 'level2' | 'level3';

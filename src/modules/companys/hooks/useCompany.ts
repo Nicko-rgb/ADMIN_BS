@@ -5,6 +5,7 @@ import { isAxiosError } from 'axios';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
+import { usePlanUsage } from '../../../shared/hooks/usePlanUsage';
 import CompanyService from '../service/companyService';
 import ManageUserService from '../../users/service/manageUserService';
 import { isUserFormValid, toUserPayload, userFormFromDetail } from '../../users/utils/userForm';
@@ -61,7 +62,12 @@ export const useCompany = () => {
         return () => { active = false; };
     }, [tenantId, reloadToken]);
 
-    const reload = () => setReloadToken((token) => token + 1);
+    const { planUsage, reloadPlanUsage } = usePlanUsage(tenantId);
+
+    const reload = () => {
+        setReloadToken((token) => token + 1);
+        reloadPlanUsage();
+    };
 
     // Edición de empresa ────────────────────────────────────────────────────────────────────
     const { preload, isValid: isCompanyEditValid, errors: companyEditErrors, ...companyEditFields } = useTenantForm(EMPTY_COMPANY_FORM, COMPANY_REQUIRED_FIELDS);
@@ -182,7 +188,7 @@ export const useCompany = () => {
     };
 
     return {
-        tenantId, company, isLoading, errorStatus, errorMessage, retry: reload,
+        tenantId, company, isLoading, errorStatus, errorMessage, retry: reload, planUsage,
 
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit,
         companyEditProps: {

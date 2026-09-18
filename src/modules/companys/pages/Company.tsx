@@ -1,9 +1,9 @@
-import { Settings, Pencil, Store, Building2, User, Plus, Users, UploadCloud, UserCog, X, MapPin, Globe } from 'lucide-react';
+import { Settings, Pencil, Store, Building2, User, Plus, Users, UploadCloud, UserCog, X, MapPin, Globe, Gift } from 'lucide-react';
 import { Header } from '../../../shared/components/Header';
 import { Button } from '../../../shared/components/Button';
 import { Modal } from '../../../shared/components/Modal';
 import { TableImage } from '../../../shared/components/Table';
-import { LoadingScreen, NotFoundScreen, ForbiddenScreen, FormActions } from '../../../shared/components';
+import { LoadingScreen, NotFoundScreen, ForbiddenScreen, FormActions, PlanUsageBar } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
@@ -25,7 +25,7 @@ const ENABLED_CLASSNAMES = { A: 'active', I: 'inactive', P: 'pending' } as const
 // vista de detalle de sucursal todavía no existe). El fetch vive en useCompany.
 const Company = () => {
     const {
-        tenantId, company, isLoading, errorStatus, errorMessage, retry,
+        tenantId, company, isLoading, errorStatus, errorMessage, retry, planUsage,
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit, companyEditProps,
         isSucursalOpen, editingSucursalId, openRegisterSucursal, openEditSucursal, closeSucursal,
         isUserModalOpen, openUserModal, closeUserModal,
@@ -78,6 +78,17 @@ const Company = () => {
                 </div>
                 <div className="company_hero_actions">
                     <Button text="Configurar" size="sm" icon={Settings} color="secondary" onClick={() => { }} />
+                </div>
+            </div>
+
+            <div className="card company_plan_card">
+                <div className="company_detail_card_title">
+                    <Gift size={22} />
+                    <h3>{planUsage ? `Plan ${planUsage.planName}` : 'Plan'}</h3>
+                </div>
+                <div className="company_plan_usage">
+                    <PlanUsageBar value={planUsage?.subsidiaries} label="Sucursales" />
+                    <PlanUsageBar value={planUsage?.users} label="Usuarios" />
                 </div>
             </div>
 

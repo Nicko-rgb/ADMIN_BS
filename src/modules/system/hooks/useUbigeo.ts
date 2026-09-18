@@ -6,7 +6,7 @@ import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import { useUbigeoCascade } from '../../../shared/hooks/useUbigeoCascade';
-import type { Country, UbigeoNode } from '../interfaces/catalog.interface';
+import type { Country, UbigeoNode } from '../../../shared/interfaces/catalog.interface';
 
 type ModalMode = 'create' | 'edit';
 

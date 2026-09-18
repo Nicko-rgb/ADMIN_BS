@@ -1,6 +1,7 @@
 import { apiService } from '../../../shared/utils/apiService';
 import type { PaginatedResponse } from '../../../shared/interfaces/pagination.interface';
-import type { CreateSurfaceTypePayload, SurfaceType, UpdateSurfaceTypePayload } from '../interfaces/catalog.interface';
+import type { SurfaceType } from '../../../shared/interfaces/catalog.interface';
+import type { CreateSurfaceTypePayload, UpdateSurfaceTypePayload } from '../interfaces/catalog.interface';
 
 // Catálogo de tipos de superficie — un método por endpoint.
 class SurfaceTypeService {

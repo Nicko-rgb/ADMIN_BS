@@ -83,6 +83,22 @@
        vista (bordes inferiores desalineados). Una sola card comparte un único
        borde/sombra: la columna más corta simplemente termina antes, sin dejar
        un borde suelto más arriba que el de al lado. */
+    .company_plan_card {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        max-width: 1000px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 1.6rem;
+
+        .company_plan_usage {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2.4rem;
+        }
+    }
+
     .company_info_card {
         max-width: 1000px;
         width: 100%;

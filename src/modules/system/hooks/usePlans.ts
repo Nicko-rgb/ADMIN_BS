@@ -3,7 +3,8 @@ import type { FormEvent } from 'react';
 import PlanService from '../service/planService';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import toast from '../../../shared/utils/toast';
-import type { Plan, UpdatePlanPayload } from '../interfaces/catalog.interface';
+import type { Plan } from '../../../shared/interfaces/catalog.interface';
+import type { UpdatePlanPayload } from '../interfaces/catalog.interface';
 
 // Estado del formulario de edición — claves iguales al payload de escritura (snake_case).
 const toEditForm = (plan: Plan): Required<UpdatePlanPayload> => ({

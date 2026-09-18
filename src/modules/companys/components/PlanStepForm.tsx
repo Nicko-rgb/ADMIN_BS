@@ -1,6 +1,6 @@
 import { Check, CreditCard } from 'lucide-react';
 import { FormSection } from '../../../shared/components';
-import type { Plan } from '../../system/interfaces/catalog.interface';
+import type { Plan } from '../../../shared/interfaces/catalog.interface';
 import type { PlanStepForm as PlanStepFormData } from '../interfaces/companyRegistration.interface';
 
 const FEATURES_PREVIEW_LIMIT = 5; // cuántas características se muestran antes del "+N más"

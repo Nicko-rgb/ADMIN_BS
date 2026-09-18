@@ -6,7 +6,8 @@ import { trimValues } from '../../../shared/utils/trimValues';
 import { normalizeStr } from '../../../shared/utils/formatText';
 import toast from '../../../shared/utils/toast';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
-import type { CreatePaymentTypePayload, PaymentType, UpdatePaymentTypePayload } from '../interfaces/catalog.interface';
+import type { PaymentType } from '../../../shared/interfaces/catalog.interface';
+import type { CreatePaymentTypePayload, UpdatePaymentTypePayload } from '../interfaces/catalog.interface';
 import type { CatalogFormField } from '../components/EditCatalogo';
 
 const FETCH_LIMIT = 100; // catálogo pequeño — se trae completo una vez, sin paginación, y se busca/filtra en el front

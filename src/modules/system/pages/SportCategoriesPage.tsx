@@ -8,7 +8,7 @@ import { formatDate } from '../../../shared/utils/formatDate';
 import { useSportCategories } from '../hooks/useSportCategories';
 import { EditCatalogo } from '../components/EditCatalogo';
 import { CreateSportCategory } from '../components/CreateSportCategory';
-import type { SportCategory } from '../interfaces/catalog.interface';
+import type { SportCategory } from '../../../shared/interfaces/catalog.interface';
 import '../styles/CatalogPage.css';
 
 // Listado, búsqueda, edición y eliminación de categorías deportivas.

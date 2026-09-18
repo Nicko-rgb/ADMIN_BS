@@ -5,7 +5,8 @@ import { handleApiError } from '../../../shared/utils/errorHandler';
 import { trimValues } from '../../../shared/utils/trimValues';
 import { normalizeStr } from '../../../shared/utils/formatText';
 import toast from '../../../shared/utils/toast';
-import type { CreateSportTypePayload, SportType, UpdateSportTypePayload } from '../interfaces/catalog.interface';
+import type { SportType } from '../../../shared/interfaces/catalog.interface';
+import type { CreateSportTypePayload, UpdateSportTypePayload } from '../interfaces/catalog.interface';
 import type { CatalogFormField } from '../components/EditCatalogo';
 
 const FETCH_LIMIT = 100; // catálogo pequeño — se trae completo una vez, sin paginación, y se busca/filtra en el front

@@ -1,6 +1,7 @@
 import { apiService } from '../../../shared/utils/apiService';
 import type { PaginatedResponse } from '../../../shared/interfaces/pagination.interface';
-import type { CreatePaymentTypePayload, PaymentType, UpdatePaymentTypePayload } from '../interfaces/catalog.interface';
+import type { PaymentType } from '../../../shared/interfaces/catalog.interface';
+import type { CreatePaymentTypePayload, UpdatePaymentTypePayload } from '../interfaces/catalog.interface';
 
 // Catálogo de tipos de pago — un método por endpoint.
 class PaymentTypeService {

@@ -4,9 +4,8 @@ import { useSessionStore } from '../store/sessionStore';
 import { handleApiError } from '../utils/errorHandler';
 import toast from '../utils/toast';
 import type {
-    Country, SportType, SportCategory, SurfaceType, PaymentType, Plan,
-} from '../../modules/system/interfaces/catalog.interface';
-import type { RoleAdmin } from '../../modules/system/interfaces/role.interface';
+    Country, SportType, SportCategory, SurfaceType, PaymentType, Plan, RoleAdmin,
+} from '../interfaces/catalog.interface';
 
 // Cache a nivel de módulo, una por catálogo — se comparte entre todos los componentes que llaman
 // a su load*, así cada catálogo se pide una sola vez por sesión sin importar cuántas pantallas lo

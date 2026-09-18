@@ -11,7 +11,7 @@ import { EditRegisterPermission } from '../components/EditRegisterPermission';
 import { CreateEditRole } from '../components/CreateEditRole';
 import { ManageRolePermissions } from '../components/ManageRolePermissions';
 import type { PermissionAdmin } from '../interfaces/permission.interface';
-import type { RoleAdmin } from '../interfaces/role.interface';
+import type { RoleAdmin } from '../../../shared/interfaces/catalog.interface';
 import '../styles/CatalogPage.css';
 import '../styles/PermissionsPage.css';
 

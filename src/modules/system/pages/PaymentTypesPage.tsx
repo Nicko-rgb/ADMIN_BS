@@ -8,7 +8,7 @@ import { formatDate } from '../../../shared/utils/formatDate';
 import { usePaymentTypes } from '../hooks/usePaymentTypes';
 import { EditCatalogo } from '../components/EditCatalogo';
 import { CreatePaymentType } from '../components/CreatePaymentType';
-import type { PaymentType } from '../interfaces/catalog.interface';
+import type { PaymentType } from '../../../shared/interfaces/catalog.interface';
 import '../styles/CatalogPage.css';
 
 const STATUS_OPTIONS = [

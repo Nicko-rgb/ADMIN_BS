@@ -1,6 +1,7 @@
 import { apiService } from '../../../shared/utils/apiService';
 import type { PaginatedResponse } from '../../../shared/interfaces/pagination.interface';
-import type { CreateSportTypePayload, SportType, UpdateSportTypePayload } from '../interfaces/catalog.interface';
+import type { SportType } from '../../../shared/interfaces/catalog.interface';
+import type { CreateSportTypePayload, UpdateSportTypePayload } from '../interfaces/catalog.interface';
 
 // Catálogo de tipos de deporte — un método por endpoint.
 class SportTypeService {

@@ -5,7 +5,8 @@ import { handleApiError } from '../../../shared/utils/errorHandler';
 import { trimValues } from '../../../shared/utils/trimValues';
 import { normalizeStr } from '../../../shared/utils/formatText';
 import toast from '../../../shared/utils/toast';
-import type { Country, CreateCountryPayload, UpdateCountryPayload } from '../interfaces/catalog.interface';
+import type { Country } from '../../../shared/interfaces/catalog.interface';
+import type { CreateCountryPayload, UpdateCountryPayload } from '../interfaces/catalog.interface';
 import type { CatalogFormField } from '../components/EditCatalogo';
 
 type StatusFilter = 'all' | 'active' | 'inactive';
