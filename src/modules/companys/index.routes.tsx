@@ -17,7 +17,7 @@ const RegisterCompany = lazy(() => import('./pages/RegisterCompany'));
 export const companyRoutes = (
     <>
         <Route index element={<CompanysPage />} />
-        <Route path="company/:tenantId" element={<Company />} />
+        <Route path="company/:publicId" element={<Company />} />
         <Route path="register-company" element={<RegisterCompany />} />
     </>
 );

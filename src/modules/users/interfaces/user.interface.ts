@@ -7,10 +7,9 @@ export type ManagedRole = 'system' | 'super_admin' | 'administrador' | 'empleado
 export type SucursalRole = 'administrador' | 'empleado';
 export type DocumentType = 'IDENTITY_CARD' | 'PASSPORT' | 'LICENSE' | 'OTHER';
 
-// Usuario del catálogo global, con su persona ya resuelta. `role` es la key del rol (puede ser un
-// rol creado desde System > Roles, no solo uno base).
+// Usuario del catálogo global, con su persona ya resuelta. `role` es la key del rol.
 export interface UserAdmin {
-    id: number;
+    publicId: string;
     name: string;
     email: string | null;
     phone: string | null;
@@ -23,7 +22,7 @@ export interface UserAdmin {
 
 // Detalle completo de un usuario — countryId crudo (para el value del select del form de edición).
 export interface UserDetail {
-    id: number;
+    publicId: string;
     firstName: string | null;
     lastName: string | null;
     email: string | null;
@@ -36,9 +35,9 @@ export interface UserDetail {
     dateBirth: string | null;
 }
 
-// Empresa o sucursal a la que está asignado un usuario gestionado.
+// Empresa o sucursal a la que está asignado un usuario gestionado — solo public_id.
 export interface ManagedUserAssignment {
-    tenantId: string;
+    publicId: string;
     name: string;
     role: string;
 }
@@ -86,7 +85,7 @@ export interface UserFormValues {
     sucursales: string[] | null;
 }
 
-// Alta — según el rol, la empresa (super_admin) o las sucursales (administrador/empleado).
+// Alta — según el rol, la empresa (super_admin) o las sucursales (administrador/empleado), por public_id.
 export interface CreateManagedUserPayload extends UpdateOwnProfilePayload {
     first_name: string;
     last_name: string;
@@ -94,5 +93,5 @@ export interface CreateManagedUserPayload extends UpdateOwnProfilePayload {
     country_id: number;
     password?: string;
     sucursales?: string[];
-    company_tenant_id?: string;
+    company_public_id?: string;
 }

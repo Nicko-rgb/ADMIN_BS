@@ -7,9 +7,9 @@ import useSucursalForm from '../hooks/useSucursalForm';
 interface SucursalFormProps {
     onClose: () => void;
     // Empresa bajo la que se registra la sucursal nueva.
-    companyTenantId?: string;
+    companyPublicId?: string;
     // Sucursal a editar; null en alta.
-    sucursalTenantId: string | null;
+    sucursalPublicId: string | null;
     onSaved: () => void;
 }
 
@@ -17,14 +17,14 @@ interface SucursalFormProps {
  * Modal de alta y edición de sucursal — mismo formulario para los dos modos, solo cambian el
  * título y el texto del botón. Se monta únicamente mientras está abierto (ver Company.tsx).
  */
-export const SucursalForm = ({ onClose, companyTenantId, sucursalTenantId, onSaved }: SucursalFormProps) => {
+export const SucursalForm = ({ onClose, companyPublicId, sucursalPublicId, onSaved }: SucursalFormProps) => {
     const {
         isEditMode, isLoadingDetail, isSubmitting,
         form, setField, errors, countryOptions,
         departments, provinces, districts, departmentId, provinceId,
         selectCountry, selectDepartment, selectProvince, selectDistrict, isLoadingUbigeo,
         handleSubmit,
-    } = useSucursalForm({ companyTenantId, sucursalTenantId, onClose, onSaved });
+    } = useSucursalForm({ companyPublicId, sucursalPublicId, onClose, onSaved });
 
     return (
         <Modal isOpen onClose={onClose} title={isEditMode ? 'Editar sucursal' : 'Nueva sucursal'} icon={Store} size="lg">

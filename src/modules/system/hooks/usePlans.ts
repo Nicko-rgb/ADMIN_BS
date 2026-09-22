@@ -30,7 +30,7 @@ export const usePlans = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [reloadToken, setReloadToken] = useState(0);
 
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState<Required<UpdatePlanPayload> | null>(null);
     const [newFeature, setNewFeature] = useState('');
     const [isSaving, setIsSaving] = useState(false);
@@ -63,7 +63,7 @@ export const usePlans = () => {
     };
 
     const openEdit = (plan: Plan) => {
-        setEditingId(plan.id);
+        setEditingId(plan.publicId);
         setForm(toEditForm(plan));
         setNewFeature('');
     };
@@ -115,7 +115,7 @@ export const usePlans = () => {
 
         setIsDeleting(true);
         try {
-            const result = await PlanService.delete(deletingPlan.id);
+            const result = await PlanService.delete(deletingPlan.publicId);
             toast.success(result.message);
             closeDelete();
             reload();

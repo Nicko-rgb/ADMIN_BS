@@ -38,9 +38,9 @@ export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions =
     const phoneCode = countries.find((country) => country.id === values.country_id)?.phoneCode;
     const roleOptions = roles.filter((item) => isSucursalRole(item.key)).map((item) => ({ value: item.key, label: item.label }));
 
-    const toggleSucursal = (tenantId: string) => {
+    const toggleSucursal = (publicId: string) => {
         const selected = values.sucursales ?? [];
-        onChange('sucursales', selected.includes(tenantId) ? selected.filter((id) => id !== tenantId) : [...selected, tenantId]);
+        onChange('sucursales', selected.includes(publicId) ? selected.filter((id) => id !== publicId) : [...selected, publicId]);
     };
 
     return (

@@ -76,7 +76,7 @@ export interface PaymentType {
 export type PlanNotificationsTier = 'basic' | 'full';
 
 export interface Plan {
-    id: number;
+    publicId: string;
     name: string;
     code: string;
     priceMonthly: string;

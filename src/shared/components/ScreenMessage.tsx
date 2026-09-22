@@ -41,7 +41,7 @@ interface NotFoundScreenProps extends ScreenMessageActions {
 
 /**
  * Recurso inexistente dentro de una página ya autenticada — ej. navegar a
- * `/companys/company/:tenantId` con un tenantId que no matchea ninguna
+ * `/companys/company/:publicId` con un publicId que no matchea ninguna
  * empresa. No confundir con `NotFoundPage` (esa es la 404 de ruta, ruta que
  * ni siquiera matchea en el router)
  */

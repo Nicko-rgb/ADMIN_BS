@@ -82,7 +82,7 @@ export const userFormFromDetail = (role: ManagedRole, detail: ManagedUserDetail,
     document_number: detail.documentNumber ?? '',
     is_enabled: detail.isEnabled,
     role,
-    sucursales: isSucursalRole(role) && manageSucursales ? detail.assignments.map((assignment) => assignment.tenantId) : null,
+    sucursales: isSucursalRole(role) && manageSucursales ? detail.assignments.map((assignment) => assignment.publicId) : null,
 });
 
 /**

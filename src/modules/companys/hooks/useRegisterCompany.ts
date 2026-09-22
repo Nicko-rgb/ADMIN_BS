@@ -12,7 +12,7 @@ import type { PlanStepForm } from '../interfaces/companyRegistration.interface';
 import type { UserFormValues } from '../../users/interfaces/user.interface';
 
 const EMPTY_PLAN_FORM: PlanStepForm = {
-    plan_id: 0,
+    plan_public_id: '',
     billing_period: 'monthly',
 };
 
@@ -46,7 +46,7 @@ export const useRegisterCompany = () => {
     const setPlanField = (name: keyof PlanStepForm) => (value: string | number) => {
         setPlanForm((prev) => ({ ...prev, [name]: value }));
     };
-    const isPlanStepValid = Boolean(planForm.plan_id);
+    const isPlanStepValid = Boolean(planForm.plan_public_id);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 

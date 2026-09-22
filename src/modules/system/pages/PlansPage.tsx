@@ -38,7 +38,7 @@ const PlansPage = () => {
             ) : (
                 <div className="plan_cards_grid">
                     {items.map((plan) => (
-                        <div className="plan_card" key={plan.id}>
+                        <div className="plan_card" key={plan.publicId}>
                             <div className="plan_card_header">
                                 <span className="plan_card_name">{plan.name}</span>
                                 <span className="plan_card_badge">{plan.code}</span>

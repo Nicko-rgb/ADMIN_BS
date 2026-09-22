@@ -46,7 +46,7 @@ const CompanysPage = () => {
     const can = usePermission();
     const canCreate = can('company.create');
 
-    const goToCompany = (company: CompanyAdmin) => navigate(`/companys/company/${company.tenantId}`);
+    const goToCompany = (company: CompanyAdmin) => navigate(`/companys/company/${company.publicId}`);
 
     const columns: TableColumn<CompanyAdmin>[] = [
         { key: 'name', header: 'Empresa' },
@@ -103,7 +103,7 @@ const CompanysPage = () => {
             {isSuperAdmin ? (
                 <div className="companys_cards_grid">
                     {items.map((company) => (
-                        <div key={company.id} className="company_card">
+                        <div key={company.publicId} className="company_card">
                             <div className="company_card_header">
                                 <div className="company_card_icon"><Building2 size={22} /></div>
                                 <div className="company_card_title">
@@ -175,7 +175,7 @@ const CompanysPage = () => {
                     <Table
                         columns={columns}
                         data={items}
-                        keyExtractor={(row) => row.id}
+                        keyExtractor={(row) => row.publicId}
                         isLoading={isLoading}
                         emptyMessage="No hay empresas registradas"
                         pagination={pagination}

@@ -13,7 +13,7 @@ export interface CompanyDetailCountry extends CountryDisplay {
 // firstName/lastName separados (no un `name` ya unido) y dateBirth, para poder precargar el
 // form de edición sin pedir nada aparte.
 export interface CompanyOwner {
-    id: number;
+    publicId: string;
     firstName: string | null;
     lastName: string | null;
     email: string | null;
@@ -26,7 +26,7 @@ export interface CompanyOwner {
 
 // Plan primario de la empresa (null si todavía no tiene suscripción).
 export interface CompanyPlan {
-    id: number;
+    publicId: string;
     name: string;
     code: string;
     status: string;
@@ -34,8 +34,7 @@ export interface CompanyPlan {
 
 // Empresa principal del catálogo SaaS, con su dueño y su plan.
 export interface CompanyAdmin {
-    id: number;
-    tenantId: string;
+    publicId: string;
     name: string;
     document: string;
     phoneCell: string;
@@ -64,7 +63,7 @@ export interface CompanyUbigeo {
 // ubigeo ya formateado) y el link a su edición; el detalle completo para editar lo trae
 // sucursal.interface.ts aparte.
 export interface CompanySubsidiary {
-    tenantId: string;
+    publicId: string;
     name: string;
     address: string;
     ubigeo: string | null;
@@ -73,18 +72,18 @@ export interface CompanySubsidiary {
 // Usuario asignado a la empresa o a alguna de sus sucursales — el dueño no entra acá, viene
 // aparte en `owner`. `sucursales` trae una entrada por asignación (puede estar en varias).
 export interface CompanyUser {
-    id: number;
+    publicId: string;
     firstName: string | null;
     lastName: string | null;
     email: string | null;
     phone: string | null;
     role: ManagedRole;
-    sucursales: { tenantId: string; name: string | null }[];
+    sucursales: { publicId: string; name: string | null }[];
 }
 
-// Detalle de una empresa (página "Ver empresa") — se busca por tenantId, no por id.
+// Detalle de una empresa (página "Ver empresa") — se busca por publicId, nunca ids internos.
 export interface CompanyDetail {
-    id: number;
+    publicId: string;
     name: string;
     document: string;
     address: string;

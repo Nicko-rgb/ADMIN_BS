@@ -37,7 +37,7 @@ const useUsers = () => {
     const roleOptions = roles.map((role) => ({ value: role.key, label: role.label }));
     const roleLabel = (key: string) => roles.find((role) => role.key === key)?.label ?? key;
 
-    const [editing, setEditing] = useState<{ role: ManagedRole; id: number } | null>(null);
+    const [editing, setEditing] = useState<{ role: ManagedRole; publicId: string } | null>(null);
     const [editValues, setEditValues] = useState<UserFormValues | null>(null);
     const [isLoadingDetail, setIsLoadingDetail] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -122,11 +122,11 @@ const useUsers = () => {
         if (!isManagedRole(row.role)) return;
         const role = row.role;
 
-        setEditing({ role, id: row.id });
+        setEditing({ role, publicId: row.publicId });
         setEditValues(null);
         setIsLoadingDetail(true);
         try {
-            const detail = await ManageUserService.getById(role, row.id);
+            const detail = await ManageUserService.getById(role, row.publicId);
             setEditValues(userFormFromDetail(role, detail, false));
         } catch (err) {
             toast.error(handleApiError(err));
@@ -154,7 +154,7 @@ const useUsers = () => {
         setIsSaving(true);
         toast.loading('Guardando cambios...');
         try {
-            const result = await ManageUserService.update(editing.role, editing.id, toUserPayload(editing.role, 'edit', editValues));
+            const result = await ManageUserService.update(editing.role, editing.publicId, toUserPayload(editing.role, 'edit', editValues));
             toast.success(result.message);
             closeEdit();
             reload();
@@ -172,7 +172,7 @@ const useUsers = () => {
         setManagingUser(row);
         setIsLoadingPermissions(true);
         try {
-            const keys = await UserPermissionService.getByUserId(row.id);
+            const keys = await UserPermissionService.getByUserId(row.publicId);
             setAssignedKeys(keys);
         } catch (err) {
             toast.error(handleApiError(err));
@@ -198,7 +198,7 @@ const useUsers = () => {
         setIsSavingPermissions(true);
         toast.loading('Guardando permisos...');
         try {
-            const result = await UserPermissionService.update(managingUser.id, assignedKeys);
+            const result = await UserPermissionService.update(managingUser.publicId, assignedKeys);
             toast.success(result.message);
             closeManagePermissions();
         } catch (err) {

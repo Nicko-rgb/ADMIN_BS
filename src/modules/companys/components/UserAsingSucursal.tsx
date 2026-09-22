@@ -28,7 +28,7 @@ export const UserAsingSucursal = ({ onClose, subsidiaries, onSaved }: UserAsingS
                     values={values}
                     onChange={setField}
                     errors={errors}
-                    sucursalOptions={subsidiaries.map((subsidiary) => ({ value: subsidiary.tenantId, label: subsidiary.name }))}
+                    sucursalOptions={subsidiaries.map((subsidiary) => ({ value: subsidiary.publicId, label: subsidiary.name }))}
                 />
 
                 <FormActions>

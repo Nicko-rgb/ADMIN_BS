@@ -16,15 +16,15 @@ class CompanyService {
         return { data: res.data.data, message: res.data.message };
     }
 
-    // Detalle de una empresa — se busca por tenantId, nunca por el id secuencial.
-    static async getByTenantId(tenantId: string): Promise<CompanyDetail> {
-        const res = await apiService.get(`/companys/${tenantId}`);
+    // Detalle de una empresa — se busca por publicId, nunca ids internos.
+    static async getByPublicId(publicId: string): Promise<CompanyDetail> {
+        const res = await apiService.get(`/companys/${publicId}`);
         return res.data.data;
     }
 
     // Autoedición de la propia empresa — sin `document` (RUC).
-    static async updateByTenantId(tenantId: string, payload: UpdateCompanyPayload): Promise<{ data: CompanyDetail; message: string }> {
-        const res = await apiService.put(`/companys/${tenantId}`, payload);
+    static async updateByPublicId(publicId: string, payload: UpdateCompanyPayload): Promise<{ data: CompanyDetail; message: string }> {
+        const res = await apiService.put(`/companys/${publicId}`, payload);
         return { data: res.data.data, message: res.data.message };
     }
 }

@@ -12,13 +12,13 @@ class PlanService {
 
     // Catálogo de planes activos: CatalogActiveService.listPlans() (shared/service).
 
-    static async update(id: number, payload: UpdatePlanPayload): Promise<{ data: Plan; message: string }> {
-        const res = await apiService.put(`/saas/plans/${id}`, payload);
+    static async update(publicId: string, payload: UpdatePlanPayload): Promise<{ data: Plan; message: string }> {
+        const res = await apiService.put(`/saas/plans/${publicId}`, payload);
         return { data: res.data.data, message: res.data.message };
     }
 
-    static async delete(id: number): Promise<{ message: string }> {
-        const res = await apiService.delete(`/saas/plans/${id}`);
+    static async delete(publicId: string): Promise<{ message: string }> {
+        const res = await apiService.delete(`/saas/plans/${publicId}`);
         return { message: res.data.message };
     }
 }

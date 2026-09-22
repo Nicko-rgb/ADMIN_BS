@@ -31,12 +31,12 @@ export const PlanStepForm = ({ plans, form, setField }: PlanStepFormProps) => (
         <div className="register_plans_grid">
             {plans.map((plan) => (
                 <button
-                    key={plan.id}
+                    key={plan.publicId}
                     type="button"
-                    className={`register_plan_card ${form.plan_id === plan.id ? 'is_selected' : ''}`}
-                    onClick={() => setField('plan_id')(plan.id)}
+                    className={`register_plan_card ${form.plan_public_id === plan.publicId ? 'is_selected' : ''}`}
+                    onClick={() => setField('plan_public_id')(plan.publicId)}
                 >
-                    <span className="register_plan_radio">{form.plan_id === plan.id && <Check size={14} />}</span>
+                    <span className="register_plan_radio">{form.plan_public_id === plan.publicId && <Check size={14} />}</span>
 
                     <div className="register_plan_card_header">
                         <span className="register_plan_card_name">{plan.name}</span>

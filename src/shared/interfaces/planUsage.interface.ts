@@ -6,8 +6,7 @@ export interface PlanLimitUsage {
 
 // Empresa titular de la suscripción — puede ser la misma empresa consultada.
 export interface PlanPrimaryCompany {
-    companyId: number;
-    tenantId: string;
+    publicId: string;
     name: string;
 }
 

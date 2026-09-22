@@ -3,10 +3,10 @@ import type { TenantFormErrors } from '../utils/tenantForm';
 
 export type SucursalStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
 
-// Detalle de una sucursal — se busca por su propio tenantId, no por el de la empresa padre.
+// Detalle de una sucursal — se busca por su propio publicId, nunca ids internos ni tenant.
 export interface SucursalDetail {
-    tenantId: string;
-    companyTenantId: string | null;
+    publicId: string;
+    companyPublicId: string | null;
     name: string;
     address: string;
     phoneCell: string;

@@ -24,7 +24,7 @@ const ENABLED_CLASSNAMES = { A: 'active', I: 'inactive', P: 'pending' } as const
 // vista de detalle de sucursal todavía no existe). El fetch vive en useCompany.
 const Company = () => {
     const {
-        tenantId, company, isLoading, errorStatus, errorMessage, retry, planUsage,
+        publicId, company, isLoading, errorStatus, errorMessage, retry, planUsage,
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit, companyEditProps,
         isSucursalOpen, editingSucursalId, openRegisterSucursal, openEditSucursal, closeSucursal,
         isUserModalOpen, openUserModal, closeUserModal,
@@ -58,7 +58,7 @@ const Company = () => {
         return null;
     }
 
-    const isPrimary = company.id === planUsage?.primaryCompany?.companyId;
+    const isPrimary = company.publicId === planUsage?.primaryCompany?.publicId;
 
     return (
         <div className="company_detail_page">
@@ -176,7 +176,7 @@ const Company = () => {
                 {company.subsidiaries.length > 0 ? (
                     <div className="company_subsidiaries_grid">
                         {company.subsidiaries.map((subsidiary) => (
-                            <div className="subsidiary_card" key={subsidiary.tenantId}>
+                            <div className="subsidiary_card" key={subsidiary.publicId}>
                                 <div className="header">
                                     <div className="avatar center">{subsidiary.name.charAt(0).toUpperCase()}</div>
                                     <span className="name">{subsidiary.name}</span>
@@ -192,7 +192,7 @@ const Company = () => {
                                         icon={Settings}
                                         color="secondary"
                                         className="action"
-                                        onClick={() => openEditSucursal(subsidiary.tenantId)}
+                                        onClick={() => openEditSucursal(subsidiary.publicId)}
                                     />
                                 )}
                             </div>
@@ -218,7 +218,7 @@ const Company = () => {
                 {company.users.length > 0 ? (
                     <div className="users_grid">
                         {company.users.map((user) => (
-                            <div className="card" key={user.id}>
+                            <div className="card" key={user.publicId}>
                                 <div className="header">
                                     <span className="name">{`${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || '—'}</span>
                                     <span className={`role ${user.role}`}>{ROLE_LABELS[user.role]}</span>
@@ -229,7 +229,7 @@ const Company = () => {
                                 </div>
                                 <div className="user_sucursales">
                                     {user.sucursales.map((sucursal) => (
-                                        <span className="sucursal_pill" key={sucursal.tenantId}>
+                                        <span className="sucursal_pill" key={sucursal.publicId}>
                                             <Store size={18} />{sucursal.name ?? '—'}
                                         </span>
                                     ))}
@@ -256,8 +256,8 @@ const Company = () => {
             {canManageSucursales && isSucursalOpen && (
                 <SucursalForm
                     onClose={closeSucursal}
-                    companyTenantId={tenantId}
-                    sucursalTenantId={editingSucursalId}
+                    companyPublicId={publicId}
+                    sucursalPublicId={editingSucursalId}
                     onSaved={retry}
                 />
             )}

@@ -17,9 +17,9 @@ export type CompanyStepErrors = TenantFormErrors<CompanyStepForm>;
 
 export type BillingPeriod = 'monthly' | 'yearly';
 
-// Paso 3 — plan elegido y periodicidad de facturación.
+// Paso 3 — plan elegido y periodicidad de facturación (por public_id, nunca id interno).
 export interface PlanStepForm {
-    plan_id: number;
+    plan_public_id: string;
     billing_period: BillingPeriod;
 }
 

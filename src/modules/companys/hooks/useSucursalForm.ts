@@ -15,22 +15,22 @@ const toNumberOrNull = (value: string): number | null => (
 
 interface UseSucursalFormArgs {
     // Empresa bajo la que se registra la sucursal nueva.
-    companyTenantId?: string;
+    companyPublicId?: string;
     // Sucursal a editar; null en alta.
-    sucursalTenantId: string | null;
+    sucursalPublicId: string | null;
     onClose: () => void;
     onSaved: () => void;
 }
 
 /**
- * Modal de sucursal — alta cuando `sucursalTenantId` es null, edición cuando trae uno: en ese
+ * Modal de sucursal — alta cuando `sucursalPublicId` es null, edición cuando trae uno: en ese
  * caso busca el detalle al montar y precarga el form. El estado y la cascada de ubigeo viven en
  * useTenantForm; acá queda solo el fetch del detalle y el guardado.
  */
-export const useSucursalForm = ({ companyTenantId, sucursalTenantId, onClose, onSaved }: UseSucursalFormArgs) => {
+export const useSucursalForm = ({ companyPublicId, sucursalPublicId, onClose, onSaved }: UseSucursalFormArgs) => {
     const { form, setField, preload, errors, isValid, ...ubigeo } = useTenantForm(EMPTY_SUCURSAL_FORM, SUCURSAL_REQUIRED_FIELDS, sucursalExtraRules);
 
-    const isEditMode = sucursalTenantId !== null;
+    const isEditMode = sucursalPublicId !== null;
     const [isLoadingDetail, setIsLoadingDetail] = useState(isEditMode);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,10 +38,10 @@ export const useSucursalForm = ({ companyTenantId, sucursalTenantId, onClose, on
     const [showErrors, setShowErrors] = useState(false);
 
     useEffect(() => {
-        if (!sucursalTenantId) return;
+        if (!sucursalPublicId) return;
 
         let active = true;
-        SucursalService.getByTenantId(sucursalTenantId)
+        SucursalService.getByPublicId(sucursalPublicId)
             .then((detail) => {
                 if (!active) return;
                 preload({
@@ -68,11 +68,11 @@ export const useSucursalForm = ({ companyTenantId, sucursalTenantId, onClose, on
             .finally(() => { if (active) setIsLoadingDetail(false); });
 
         return () => { active = false; };
-    }, [sucursalTenantId, preload, onClose]);
+    }, [sucursalPublicId, preload, onClose]);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!companyTenantId) return;
+        if (!companyPublicId) return;
 
         if (!isValid) {
             setShowErrors(true);
@@ -96,9 +96,9 @@ export const useSucursalForm = ({ companyTenantId, sucursalTenantId, onClose, on
                 website: trimmed.website || null,
             };
 
-            const result = sucursalTenantId
-                ? await SucursalService.update(sucursalTenantId, payload)
-                : await SucursalService.register(companyTenantId, payload);
+            const result = sucursalPublicId
+                ? await SucursalService.update(sucursalPublicId, payload)
+                : await SucursalService.register(companyPublicId, payload);
 
             toast.success(result.message);
             onSaved();

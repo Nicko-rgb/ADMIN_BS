@@ -15,8 +15,8 @@ class ManageUserService {
         return { data: res.data.data, pagination: res.data.pagination };
     }
 
-    static async getById(role: ManagedRole, id: number): Promise<ManagedUserDetail> {
-        const res = await apiService.get(`/users/manage/${role}/${id}`);
+    static async getById(role: ManagedRole, publicId: string): Promise<ManagedUserDetail> {
+        const res = await apiService.get(`/users/manage/${role}/${publicId}`);
         return res.data.data;
     }
 
@@ -25,8 +25,8 @@ class ManageUserService {
         return { data: res.data.data, message: res.data.message };
     }
 
-    static async update(role: ManagedRole, id: number, payload: UpdateManagedUserPayload): Promise<{ data: ManagedUserDetail; message: string }> {
-        const res = await apiService.put(`/users/manage/${role}/${id}`, payload);
+    static async update(role: ManagedRole, publicId: string, payload: UpdateManagedUserPayload): Promise<{ data: ManagedUserDetail; message: string }> {
+        const res = await apiService.put(`/users/manage/${role}/${publicId}`, payload);
         return { data: res.data.data, message: res.data.message };
     }
 }

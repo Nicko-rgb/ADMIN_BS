@@ -106,7 +106,7 @@ const UserCatalog = () => {
             <Table
                 columns={columns}
                 data={items}
-                keyExtractor={(row) => row.id}
+                keyExtractor={(row) => row.publicId}
                 isLoading={isLoading}
                 emptyMessage="No hay usuarios registrados"
                 pagination={pagination}

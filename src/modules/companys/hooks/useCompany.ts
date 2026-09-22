@@ -17,9 +17,9 @@ import type { UserFormValues } from '../../users/interfaces/user.interface';
 
 export type CompanyErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 
-// Detalle de una empresa — trae el tenantId de la URL (/companys/company/:tenantId) y carga
-// país, ubigeo formateado, dueño y sucursales en un solo fetch. El 404 (tenantId inexistente)
-// y el 403 (empresa fuera del scope del usuario, ver company.service.ts::getByTenantId en el
+// Detalle de una empresa — trae el publicId de la URL (/companys/company/:publicId) y carga
+// país, ubigeo formateado, dueño y sucursales en un solo fetch. El 404 (publicId inexistente)
+// y el 403 (empresa fuera del scope del usuario, ver company.service.ts::getByPublicId en el
 // backend) se distinguen por status para que la página elija entre NotFoundScreen y
 // ForbiddenScreen — cualquier otro error queda como 'unknown', mismo mensaje genérico.
 //
@@ -30,7 +30,7 @@ export type CompanyErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 // trae el detalle completo por id, la autoedición del propio perfil vive aparte en /home/profile
 // (useProfile).
 export const useCompany = () => {
-    const { tenantId } = useParams<{ tenantId: string }>();
+    const { publicId } = useParams<{ publicId: string }>();
 
     const [company, setCompany] = useState<CompanyDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -39,14 +39,14 @@ export const useCompany = () => {
     const [reloadToken, setReloadToken] = useState(0);
 
     useEffect(() => {
-        if (!tenantId) return;
+        if (!publicId) return;
         let active = true;
 
         const fetchCompany = async () => {
             setIsLoading(true);
             setErrorStatus(null);
             try {
-                const data = await CompanyService.getByTenantId(tenantId);
+                const data = await CompanyService.getByPublicId(publicId);
                 if (active) setCompany(data);
             } catch (err) {
                 if (!active) return;
@@ -61,9 +61,9 @@ export const useCompany = () => {
         fetchCompany();
 
         return () => { active = false; };
-    }, [tenantId, reloadToken]);
+    }, [publicId, reloadToken]);
 
-    const { planUsage, notificationsTier, reloadPlanUsage } = usePlanUsage(company?.id);
+    const { planUsage, notificationsTier, reloadPlanUsage } = usePlanUsage(company?.publicId);
 
     const reload = () => {
         setReloadToken((token) => token + 1);
@@ -100,7 +100,7 @@ export const useCompany = () => {
 
     const handleSubmitCompanyEdit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!tenantId) return;
+        if (!publicId) return;
 
         if (!isCompanyEditValid) {
             setShowCompanyEditErrors(true);
@@ -111,7 +111,7 @@ export const useCompany = () => {
         setIsSavingCompany(true);
         try {
             const payload = trimValues(companyEditFields.form);
-            const result = await CompanyService.updateByTenantId(tenantId, payload);
+            const result = await CompanyService.updateByPublicId(publicId, payload);
             setCompany(result.data);
             toast.success(result.message);
             closeEditCompany();
@@ -124,17 +124,17 @@ export const useCompany = () => {
 
     // Modal de sucursal ──────────────────────────────────────────────────────────────────────
     // Solo apertura/cierre y cuál se edita (null = alta); su data la trae el propio modal.
-    const [sucursalModal, setSucursalModal] = useState<{ isOpen: boolean; tenantId: string | null }>({ isOpen: false, tenantId: null });
+    const [sucursalModal, setSucursalModal] = useState<{ isOpen: boolean; publicId: string | null }>({ isOpen: false, publicId: null });
 
     const openRegisterSucursal = () => {
         if (!hasPlanRoom(planUsage?.subsidiaries)) {
             return toast.warning('Alcanzaste el límite de tu plan para registrar sucursales, actualiza de plan.', { duration: 5000 });
         }
-        setSucursalModal({ isOpen: true, tenantId: null });
+        setSucursalModal({ isOpen: true, publicId: null });
     };
 
-    const openEditSucursal = (sucursalTenantId: string) => setSucursalModal({ isOpen: true, tenantId: sucursalTenantId });
-    const closeSucursal = useCallback(() => setSucursalModal({ isOpen: false, tenantId: null }), []);
+    const openEditSucursal = (sucursalPublicId: string) => setSucursalModal({ isOpen: true, publicId: sucursalPublicId });
+    const closeSucursal = useCallback(() => setSucursalModal({ isOpen: false, publicId: null }), []);
 
     // Modal de alta de usuario de sucursal — su estado y su envío viven en useUserAsingSucursal.
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -161,7 +161,7 @@ export const useCompany = () => {
         setOwnerEditValues(null);
         setIsLoadingOwnerDetail(true);
         try {
-            const detail = await ManageUserService.getById('super_admin', company.owner.id);
+            const detail = await ManageUserService.getById('super_admin', company.owner.publicId);
             setOwnerEditValues(userFormFromDetail('super_admin', detail, false));
         } catch (err) {
             toast.error(handleApiError(err));
@@ -189,7 +189,7 @@ export const useCompany = () => {
         setIsSavingOwner(true);
         toast.loading('Guardando cambios...');
         try {
-            const result = await ManageUserService.update('super_admin', company.owner.id, toUserPayload('super_admin', 'edit', ownerEditValues));
+            const result = await ManageUserService.update('super_admin', company.owner.publicId, toUserPayload('super_admin', 'edit', ownerEditValues));
             toast.success(result.message);
             closeEditOwner();
             reload();
@@ -201,15 +201,15 @@ export const useCompany = () => {
     };
 
     return {
-        tenantId, company, isLoading, errorStatus, errorMessage, retry: reload, planUsage, notificationsTier,
+        publicId, company, isLoading, errorStatus, errorMessage, retry: reload, planUsage, notificationsTier,
 
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit,
         companyEditProps: {
             ...companyEditFields,
-            errors: showCompanyEditErrors ? companyEditErrors : {},
+            errors: showErrors ? companyEditErrors : {},
         },
 
-        isSucursalOpen: sucursalModal.isOpen, editingSucursalId: sucursalModal.tenantId,
+        isSucursalOpen: sucursalModal.isOpen, editingSucursalId: sucursalModal.publicId,
         openRegisterSucursal, openEditSucursal, closeSucursal,
 
         isUserModalOpen, openUserModal, closeUserModal,
