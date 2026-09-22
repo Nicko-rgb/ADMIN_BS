@@ -88,6 +88,11 @@
         .modal_body {
             padding: 1.5rem;
             overflow-y: auto;
+
+            .form_section {
+                border: none !important;
+                box-shadow: none !important;
+            }
         }
     }
 }

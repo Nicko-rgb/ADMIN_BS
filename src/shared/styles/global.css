@@ -81,16 +81,32 @@ body {
    Los pares soft + text vienen resueltos por modo desde colors.css, así el color
    no depende de qué haya detrás. */
 .status_badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 1.3rem;
     font-weight: 600;
     text-transform: uppercase;
+    position: relative;
+
+    &::before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: currentColor;
+    }
 
     &.active {
-        background: var(--success-soft);
-        color: var(--success-text);
+        background: var(--primary-light);
+        color: var(--primary);
+
+        &::before {
+            animation: status_badge_pulse 1.8s ease-out infinite;
+        }
     }
 
     &.inactive {
@@ -101,6 +117,23 @@ body {
     &.pending, &.maintenance {
         background: var(--warning-soft);
         color: var(--warning-text);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &::before {
+            animation: none;
+        }
+    }
+}
+
+/* Halo que se expande y se desvanece alrededor del punto, sin agrandarlo. */
+@keyframes status_badge_pulse {
+    from {
+        box-shadow: 0 0 0 0 currentColor;
+    }
+
+    to {
+        box-shadow: 0 0 0 6px transparent;
     }
 }
 

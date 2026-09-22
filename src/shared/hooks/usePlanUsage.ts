@@ -5,8 +5,8 @@ import toast from '../utils/toast';
 import type { PlanUsage } from '../interfaces/planUsage.interface';
 
 /**
- * Plan de una empresa y el uso de cada límite. `planUsage` es null mientras carga;
- * `reloadPlanUsage` lo vuelve a pedir (ej. después de crear una sucursal o un usuario).
+ * Plan de una empresa, el uso de cada límite y su nivel de notificaciones ('basic' | 'full').
+ * `planUsage` es null mientras carga; `reloadPlanUsage` lo vuelve a pedir.
  */
 export const usePlanUsage = (companyId?: number) => {
     const [planUsage, setPlanUsage] = useState<PlanUsage | null>(null);
@@ -25,7 +25,7 @@ export const usePlanUsage = (companyId?: number) => {
 
     const reloadPlanUsage = useCallback(() => setReloadToken((token) => token + 1), []);
 
-    return { planUsage, reloadPlanUsage };
+    return { planUsage , notificationsTier: planUsage?.notificationsTier ?? null, reloadPlanUsage };
 };
 
 export default usePlanUsage;

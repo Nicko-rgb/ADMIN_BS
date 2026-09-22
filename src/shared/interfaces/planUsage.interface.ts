@@ -11,8 +11,12 @@ export interface PlanPrimaryCompany {
     name: string;
 }
 
+// Nivel de notificaciones del plan: 'basic' (solo email) o 'full' (todos los canales).
+export type PlanNotificationsTier = 'basic' | 'full';
+
 export interface PlanUsage {
     planName: string;
+    notificationsTier: PlanNotificationsTier;
     primaryCompany: PlanPrimaryCompany | null;
     subsidiaries: PlanLimitUsage;
     users: PlanLimitUsage;

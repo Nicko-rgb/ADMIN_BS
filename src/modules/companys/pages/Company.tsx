@@ -2,7 +2,6 @@ import { Settings, Pencil, Store, Building2, User, Plus, Users, UploadCloud, Use
 import { Header } from '../../../shared/components/Header';
 import { Button } from '../../../shared/components/Button';
 import { Modal } from '../../../shared/components/Modal';
-import { TableImage } from '../../../shared/components/Table';
 import { LoadingScreen, NotFoundScreen, ForbiddenScreen, FormActions, PlanUsageBar } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
@@ -59,19 +58,23 @@ const Company = () => {
         return null;
     }
 
+    const isPrimary = company.id === planUsage?.primaryCompany?.companyId;
+
     return (
         <div className="company_detail_page">
             <Header title={company.name} breadcrumbs={[{ label: 'Empresas', path: '/companys' }]} showCard={false} />
 
-            <div className="company_hero">
+            <div className="company_hero card">
                 <div className="company_hero_identity">
-                    <div className="company_avatar">{company.name.charAt(0).toUpperCase()}</div>
+                    <div className="company_avatar center">{company.name.charAt(0).toUpperCase()}</div>
                     <div className="company_hero_text">
                         <div className="company_hero_title_row">
                             <h1>{company.name}</h1>
-                            {company.isEnabled && (
-                                <span className={`status_badge ${ENABLED_CLASSNAMES[company.isEnabled]}`}>{ENABLED_LABELS[company.isEnabled]}</span>
-                            )}
+                            <span className={`status_badge ${ENABLED_CLASSNAMES[company.isEnabled]}`}>{ENABLED_LABELS[company.isEnabled]}</span>
+                            <span className="company_plan_badge"><Gift size={14} />Plan {planUsage?.planName || '-'}</span>
+                            {isPrimary &&
+                                <span className='company_plan_badge'>Empresa Primaria </span>
+                            }
                         </div>
                         <span className="company_hero_subtitle">RUC {company.document}</span>
                     </div>
@@ -81,103 +84,91 @@ const Company = () => {
                 </div>
             </div>
 
-            <div className="card company_plan_card">
-                <div className="company_detail_card_title">
-                    <Gift size={22} />
-                    <h3>{planUsage ? `Plan ${planUsage.planName}` : 'Plan'}</h3>
-                </div>
-                <div className="company_plan_usage">
-                    <PlanUsageBar value={planUsage?.subsidiaries} label="Sucursales" />
-                    <PlanUsageBar value={planUsage?.users} label="Usuarios" />
-                </div>
-            </div>
-
             <div className="card company_info_card">
-                <div className="company_info_columns">
-                    <div className="company_info_column">
-                        <div className="company_detail_card_title">
-                            <Building2 size={22} />
-                            <h3>Información de la empresa</h3>
-                            <Button text="Editar" size="sm" icon={Pencil} onClick={openEditCompany} />
-                        </div>
-                        <div className="company_detail_row">
-                            <span className="company_detail_label">Teléfono celular</span>
-                            <span>{formatPhone(company.country?.phoneCode, company.phoneCell) || '—'}</span>
-                        </div>
-                        <div className="company_detail_row">
-                            <span className="company_detail_label">Teléfono fijo</span>
-                            <span>{company.phone ? formatPhone(company.country?.phoneCode, company.phone) : '—'}</span>
-                        </div>
-                        <div className="company_detail_row">
-                            <span className="company_detail_label">Dirección</span>
-                            <span>{company.address}</span>
-                        </div>
-                        <div className="company_detail_row">
-                            <span className="company_detail_label">País</span>
-                            {company.country ? (
-                                <div className="company_detail_country" title={company.ubigeo?.formatted ? `${company.country.name} - ${company.ubigeo.formatted}` : company.country.name}>
-                                    <TableImage src={company.country.flagUrl} alt={company.country.name} />
-                                    <span className="company_detail_ellipsis">
-                                        {company.country.name}{company.ubigeo?.formatted ? ` - ${company.ubigeo.formatted}` : ''}
-                                    </span>
-                                </div>
-                            ) : '—'}
-                        </div>
-                        <div className="company_detail_row">
-                            <span className="company_detail_label">Registrada</span>
-                            <span>{formatDate(company.createdAt)}</span>
-                        </div>
+                <div className="company_info_column">
+                    <div className="title_card">
+                        <Building2 size={22} />
+                        <h3>Información de la empresa</h3>
+                        <Button text="Editar" size="sm" icon={Pencil} onClick={openEditCompany} />
                     </div>
+                    <div className="company_detail_row">
+                        <span className="company_detail_label">Teléfono celular</span>
+                        <span>{formatPhone(company.country?.phoneCode, company.phoneCell) || '—'}</span>
+                    </div>
+                    <div className="company_detail_row">
+                        <span className="company_detail_label">Teléfono fijo</span>
+                        <span>{company.phone ? formatPhone(company.country?.phoneCode, company.phone) : '—'}</span>
+                    </div>
+                    <div className="company_detail_row">
+                        <span className="company_detail_label">Dirección</span>
+                        <span>{company.address}</span>
+                    </div>
+                    <div className="company_detail_row">
+                        <span className="company_detail_label">País</span>
+                        {company.country ? (
+                            <div className="company_detail_country" title={company.ubigeo?.formatted ? `${company.country.name} - ${company.ubigeo.formatted}` : company.country.name}>
+                                <img src={company.country.flagUrl} alt="" />
+                                <span className="ellipsis">
+                                    {company.country.name}{company.ubigeo?.formatted ? ` - ${company.ubigeo.formatted}` : ''}
+                                </span>
+                            </div>
+                        ) : '—'}
+                    </div>
+                    <div className="company_detail_row">
+                        <span className="company_detail_label">Registrada</span>
+                        <span>{formatDate(company.createdAt)}</span>
+                    </div>
+                </div>
 
-                    <div className="company_info_column">
-                        <div className="company_detail_card_title">
-                            <User size={22} />
-                            <h3>Información del dueño</h3>
-                            {company.owner && canEditOwner && <Button text="Editar" size="sm" icon={Pencil} onClick={openEditOwner} />}
-                        </div>
-                        {company.owner ? (
-                            <>
-                                <div className="company_detail_row">
-                                    <span className="company_detail_label">Nombre</span>
-                                    <span>{`${company.owner.firstName} ${company.owner.lastName}`}</span>
-                                </div>
-                                <div className="company_detail_row">
-                                    <span className="company_detail_label">Correo</span>
-                                    <span>{company.owner.email ?? '—'}</span>
-                                </div>
-                                <div className="company_detail_row">
-                                    <span className="company_detail_label">Teléfono</span>
-                                    <span>{formatPhone(company.owner.country?.phoneCode, company.owner.phone) || '—'}</span>
-                                </div>
-                                <div className="company_detail_row">
-                                    <span className="company_detail_label">Documento</span>
-                                    <span>
-                                        {company.owner.documentType
-                                            ? `${DOCUMENT_TYPE_LABELS[company.owner.documentType]} · ${company.owner.documentNumber}`
-                                            : '—'}
-                                    </span>
-                                </div>
-                                <div className="company_detail_row">
-                                    <span className="company_detail_label">País</span>
-                                    {company.owner.country ? (
-                                        <div className="company_detail_country">
-                                            <TableImage src={company.owner.country.flagUrl} alt={company.owner.country.name} />
-                                            <span>{company.owner.country.name}</span>
-                                        </div>
-                                    ) : '—'}
-                                </div>
-                            </>
-                        ) : (
-                            <span className="company_empty_value">Sin dueño asignado</span>
-                        )}
+                <div className="company_info_column">
+                    <div className="title_card">
+                        <User size={22} />
+                        <h3>Información del dueño</h3>
+                        {company.owner && canEditOwner && <Button text="Editar" size="sm" icon={Pencil} onClick={openEditOwner} />}
                     </div>
+                    {company.owner ? (
+                        <>
+                            <div className="company_detail_row">
+                                <span className="company_detail_label">Nombre</span>
+                                <span>{`${company.owner.firstName} ${company.owner.lastName}`}</span>
+                            </div>
+                            <div className="company_detail_row">
+                                <span className="company_detail_label">Correo</span>
+                                <span>{company.owner.email ?? '—'}</span>
+                            </div>
+                            <div className="company_detail_row">
+                                <span className="company_detail_label">Teléfono</span>
+                                <span>{formatPhone(company.owner.country?.phoneCode, company.owner.phone) || '—'}</span>
+                            </div>
+                            <div className="company_detail_row">
+                                <span className="company_detail_label">Documento</span>
+                                <span>
+                                    {company.owner.documentType
+                                        ? `${DOCUMENT_TYPE_LABELS[company.owner.documentType]} · ${company.owner.documentNumber}`
+                                        : '—'}
+                                </span>
+                            </div>
+                            <div className="company_detail_row">
+                                <span className="company_detail_label">País</span>
+                                {company.owner.country ? (
+                                    <div className="company_detail_country">
+                                        <img src={company.owner.country.flagUrl} alt={company.owner.country.name} />
+                                        <span>{company.owner.country.name}</span>
+                                    </div>
+                                ) : '—'}
+                            </div>
+                        </>
+                    ) : (
+                        <span className="company_empty_value">Sin dueño asignado</span>
+                    )}
                 </div>
             </div>
 
-            <div className="company_subsidiaries_section">
-                <div className="company_detail_card_title">
+            <div className="section_company card">
+                <div className="title_card">
                     <Store size={18} />
                     <h3>Sucursales</h3>
+                    <PlanUsageBar value={planUsage?.subsidiaries} label="Sucursales" />
                     {canManageSucursales && (
                         <Button text="Nueva Sucursal" size="sm" icon={Plus} onClick={openRegisterSucursal} />
                     )}
@@ -215,10 +206,11 @@ const Company = () => {
                 )}
             </div>
 
-            <div className="company_subsidiaries_section">
-                <div className="company_detail_card_title">
+            <div className="section_company card">
+                <div className="title_card">
                     <Users size={18} />
                     <h3>Usuarios</h3>
+                    <PlanUsageBar value={planUsage?.users} label="Usuarios" />
                     {canManageCompanyUsers && (
                         <Button text="Nuevo Usuario" size="sm" icon={Plus} onClick={openUserModal} />
                     )}

@@ -20,14 +20,14 @@ const usageLevel = (value: PlanLimitUsage): string => {
     return usageRatio(value) >= 0.8 ? 'warning' : 'ok';
 };
 
-// Barra de uso de un límite del plan: "usado / máximo", con ∞ cuando es ilimitado.
+// Uso de un límite del plan: label arriba, barra chica + "usado / máximo", con ∞ cuando es ilimitado.
 export const PlanUsageBar = ({ value, label }: PlanUsageBarProps) => (
     <div className={`plan_usage_bar ${value ? usageLevel(value) : 'loading'}`}>
-        <div className="plan_usage_header">
-            <span className="plan_usage_label">{label}</span>
-            <span className="plan_usage_count">{value ? `${value.used} / ${value.max ?? '∞'}` : '—'}</span>
+        <div className='label_box'>
+            <label title={label}>{label}</label>
+            <progress className="progress_bar" value={value ? usageRatio(value) : 0} max={1} />
         </div>
-        <progress className="plan_usage_track" value={value ? usageRatio(value) : 0} max={1} aria-label={label} />
+        <span className="usage_count">{value ? `${value.used} / ${value.max ?? '∞'}` : '—'}</span>
     </div>
 );
 

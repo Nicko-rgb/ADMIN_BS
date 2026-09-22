@@ -6,6 +6,7 @@ import { handleApiError } from '../../../shared/utils/errorHandler';
 import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
 import { usePlanUsage } from '../../../shared/hooks/usePlanUsage';
+import { hasPlanRoom } from '../../../shared/utils/planUsage';
 import CompanyService from '../service/companyService';
 import ManageUserService from '../../users/service/manageUserService';
 import { isUserFormValid, toUserPayload, userFormFromDetail } from '../../users/utils/userForm';
@@ -62,7 +63,7 @@ export const useCompany = () => {
         return () => { active = false; };
     }, [tenantId, reloadToken]);
 
-    const { planUsage, reloadPlanUsage } = usePlanUsage(company?.id);
+    const { planUsage, notificationsTier, reloadPlanUsage } = usePlanUsage(company?.id);
 
     const reload = () => {
         setReloadToken((token) => token + 1);
@@ -125,13 +126,25 @@ export const useCompany = () => {
     // Solo apertura/cierre y cuál se edita (null = alta); su data la trae el propio modal.
     const [sucursalModal, setSucursalModal] = useState<{ isOpen: boolean; tenantId: string | null }>({ isOpen: false, tenantId: null });
 
-    const openRegisterSucursal = () => setSucursalModal({ isOpen: true, tenantId: null });
+    const openRegisterSucursal = () => {
+        if (!hasPlanRoom(planUsage?.subsidiaries)) {
+            return toast.warning('Alcanzaste el límite de tu plan para registrar sucursales, actualiza de plan.', { duration: 5000 });
+        }
+        setSucursalModal({ isOpen: true, tenantId: null });
+    };
+
     const openEditSucursal = (sucursalTenantId: string) => setSucursalModal({ isOpen: true, tenantId: sucursalTenantId });
     const closeSucursal = useCallback(() => setSucursalModal({ isOpen: false, tenantId: null }), []);
 
     // Modal de alta de usuario de sucursal — su estado y su envío viven en useUserAsingSucursal.
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-    const openUserModal = () => setIsUserModalOpen(true);
+    const openUserModal = () => {
+        if (!hasPlanRoom(planUsage?.users)) {
+            return toast.warning('Alcanzaste el límite de tu plan para registrar usuarios, actualiza de plan.', { duration: 5000 });
+        }
+        setIsUserModalOpen(true);
+    };
+
     const closeUserModal = () => setIsUserModalOpen(false);
 
     // Edición de dueño ───────────────────────────────────────────────────────────────────────
@@ -188,7 +201,7 @@ export const useCompany = () => {
     };
 
     return {
-        tenantId, company, isLoading, errorStatus, errorMessage, retry: reload, planUsage,
+        tenantId, company, isLoading, errorStatus, errorMessage, retry: reload, planUsage, notificationsTier,
 
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit,
         companyEditProps: {
