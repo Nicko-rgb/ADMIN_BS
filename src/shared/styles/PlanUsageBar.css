@@ -4,7 +4,7 @@
     gap: 1rem;
     flex-shrink: 0;
     width: 100%;
-    max-width: 100px;
+    max-width: 120px;
 
     .label_box {
         display: flex;
@@ -14,7 +14,7 @@
         min-width: 0;
 
         label {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 400;
             color: var(--text-muted);
             line-height: 1.2;
@@ -52,7 +52,7 @@
 
     .usage_count {
         flex-shrink: 0;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         font-weight: 600;
         color: var(--text-soft);
         font-variant-numeric: tabular-nums;

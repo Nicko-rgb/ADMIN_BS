@@ -3,15 +3,40 @@ import type { DocumentType, ManagedRole } from '../../users/interfaces/user.inte
 
 export type CompanyEnabled = 'A' | 'I' | 'P';
 
-// País con su id crudo — a diferencia de CountryDisplay (solo para mostrar), acá hace falta
-// para precargar el select del form de edición (de la empresa o del dueño).
-export interface CompanyDetailCountry extends CountryDisplay {
+// Dueño en el listado (toCompanyListDto) — solo nombre y email, sin publicId ni persona.
+export interface CompanyListOwner {
+    firstName: string | null;
+    lastName: string | null;
+    email: string | null;
+}
+
+// Plan en el listado (toCompanyListDto) — { name, code, status }, sin publicId.
+export interface CompanyPlan {
+    name: string;
+    code: string;
+    status: string;
+}
+
+// Listado de empresas (toCompanyListDto) — sin `website` (el backend no lo envía acá).
+export interface CompanyAdmin {
+    publicId: string;
+    name: string;
+    document: string;
+    phoneCell: string;
+    country: CountryDisplay | null;
+    isEnabled: CompanyEnabled | null;
+    owner: CompanyListOwner | null;
+    plan: CompanyPlan | null;
+    createdAt: string;
+}
+
+// País del dueño en el detalle — el único `country` con `id` que envía el backend
+// (owner.person.country). El `country` de la empresa NO trae id.
+export interface CompanyOwnerCountry extends CountryDisplay {
     id: number;
 }
 
-// Dueño de la empresa — primer super_admin activo asignado (null si todavía no tiene).
-// firstName/lastName separados (no un `name` ya unido) y dateBirth, para poder precargar el
-// form de edición sin pedir nada aparte.
+// Dueño en el detalle (toCompanyDetailDto) — con publicId y datos de persona.
 export interface CompanyOwner {
     publicId: string;
     firstName: string | null;
@@ -21,47 +46,16 @@ export interface CompanyOwner {
     documentType: DocumentType | null;
     documentNumber: string | null;
     dateBirth: string | null;
-    country: CompanyDetailCountry | null;
+    country: CompanyOwnerCountry | null;
 }
 
-// Plan primario de la empresa (null si todavía no tiene suscripción).
-export interface CompanyPlan {
-    publicId: string;
-    name: string;
-    code: string;
-    status: string;
-}
-
-// Empresa principal del catálogo SaaS, con su dueño y su plan.
-export interface CompanyAdmin {
-    publicId: string;
-    name: string;
-    document: string;
-    phoneCell: string;
-    website: string | null;
-    country: CountryDisplay | null;
-    isEnabled: CompanyEnabled | null;
-    owner: CompanyOwner | null;
-    plan: CompanyPlan | null;
-    createdAt: string;
-}
-
-// Ubigeo de la empresa ya resuelto con su cadena de padres — distrito, provincia y
-// departamento, más el string ya armado para mostrar directo ("Chachapoyas, Chachapoyas, Amazonas").
-// Los ids de cada nivel van además de los nombres, para precargar la cascada del form de edición.
+// Ubigeo en el detalle (toCompanyDetailDto) — solo el string ya formateado.
 export interface CompanyUbigeo {
-    id: number;
-    district: string;
-    province: string | null;
-    provinceId: number | null;
-    department: string | null;
-    departmentId: number | null;
     formatted: string;
 }
 
-// Sucursal de la empresa, en la grilla del detalle — lo que muestra la card (nombre, dirección,
-// ubigeo ya formateado) y el link a su edición; el detalle completo para editar lo trae
-// sucursal.interface.ts aparte.
+// Sucursal en la grilla del detalle — { publicId, name, address, ubigeo } con el ubigeo
+// ya formateado como string; el detalle completo para editar vive en sucursal.interface.ts.
 export interface CompanySubsidiary {
     publicId: string;
     name: string;
@@ -81,7 +75,9 @@ export interface CompanyUser {
     sucursales: { publicId: string; name: string | null }[];
 }
 
-// Detalle de una empresa (página "Ver empresa") — se busca por publicId, nunca ids internos.
+// Detalle de una empresa (toCompanyDetailDto) — se busca por publicId, nunca ids internos.
+// El `country` de la empresa es solo display (sin id); el detalle no trae `plan`
+// (el plan/uso se consulta aparte con usePlanUsage).
 export interface CompanyDetail {
     publicId: string;
     name: string;
@@ -90,7 +86,7 @@ export interface CompanyDetail {
     phoneCell: string;
     phone: string | null;
     isEnabled: CompanyEnabled | null;
-    country: CompanyDetailCountry | null;
+    country: CountryDisplay | null;
     ubigeo: CompanyUbigeo | null;
     owner: CompanyOwner | null;
     subsidiaries: CompanySubsidiary[];

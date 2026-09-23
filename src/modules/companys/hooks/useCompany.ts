@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { isAxiosError } from 'axios';
@@ -81,17 +81,19 @@ export const useCompany = () => {
     const openEditCompany = () => {
         if (!company) return;
         setShowCompanyEditErrors(false);
+        // El detalle no trae ids de país/ubigeo (solo display) — la cascada arranca vacía
+        // y el usuario reelige ubicación al guardar.
         preload(
             {
                 name: company.name,
                 document: company.document,
-                country_id: company.country?.id ?? 0,
-                ubigeo_id: company.ubigeo?.id ?? 0,
+                country_id: 0,
+                ubigeo_id: 0,
                 address: company.address,
                 phone_cell: company.phoneCell,
                 phone: company.phone ?? '',
             },
-            { departmentId: company.ubigeo?.departmentId ?? 0, provinceId: company.ubigeo?.provinceId ?? 0 },
+            { departmentId: 0, provinceId: 0 },
         );
         setIsEditCompanyOpen(true);
     };
@@ -122,19 +124,11 @@ export const useCompany = () => {
         }
     };
 
-    // Modal de sucursal ──────────────────────────────────────────────────────────────────────
-    // Solo apertura/cierre y cuál se edita (null = alta); su data la trae el propio modal.
-    const [sucursalModal, setSucursalModal] = useState<{ isOpen: boolean; publicId: string | null }>({ isOpen: false, publicId: null });
-
     const openRegisterSucursal = () => {
         if (!hasPlanRoom(planUsage?.subsidiaries)) {
             return toast.warning('Alcanzaste el límite de tu plan para registrar sucursales, actualiza de plan.', { duration: 5000 });
         }
-        setSucursalModal({ isOpen: true, publicId: null });
     };
-
-    const openEditSucursal = (sucursalPublicId: string) => setSucursalModal({ isOpen: true, publicId: sucursalPublicId });
-    const closeSucursal = useCallback(() => setSucursalModal({ isOpen: false, publicId: null }), []);
 
     // Modal de alta de usuario de sucursal — su estado y su envío viven en useUserAsingSucursal.
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -201,16 +195,15 @@ export const useCompany = () => {
     };
 
     return {
-        publicId, company, isLoading, errorStatus, errorMessage, retry: reload, planUsage, notificationsTier,
+        company, isLoading, errorStatus, errorMessage, retry: reload, planUsage, notificationsTier,
 
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit,
         companyEditProps: {
             ...companyEditFields,
-            errors: showErrors ? companyEditErrors : {},
+            errors: showCompanyEditErrors ? companyEditErrors : {},
         },
 
-        isSucursalOpen: sucursalModal.isOpen, editingSucursalId: sucursalModal.publicId,
-        openRegisterSucursal, openEditSucursal, closeSucursal,
+        openRegisterSucursal,
 
         isUserModalOpen, openUserModal, closeUserModal,
 

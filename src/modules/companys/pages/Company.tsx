@@ -1,15 +1,12 @@
 import { Settings, Pencil, Store, Building2, User, Plus, Users, UploadCloud, UserCog, X, MapPin, Globe, Gift } from 'lucide-react';
-import { Header } from '../../../shared/components/Header';
-import { Button } from '../../../shared/components/Button';
-import { Modal } from '../../../shared/components/Modal';
-import { LoadingScreen, NotFoundScreen, ForbiddenScreen, FormActions, PlanUsageBar } from '../../../shared/components';
+import { useNavigate } from 'react-router-dom';
+import { Header, Button, Modal, LoadingScreen, NotFoundScreen, FormActions, PlanUsageBar, ForbiddenScreen } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { DOCUMENT_TYPE_LABELS, ROLE_LABELS, ROLE_MANAGE_PERMISSIONS } from '../../users/utils/userConstants';
 import FormUserManage from '../../users/components/FormUserManage';
 import CompanyEdit from '../components/CompanyEdit';
-import SucursalForm from '../components/SucursalForm';
 import UserAsingSucursal from '../components/UserAsingSucursal';
 import useCompany from '../hooks/useCompany';
 import '../styles/Company.css';
@@ -24,18 +21,18 @@ const ENABLED_CLASSNAMES = { A: 'active', I: 'inactive', P: 'pending' } as const
 // vista de detalle de sucursal todavía no existe). El fetch vive en useCompany.
 const Company = () => {
     const {
-        publicId, company, isLoading, errorStatus, errorMessage, retry, planUsage,
-        isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit, companyEditProps,
-        isSucursalOpen, editingSucursalId, openRegisterSucursal, openEditSucursal, closeSucursal,
-        isUserModalOpen, openUserModal, closeUserModal,
-        isEditOwnerOpen, openEditOwner, closeEditOwner, isLoadingOwnerDetail, isSavingOwner, isOwnerEditValid, handleSubmitOwnerEdit,
-        ownerEditValues, setOwnerEditField,
+        company, isLoading, errorStatus, errorMessage, retry, planUsage, isEditCompanyOpen, setOwnerEditField,
+        openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit, companyEditProps,
+        openRegisterSucursal, isUserModalOpen, openUserModal, closeUserModal, isEditOwnerOpen,  openEditOwner, 
+        closeEditOwner, isLoadingOwnerDetail, isSavingOwner, isOwnerEditValid, handleSubmitOwnerEdit, ownerEditValues,
     } = useCompany();
+
+    const navigate = useNavigate()
 
     // Un super_admin edita su propio perfil desde /home/profile, no desde acá.
     const can = usePermission();
     const canEditOwner = can(ROLE_MANAGE_PERMISSIONS.super_admin);
-    const canManageSucursales = can('sucursal.manage');
+    const canManageSucursales = can('sucursal.create');
     const canManageCompanyUsers = can(ROLE_MANAGE_PERMISSIONS.administrador, ROLE_MANAGE_PERMISSIONS.empleado);
 
     if (isLoading) {
@@ -70,7 +67,9 @@ const Company = () => {
                     <div className="company_hero_text">
                         <div className="company_hero_title_row">
                             <h1>{company.name}</h1>
-                            <span className={`status_badge ${ENABLED_CLASSNAMES[company.isEnabled]}`}>{ENABLED_LABELS[company.isEnabled]}</span>
+                            {company.isEnabled ? (
+                                <span className={`status_badge ${ENABLED_CLASSNAMES[company.isEnabled]}`}>{ENABLED_LABELS[company.isEnabled]}</span>
+                            ) : null}
                             <span className="company_plan_badge"><Gift size={14} />Plan {planUsage?.planName || '-'}</span>
                             {isPrimary &&
                                 <span className='company_plan_badge'>Empresa Primaria </span>
@@ -183,7 +182,7 @@ const Company = () => {
                                 </div>
                                 <div className="info">
                                     <p><MapPin /><span>{subsidiary.address}</span></p>
-                                    <p><Globe /><span>{subsidiary.ubigeo}nxon miller mancilla</span></p>
+                                    <p><Globe /><span>{subsidiary.ubigeo}</span></p>
                                 </div>
                                 {canManageSucursales && (
                                     <Button
@@ -192,7 +191,7 @@ const Company = () => {
                                         icon={Settings}
                                         color="secondary"
                                         className="action"
-                                        onClick={() => openEditSucursal(subsidiary.publicId)}
+                                        onClick={() => navigate(`/companys/company/sucursal/${subsidiary.publicId}`)}
                                     />
                                 )}
                             </div>
@@ -252,15 +251,6 @@ const Company = () => {
                 isSaving={isSavingCompany}
                 fields={companyEditProps}
             />
-
-            {canManageSucursales && isSucursalOpen && (
-                <SucursalForm
-                    onClose={closeSucursal}
-                    companyPublicId={publicId}
-                    sucursalPublicId={editingSucursalId}
-                    onSaved={retry}
-                />
-            )}
 
             {canEditOwner && (
                 <Modal isOpen={isEditOwnerOpen} onClose={closeEditOwner} title="Editar dueño" icon={UserCog} size="lg">

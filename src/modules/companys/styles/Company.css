@@ -65,7 +65,7 @@
                         border-radius: 999px;
                         background: var(--primary-light);
                         color: var(--primary);
-                        font-size: 1.3rem;
+                        font-size: 1.4rem;
                         font-weight: 600;
                     }
                 }
@@ -110,7 +110,7 @@
                 align-items: center;
                 justify-content: space-between;
                 gap: 1rem;
-                font-size: 1.3rem;
+                font-size: 1.4rem;
 
                 .company_detail_label {
                     flex-shrink: 0;
@@ -285,7 +285,7 @@
                 flex-shrink: 0;
                 padding: 3px 10px;
                 border-radius: 20px;
-                font-size: 1.1rem;
+                font-size: 1.2rem;
                 font-weight: 600;
                 background: var(--gray-medium);
                 color: var(--text-soft);
@@ -346,7 +346,7 @@
         color: var(--text-muted);
 
         span {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-style: italic;
         }
     }
@@ -354,7 +354,7 @@
     .company_empty_value {
         color: var(--text-muted);
         font-style: italic;
-        font-size: 1.3rem;
+        font-size: 1.4rem;
     }
 
     @media (max-width: 768px) {
