@@ -72,7 +72,7 @@ const Sucursal = () => {
                                 <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
                             )}
                             {can('sucursal.config') && (
-                                <Button text="Configurar" size="sm" icon={Settings} color="secondary" disabled title="Próximamente" onClick={() => { }} />
+                                <Button text="Configurar" size="sm" icon={Settings} color="secondary" title="Próximamente" onClick={() => { }} />
                             )}
                         </div>
                     </div>

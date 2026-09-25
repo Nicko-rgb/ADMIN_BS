@@ -8,7 +8,7 @@ export default defineConfig({
   // back_url de MercadoPago, que rechaza http:// en local.
   plugins: [react(), basicSsl()],
   server: {
-    port: 3000,
+    port: 5000,
     // Evita CORS en dev: el navegador ve /api como same-origin, Vite lo reenvía al backend.
     proxy: {
       '/api': 'http://localhost:5010',

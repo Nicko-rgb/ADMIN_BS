@@ -23,7 +23,7 @@ const useCompanies = () => {
     const isSuperAdmin = role === 'super_admin';
 
     const { countries, loadCountries } = useCatalogActive();
-    const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
+    const countryOptions = (countries ?? []).map((country) => ({ value: country.id, label: country.country }));
 
     useEffect(() => { loadCountries(); }, [loadCountries]);
 

@@ -12,8 +12,9 @@ import type { MenuGroup, MenuItem, MenuNode } from '../interfaces/menu.interface
  * groupTitle y anida por parentKey. El orden ya viene resuelto por el
  * backend (group_title, sort_order) — acá solo se agrupa, no se reordena.
  */
-export const buildMenuGroups = (items: MenuItem[]): MenuGroup[] => {
-    const roots = items.filter((item) => !item.parentKey);
+export const buildMenuGroups = (items: MenuItem[] = []): MenuGroup[] => {
+    const safeItems = Array.isArray(items) ? items : [];
+    const roots = safeItems.filter((item) => !item.parentKey);
     const groups: MenuGroup[] = [];
 
     for (const root of roots) {
@@ -24,7 +25,7 @@ export const buildMenuGroups = (items: MenuItem[]): MenuGroup[] => {
             groups.push(group);
         }
 
-        const children: MenuNode[] = items
+        const children: MenuNode[] = safeItems
             .filter((item) => item.parentKey === root.key)
             .map((item) => ({ ...item, children: [] }));
 

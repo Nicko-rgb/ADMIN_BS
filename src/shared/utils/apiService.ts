@@ -8,7 +8,7 @@ import { useSessionStore } from '../store/sessionStore';
  * apunta directo al backend real.
  */
 export const apiService = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api',
+    baseURL: import.meta.env.VITE_API_URL,
     timeout: 15000,
     // Timeout con código propio (ETIMEDOUT) en vez del genérico ECONNABORTED
     transitional: { clarifyTimeoutError: true },
