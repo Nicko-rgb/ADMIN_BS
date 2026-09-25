@@ -75,6 +75,7 @@ body {
     background: var(--surface);
     border-radius: 10px;
     box-shadow: var(--shadow), var(--shadow);
+    padding: 20px;
 }
 
 /* Badge de estado activo/inactivo — usado en tablas y listas.

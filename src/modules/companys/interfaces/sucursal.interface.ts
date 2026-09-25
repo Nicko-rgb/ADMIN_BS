@@ -13,6 +13,7 @@ export interface SucursalCountry extends CountryDisplay {
 export interface SucursalUbigeo {
     id: number;
     district: string;
+    province: string | null;
     provinceId: number | null;
     department: string | null;
     departmentId: number | null;
