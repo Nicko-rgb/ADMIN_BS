@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { isAxiosError } from 'axios';
-import { handleApiError } from '../../../shared/utils/errorHandler';
+import { handleApiError, getApiErrorStatus } from '../../../shared/utils/errorHandler';
 import SucursalService from '../service/sucursalService';
+import SucursalConfigService from '../service/sucursalConfigService';
 import type { SucursalDetail } from '../interfaces/sucursal.interface';
+import type { SucursalConfig } from '../interfaces/sucursalConfig.interface';
 
 export type SucursalErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 
@@ -15,6 +16,10 @@ export const useSucursal = () => {
     const { publicId } = useParams<{ publicId: string }>();
 
     const [sucursal, setSucursal] = useState<SucursalDetail | null>(null);
+    // Config para mostrar en la página (redes en el cover, operativo en su card).
+    // null = sin config o no se pudo cargar — la página igual se muestra; el modal
+    // hace su propio fetch con manejo de errores al abrirse.
+    const [config, setConfig] = useState<SucursalConfig | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorStatus, setErrorStatus] = useState<SucursalErrorStatus | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
@@ -27,12 +32,18 @@ export const useSucursal = () => {
         const fetchSucursal = async () => {
             setIsLoading(true);
             setErrorStatus(null);
+            setConfig(null);
             try {
-                const data = await SucursalService.getByPublicId(publicId);
-                if (active) setSucursal(data);
+                const [sucursalData, configData] = await Promise.all([
+                    SucursalService.getByPublicId(publicId),
+                    SucursalConfigService.get(publicId).catch(() => null),
+                ]);
+                if (!active) return;
+                setSucursal(sucursalData);
+                setConfig(configData);
             } catch (err) {
                 if (!active) return;
-                const status = isAxiosError(err) ? err.response?.status : undefined;
+                const status = getApiErrorStatus(err);
                 setErrorStatus(status === 404 ? 'not_found' : status === 403 ? 'forbidden' : 'unknown');
                 setErrorMessage(handleApiError(err));
             } finally {
@@ -47,7 +58,7 @@ export const useSucursal = () => {
 
     const reload = () => setReloadToken((token) => token + 1);
 
-    return { publicId, sucursal, isLoading, errorStatus, errorMessage, retry: reload };
+    return { publicId, sucursal, config, isLoading, errorStatus, errorMessage, retry: reload };
 };
 
 export default useSucursal;

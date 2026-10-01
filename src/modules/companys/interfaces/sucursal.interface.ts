@@ -3,6 +3,14 @@ import type { TenantFormErrors } from '../utils/tenantForm';
 
 export type SucursalStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
 
+// Espacio de la sede (toSucursalDto → spaces) — nombre, deporte y estado.
+export interface SucursalSpace {
+    publicId: string;
+    name: string;
+    sport: string | null;
+    status: SucursalStatus;
+}
+
 // País de la sucursal (toSucursalDto) — con `id` de catálogo para precargar el form.
 // A diferencia de la empresa, la sucursal SÍ trae ids (ver BACKEND dto/sucursal.dto.ts).
 export interface SucursalCountry extends CountryDisplay {
@@ -35,6 +43,7 @@ export interface SucursalDetail {
     status: SucursalStatus | null;
     country: SucursalCountry | null;
     ubigeo: SucursalUbigeo | null;
+    spaces: SucursalSpace[];
     createdAt: string;
 }
 

@@ -61,6 +61,7 @@ export interface CompanySubsidiary {
     name: string;
     address: string;
     ubigeo: string | null;
+    status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE' | null;
 }
 
 // Usuario asignado a la empresa o a alguna de sus sucursales — el dueño no entra acá, viene

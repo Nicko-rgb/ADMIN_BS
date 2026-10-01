@@ -14,6 +14,9 @@ import '../styles/Company.css';
 const ENABLED_LABELS = { A: 'Activo', I: 'Inactivo', P: 'Pendiente' } as const;
 const ENABLED_CLASSNAMES = { A: 'active', I: 'inactive', P: 'pending' } as const;
 
+const SUCURSAL_STATUS_LABELS = { ACTIVE: 'Activa', INACTIVE: 'Inactiva', MAINTENANCE: 'Mantenimiento' } as const;
+const SUCURSAL_STATUS_CLASSNAMES = { ACTIVE: 'active', INACTIVE: 'inactive', MAINTENANCE: 'maintenance' } as const;
+
 // Detalle de una empresa — página de entidad: hero horizontal (avatar, nombre, estado y
 // acciones en una sola fila, como .company_card de CompanysPage pero a tamaño de detalle),
 // una única card de información partida en dos columnas (empresa | dueño, ver por qué en
@@ -176,6 +179,9 @@ const Company = () => {
                     <div className="company_subsidiaries_grid">
                         {company.subsidiaries.map((subsidiary) => (
                             <div className="subsidiary_card" key={subsidiary.publicId}>
+                                {subsidiary.status ? (
+                                    <span className={`subsidiary_status_dot ${SUCURSAL_STATUS_CLASSNAMES[subsidiary.status]}`} title={SUCURSAL_STATUS_LABELS[subsidiary.status]} />
+                                ) : null}
                                 <div className="header">
                                     <div className="avatar center">{subsidiary.name.charAt(0).toUpperCase()}</div>
                                     <span className="name">{subsidiary.name}</span>

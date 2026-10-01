@@ -2,6 +2,7 @@ import { AxiosError, isAxiosError } from 'axios';
 
 interface ApiErrorObject {
     code: string;
+    status?: number;
     message: string;
     details: unknown;
 }
@@ -13,6 +14,16 @@ interface ApiErrorPayload {
     // string plano — cubrir ambos para no terminar con un toast vacío.
     error: ApiErrorObject | string;
 }
+
+// Status HTTP del error — primero el que trae el body (`error.status`, lo pone
+// ApiResponse.error), con fallback al status HTTP de axios (por si un proxy o
+// middleware intermedio lo enmascara).
+export const getApiErrorStatus = (err: unknown): number | undefined => {
+    if (!isAxiosError<ApiErrorPayload>(err)) return undefined;
+    const serverError = err.response?.data?.error;
+    const bodyStatus = typeof serverError === 'object' ? serverError.status : undefined;
+    return bodyStatus ?? err.response?.status;
+};
 
 /**
  * Maneja errores de axios y devuelve un mensaje amigable para el usuario.
