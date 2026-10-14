@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, ShieldUser, UserCircle } from 'lucide-react';
+import { Bell, ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, ShieldUser, UserCircle } from 'lucide-react';
 import { useMenu } from '../hooks/useMenu';
 import { useSessionStore } from '../store/sessionStore';
 import { useAppLayout } from '../hooks/useAppLayout';
@@ -98,6 +98,10 @@ export const AppLayout = () => {
                 </nav>
 
                 <div className="sidebar_footer">
+                    <button className="menu_item">
+                        <Bell size={16} />
+                        <span className="menu_item_label">Notificaciones</span>
+                    </button>
                     <NavLink to="/home/profile" className="menu_item">
                         <UserCircle size={16} />
                         <span className="menu_item_label">Mi Perfil</span>
