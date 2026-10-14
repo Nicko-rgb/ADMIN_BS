@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import { Store, Pencil, Settings, Phone, MapPin, FileText, CalendarDays, BriefcaseBusiness, Clock, Dumbbell, Plus } from 'lucide-react';
 import { FaFacebook, FaInstagram, FaTiktok, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import type { IconType } from 'react-icons';
-=======
 import { Store, Pencil, Settings, Phone, MapPin, FileText, CalendarDays, BriefcaseBusiness, Clock, Dumbbell, Plus, Image } from 'lucide-react';
->>>>>>> c04237a97519b6beaf3dbf8a63f75404baf86abd
 import { Button } from '../../../shared/components/Button';
 import { LoadingScreen, NotFoundScreen, ForbiddenScreen, PlanUsageBar } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
