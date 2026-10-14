@@ -78,7 +78,7 @@ interface ForbiddenScreenProps extends ScreenMessageActions {
  */
 export const ForbiddenScreen = ({
     title = 'Acceso denegado',
-    message = 'No tenés acceso para ver esta página.',
+    message = 'No tenés acceso/permisos para ver esta página.',
     backText = 'Volver',
     onBack,
     onRetry,

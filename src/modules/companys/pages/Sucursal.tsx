@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaFacebook, FaInstagram, FaTiktok, FaWhatsapp, FaYoutube } from 'react-icons/fa';
+import type { IconType } from 'react-icons';
 import { Store, Pencil, Settings, Phone, MapPin, FileText, CalendarDays, BriefcaseBusiness, Clock, Dumbbell, Plus, Image, ArrowLeft } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 import { LoadingScreen, NotFoundScreen, ForbiddenScreen, PlanUsageBar } from '../../../shared/components';
@@ -25,12 +27,9 @@ const shortTime = (value: string) => value.slice(0, 5);
 const Sucursal = () => {
     const navigate = useNavigate();
     const { publicId, sucursal, config, isLoading, errorStatus, errorMessage, retry } = useSucursal();
-    const { planUsage, notificationsTier, reloadPlanUsage } = usePlanUsage(sucursal?.companyPublicId);
+    const { planUsage } = usePlanUsage(sucursal?.companyPublicId ?? undefined);
 
     const can = usePermission();
-    if (!can('sucursal.view')) {
-        return <ForbiddenScreen />;
-    }
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -57,19 +56,20 @@ const Sucursal = () => {
 
     const goBack = () => navigate(`/companys/company/${sucursal.companyPublicId}`);
 
-    // Redes con valor para el cover — lucide-react v1.33 eliminó los brand icons,
-    // así que van círculos con iniciales. WhatsApp abre wa.me con mensaje precargado.
+    // Redes con valor para el cover — brand icons vía react-icons (lucide no trae marcas).
+    // WhatsApp abre wa.me con mensaje precargado.
     const socials = [
-        config?.socialFacebook ? { href: config.socialFacebook, label: 'Facebook', short: 'Fb' } : null,
-        config?.socialInstagram ? { href: config.socialInstagram, label: 'Instagram', short: 'Ig' } : null,
-        config?.socialTiktok ? { href: config.socialTiktok, label: 'TikTok', short: 'Tk' } : null,
-        config?.socialYoutube ? { href: config.socialYoutube, label: 'YouTube', short: 'Yt' } : null,
+        config?.socialFacebook ? { href: config.socialFacebook, label: 'Facebook', key: 'facebook', Icon: FaFacebook } : null,
+        config?.socialInstagram ? { href: config.socialInstagram, label: 'Instagram', key: 'instagram', Icon: FaInstagram } : null,
+        config?.socialTiktok ? { href: config.socialTiktok, label: 'TikTok', key: 'tiktok', Icon: FaTiktok } : null,
+        config?.socialYoutube ? { href: config.socialYoutube, label: 'YouTube', key: 'youtube', Icon: FaYoutube } : null,
         config?.socialWhatsapp ? {
             href: `https://wa.me/${config.socialWhatsapp}${config.whatsappMessage ? `?text=${encodeURIComponent(config.whatsappMessage)}` : ''}`,
             label: 'WhatsApp',
-            short: 'Wa',
+            key: 'whatsapp',
+            Icon: FaWhatsapp,
         } : null,
-    ].filter((s): s is { href: string; label: string; short: string } => s !== null);
+    ].filter((s): s is { href: string; label: string; key: string; Icon: IconType } => s !== null);
 
     return (
         <div className="sucursal_page">
@@ -84,14 +84,16 @@ const Sucursal = () => {
                             <div className="cover_avatar center"><Store size={30} /></div>
                             <div className="cover_text">
                                 <h1>{sucursal.name}</h1>
-                                <span className={`status_badge ${STATUS_CLASSNAMES[sucursal.status]}`}>{STATUS_LABELS[sucursal.status]}</span>
+                                {sucursal.status && (
+                                    <span className={`status_badge ${STATUS_CLASSNAMES[sucursal.status]}`}>{STATUS_LABELS[sucursal.status]}</span>
+                                )}
                             </div>
                         </div>
                         <div className="cover_socials">
                             {socials.length > 0 ? (
-                                socials.map(({ href, label, short }) => (
-                                    <a key={label} href={href} target="_blank" rel="noreferrer" title={label} aria-label={label} className="cover_social_link">
-                                        {short}
+                                socials.map(({ href, label, key, Icon }) => (
+                                    <a key={label} href={href} target="_blank" rel="noreferrer" title={label} aria-label={label} className={`cover_social_link ${key}`}>
+                                        <Icon size={22} aria-hidden />
                                     </a>
                                 ))
                             ) : (
