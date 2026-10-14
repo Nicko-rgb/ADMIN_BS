@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ComponentType, FormEvent } from 'react';
-import { Settings, Share2, Clock, CircleCheck, CircleX, Wrench, UploadCloud, X } from 'lucide-react';
+import { Settings, Share2, Clock, CircleCheck, CircleX, Wrench, UploadCloud, X, Image } from 'lucide-react';
 import { Modal } from '../../../shared/components/Modal';
 import { Button } from '../../../shared/components/Button';
 import { Tabs } from '../../../shared/components/Tabs';
@@ -19,7 +19,7 @@ interface SucursalConfigFormProps {
     onSaved?: () => void;
 }
 
-type ConfigTab = 'operativo' | 'redes';
+type ConfigTab = 'operativo' | 'redes' | 'imagen';
 
 // Campos de cada tab — para llevar al usuario al tab con errores al fallar el submit.
 const OPERATIVO_FIELDS: (keyof SucursalConfigFormValues)[] = ['opening_time', 'closing_time', 'min_price', 'features'];
@@ -61,6 +61,7 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, o
                         tabs={[
                             { key: 'operativo', label: 'Operativo', icon: Clock },
                             { key: 'redes', label: 'Redes sociales', icon: Share2 },
+                            { key: 'imagen', label: 'Imagen', icon: Image },
                         ]}
                         activeKey={activeTab}
                         onChange={(key) => setActiveTab(key as ConfigTab)}
@@ -121,6 +122,12 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, o
                                 <TextAreaField name="whatsapp_message" label="Mensaje de WhatsApp (Opcional)" value={form.whatsapp_message} onChange={(e) => setField('whatsapp_message')(e.target.value)} placeholder="Hola, quiero reservar..." error={errors.whatsapp_message} />
                             </FormRow>
                         </FormSection>
+                    )}
+
+                    {activeTab === 'imagen' && (
+                        <div className='tab_imagen'>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlaSj8uGSIYdvnfHOt4t0wZc-Yy0r2YGihc0Y5RELmvmU4SBvNIz_KiA4&s=10" alt="" />
+                        </div>
                     )}
 
                     <FormActions>

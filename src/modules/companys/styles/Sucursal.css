@@ -27,6 +27,16 @@
             justify-content: space-between;
             align-items: end;
 
+            .btn_bg_sucursal {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                z-index: 100;
+                width: 32px;
+                height: 32px;
+                border-radius: 5px;
+            }
+
             .cover_placeholder {
                 position: absolute;
                 inset: 0;
@@ -288,6 +298,15 @@
                     }
                 }
             }
+        }
+    }
+
+    .tab_imagen {
+        display: flex;
+        flex-direction: column;
+        img {
+            height: 410px;
+            object-fit: cover;
         }
     }
 
