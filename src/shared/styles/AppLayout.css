@@ -119,7 +119,7 @@
             width: 100%;
 
             &:hover {
-                background: var(--surface-2);
+                background: var(--primary-light);
                 color: var(--text);
             }
 

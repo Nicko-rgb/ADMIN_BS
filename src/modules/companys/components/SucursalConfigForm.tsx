@@ -4,7 +4,7 @@ import { Settings, Share2, Clock, CircleCheck, CircleX, Wrench, UploadCloud, X, 
 import { Modal } from '../../../shared/components/Modal';
 import { Button } from '../../../shared/components/Button';
 import { Tabs } from '../../../shared/components/Tabs';
-import { InputField, TextAreaField, FormSection, FormRow, FormActions, LoadingScreen } from '../../../shared/components';
+import { InputField, TextAreaField, FormSection, FormRow, FormActions } from '../../../shared/components';
 import useSucursalConfig from '../hooks/useSucursalConfig';
 import type { SucursalStatus } from '../interfaces/sucursal.interface';
 import type { SucursalConfigFormValues } from '../interfaces/sucursalConfig.interface';
@@ -53,9 +53,7 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, o
 
     return (
         <Modal isOpen onClose={onClose} title={isEditMode ? 'Editar configuración' : 'Configurar sucursal'} icon={Settings} size="lg">
-            {isLoadingDetail ? (
-                <LoadingScreen message="Cargando configuración..." size="sm" />
-            ) : (
+            
                 <form onSubmit={handleTabSubmit} noValidate>
                     <Tabs
                         tabs={[
@@ -132,10 +130,9 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, o
 
                     <FormActions>
                         <Button text="Cancelar" icon={X} size="lg" color="secondary" type="button" onClick={onClose} />
-                        <Button text={isEditMode ? 'Guardar' : 'Guardar configuración'} icon={UploadCloud} size="lg" type="submit" loading={isSubmitting} />
+                        <Button text={isLoadingDetail ? 'Cargando...' : isEditMode ? 'Guardar' : 'Guardar configuración'} icon={UploadCloud} size="lg" type="submit" loading={isSubmitting || isLoadingDetail} />
                     </FormActions>
                 </form>
-            )}
         </Modal>
     );
 };
