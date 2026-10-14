@@ -98,7 +98,7 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, o
                                     <InputField name="min_price" label="Precio mínimo referencial (Opcional)" numberOnly value={form.min_price} onChange={(e) => setField('min_price')(e.target.value)} placeholder="25.00" error={errors.min_price} />
                                 </FormRow>
                                 <FormRow>
-                                    <TextAreaField name="features" label="Características (Opcional)" value={form.features} onChange={(e) => setField('features')(e.target.value)} placeholder="Cancha sintética, Vestuarios, Estacionamiento" error={errors.features} />
+                                    <TextAreaField name="features" label="Características (Opcional)" value={form.features} onChange={(e) => setField('features')(e.target.value)} placeholder="Estacionamiento, Vestuarios, Ducha..." error={errors.features} />
                                 </FormRow>
                             </FormSection>
                         </>
