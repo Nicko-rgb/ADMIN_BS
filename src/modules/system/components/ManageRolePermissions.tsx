@@ -13,6 +13,8 @@ interface ManageRolePermissionsProps {
     catalog: PermissionAdmin[];
     assignedKeys: string[];
     onToggle: (key: string) => void;
+    syncToUsers: boolean;
+    onSyncChange: (value: boolean) => void;
     onSave: () => void;
     isLoading: boolean;
     isSaving?: boolean;
@@ -41,12 +43,12 @@ const groupByModuleAndGroupName = (catalog: PermissionAdmin[]): GroupedByModule 
 };
 
 /**
- * Modal de permisos base de un rol — mismo patrón que ManageUserPermissions.tsx (checklist en
- * tarjetas por módulo vía FormSection, subdividido por grupo funcional dentro de cada una,
- * reemplazo completo al guardar) pero apuntando a un rol: editar acá cambia de una sola vez los
- * permisos de TODOS los usuarios que tienen ese rol, sin tocarlos uno por uno.
+ * Modal de plantilla de permisos de un rol — mismo patrón que ManageUserPermissions.tsx
+ * (checklist en tarjetas por módulo vía FormSection, reemplazo completo al guardar) pero
+ * apuntando a un rol: sin sync solo cambia lo que reciben los usuarios NUEVOS; con
+ * "Aplicar a existentes" propaga el diff a todos los usuarios que ya tienen ese rol.
  */
-export const ManageRolePermissions = ({ isOpen, onClose, roleLabel, catalog, assignedKeys, onToggle, onSave, isLoading, isSaving = false }: ManageRolePermissionsProps) => (
+export const ManageRolePermissions = ({ isOpen, onClose, roleLabel, catalog, assignedKeys, onToggle, syncToUsers, onSyncChange, onSave, isLoading, isSaving = false }: ManageRolePermissionsProps) => (
     <Modal isOpen={isOpen} onClose={onClose} title={`Permisos del rol: ${roleLabel}`} icon={ShieldCheck} size="lg">
         {isLoading ? (
             <div className="manage_permissions_loading">Cargando permisos...</div>
@@ -72,6 +74,15 @@ export const ManageRolePermissions = ({ isOpen, onClose, roleLabel, catalog, ass
                         ))}
                     </FormSection>
                 ))}
+
+                <FormSection title="Aplicación del cambio">
+                    <CheckboxField
+                        name="sync_to_users"
+                        label="Aplicar también a los usuarios que ya tienen este rol (otorga los agregados y quita los removidos)"
+                        checked={syncToUsers}
+                        onChange={(e) => onSyncChange(e.target.checked)}
+                    />
+                </FormSection>
 
                 <FormActions>
                     <Button text="Cancelar" icon={X} size="lg" color="secondary" type="button" onClick={onClose} />

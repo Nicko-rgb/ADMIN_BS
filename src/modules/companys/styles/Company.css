@@ -313,6 +313,11 @@
                 background: var(--gray-medium);
                 color: var(--text-soft);
 
+                &.super_admin {
+                    background: var(--success-soft);
+                    color: var(--success-text);
+                }
+
                 &.administrador {
                     background: var(--purple-soft);
                     color: var(--purple-text);
@@ -353,6 +358,33 @@
                     font-weight: 500;
                     background: var(--gray-medium);
                     color: var(--text-soft);
+                }
+            }
+
+            .user_country {
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+                font-size: 1.3rem;
+                color: var(--text-muted);
+
+                img {
+                    width: 16px;
+                    height: 12px;
+                    border-radius: 2px;
+                    object-fit: cover;
+                    flex-shrink: 0;
+                }
+            }
+
+            .user_card_actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: .8rem;
+                padding-top: .8rem;
+                border-top: 1px solid var(--border);
+                button {
+                    flex: 1;
                 }
             }
         }

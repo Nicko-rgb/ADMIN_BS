@@ -7,15 +7,17 @@ interface SessionData {
     user: SessionUser | null;
     permissions: string[];
     companyIds: number[];
+    /** Alcance del rol (1=system … 4=empleado, null=cliente) — pista de UI, la seguridad la decide el backend. */
+    scopeLevel: number | null;
 }
 
 interface SessionState extends SessionData {
-    setSession: (session: { token: string; user: SessionUser; permissions: string[]; companyIds: number[] }) => void;
+    setSession: (session: { token: string; user: SessionUser; permissions: string[]; companyIds: number[]; scopeLevel: number | null }) => void;
     updateUser: (fields: Partial<SessionUser>) => void;
     clearSession: () => void;
 }
 
-const EMPTY_SESSION: SessionData = { token: null, user: null, permissions: [], companyIds: [] };
+const EMPTY_SESSION: SessionData = { token: null, user: null, permissions: [], companyIds: [], scopeLevel: null };
 
 /**
  * Sesión del usuario autenticado — única fuente de verdad del token, del

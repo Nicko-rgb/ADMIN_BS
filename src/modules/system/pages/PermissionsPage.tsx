@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { Pencil, Search, ShieldCheck, ShieldUser, Trash2 } from 'lucide-react';
 import { Table, TableActions } from '../../../shared/components/Table';
-import type { TableColumn, TableAction } from '../../../shared/components/Table';
+import type { TableColumn } from '../../../shared/components/Table';
+import { Button } from '../../../shared/components/Button';
 import { Header } from '../../../shared/components/Header';
 import { Dialog } from '../../../shared/components/Dialog';
-import { InputField, SelectField, Tabs } from '../../../shared/components';
+import { InputField, SelectField, Tabs, LoadingScreen, EmptyScreen } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { usePermissions } from '../hooks/usePermissions';
 import { EditRegisterPermission } from '../components/EditRegisterPermission';
 import { CreateEditRole } from '../components/CreateEditRole';
 import { ManageRolePermissions } from '../components/ManageRolePermissions';
 import type { PermissionAdmin } from '../interfaces/permission.interface';
-import type { RoleAdmin } from '../../../shared/interfaces/catalog.interface';
 import '../styles/CatalogPage.css';
 import '../styles/PermissionsPage.css';
 
@@ -21,19 +21,22 @@ const APP_ACCESS_LABELS: Record<string, string> = {
     both: 'Ambas',
 };
 
-// Los 5 roles sembrados de base — el resto del sistema los referencia por key (login bloquea
-// 'cliente', bootstrap busca 'system'...), así que ni el backend ni acá dejan borrarlos. Mismo
-// criterio que role.service.ts::RESERVED_ROLE_KEYS, solo para no ofrecer una acción que el
-// backend va a rechazar igual.
-const RESERVED_ROLE_KEYS = ['cliente', 'empleado', 'administrador', 'super_admin', 'system'];
+// Etiqueta legible del alcance de datos de cada rol (ver accessScope en el backend).
+const SCOPE_LABELS: Record<number, string> = {
+    1: 'Todo el sistema',
+    2: 'Sus empresas',
+    3: 'Sus sucursales',
+    4: 'Sus sucursales',
+};
 
 type PageTab = 'permissions' | 'roles';
 
 /**
  * Permisos y Roles del sistema, en una sola página con dos tabs:
  *  - Permisos: catálogo granular (key, módulo, grupo, acceso por app).
- *  - Roles: alta/edición/baja de roles + sus permisos base — editar acá los permisos de un rol
- *    se los da (o quita) de una sola vez a todos los usuarios que lo tienen, sin ir uno por uno.
+ *  - Roles: alta/edición/baja de roles + su plantilla de permisos — editarla cambia lo que
+ *    reciben los usuarios nuevos; con "Aplicar a existentes" propaga el diff a los que ya
+ *    tienen ese rol.
  */
 const PermissionsPage = () => {
     const [tab, setTab] = useState<PageTab>('permissions');
@@ -45,17 +48,17 @@ const PermissionsPage = () => {
         search, setSearch,
         moduleFilter, setModuleFilter, moduleOptions,
         groupFilter, setGroupFilter, groupOptions,
-        isEditOpen, form, setField, openEdit, closeEdit, handleSubmit, isSaving,
-        isCreateOpen, createForm, openCreate, closeCreate, setCreateField, handleCreateSubmit, isCreating,
+        isPermissionModalOpen, permissionModalMode,
+        permissionForm, setPermissionField, openPermissionCreate, openPermissionEdit, closePermissionModal, handlePermissionSubmit, isSavingPermission,
         deletingItem, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
 
         // Roles
         roleItems, isRolesLoading,
         permissionCatalog,
-        isRoleEditOpen, editingRole, roleForm, setRoleField, openRoleEdit, closeRoleEdit, handleRoleSubmit, isSavingRole,
-        isRoleCreateOpen, roleCreateForm, openRoleCreate, closeRoleCreate, setRoleCreateField, handleRoleCreateSubmit, isCreatingRole,
+        isRoleModalOpen, roleModalMode,
+        roleForm, setRoleField, openRoleCreate, openRoleEdit, closeRoleModal, handleRoleSubmit, isSavingRole,
         deletingRole, isRoleDeleteOpen, openRoleDelete, closeRoleDelete, confirmRoleDelete, isDeletingRole,
-        isManageRolePermissionsOpen, managingRole, assignedRoleKeys, isLoadingRolePermissions, isSavingRolePermissions,
+        isManageRolePermissionsOpen, managingRole, assignedRoleKeys, syncRoleToUsers, setSyncRoleToUsers, isLoadingRolePermissions, isSavingRolePermissions,
         openManageRolePermissions, closeManageRolePermissions, toggleRolePermission, saveManageRolePermissions,
     } = usePermissions();
 
@@ -74,30 +77,10 @@ const PermissionsPage = () => {
         {
             key: 'actions', header: 'Acciones', render: (row) => (
                 <TableActions actions={[
-                    { label: 'Editar', icon: Pencil, variant: 'edit', onClick: () => openEdit(row) },
+                    { label: 'Editar', icon: Pencil, variant: 'edit', onClick: () => openPermissionEdit(row) },
                     { label: 'Eliminar', icon: Trash2, variant: 'delete', onClick: () => openDelete(row) },
                 ]} />
             )
-        },
-    ];
-
-    const roleColumns: TableColumn<RoleAdmin>[] = [
-        { key: 'key', header: 'Key' },
-        { key: 'label', header: 'Etiqueta' },
-        { key: 'scopeLevel', header: 'Alcance', render: (row) => row.scopeLevel ?? '—' },
-        { key: 'isActive', header: 'Estado', render: (row) => <span className={`status_badge ${row.isActive ? 'active' : 'inactive'}`}>{row.isActive ? 'Activo' : 'Inactivo'}</span> },
-        { key: 'createdAt', header: 'Creado', render: (row) => formatDate(row.createdAt) },
-        {
-            key: 'actions', header: 'Acciones', render: (row) => {
-                const actions: TableAction[] = [
-                    { label: 'Editar', icon: Pencil, variant: 'edit', onClick: () => openRoleEdit(row) },
-                    { label: 'Gestionar permisos', icon: ShieldCheck, variant: 'view', onClick: () => openManageRolePermissions(row) },
-                ];
-                if (!RESERVED_ROLE_KEYS.includes(row.key)) {
-                    actions.push({ label: 'Eliminar', icon: Trash2, variant: 'delete', onClick: () => openRoleDelete(row) });
-                }
-                return <TableActions actions={actions} />;
-            }
         },
     ];
 
@@ -109,7 +92,7 @@ const PermissionsPage = () => {
                 title="Permisos y Roles"
                 subtitle={isPermissionsTab ? 'Catálogo de permisos disponibles en el sistema' : 'Roles del sistema — permisos base y alcance de datos'}
                 icon={isPermissionsTab ? ShieldCheck : ShieldUser}
-                action={isPermissionsTab ? { label: 'Nuevo permiso', onClick: openCreate } : { label: 'Nuevo rol', onClick: openRoleCreate }}
+                action={isPermissionsTab ? { label: 'Nuevo permiso', onClick: openPermissionCreate } : { label: 'Nuevo rol', onClick: openRoleCreate }}
             />
 
             <Tabs
@@ -165,33 +148,57 @@ const PermissionsPage = () => {
                         onPageChange={setPage}
                     />
                 </>
-            ) : (
-                <Table
-                    columns={roleColumns}
-                    data={roleItems}
-                    keyExtractor={(row) => row.id}
-                    isLoading={isRolesLoading}
-                    emptyMessage="No hay roles registrados"
+            ) : isRolesLoading ? (
+                <LoadingScreen message="Cargando roles..." />
+            ) : roleItems.length === 0 ? (
+                <EmptyScreen
+                    title="No hay roles registrados"
+                    message="Creá el primer rol para organizar permisos y alcances."
+                    actionText="Nuevo rol"
+                    onAction={openRoleCreate}
                 />
+            ) : (
+                <div className="roles_cards_grid">
+                    {roleItems.map((role) => (
+                        <div key={role.id} className="role_card">
+                            <div className="role_card_header">
+                                <div className="role_card_icon"><ShieldUser size={22} /></div>
+                                <div className="role_card_title">
+                                    <h3>{role.label}</h3>
+                                    <span className="permission_key">{role.key}</span>
+                                </div>
+                                <span className={`status_badge ${role.isActive ? 'active' : 'inactive'}`}>{role.isActive ? 'Activo' : 'Inactivo'}</span>
+                            </div>
+
+                            <div className="role_card_body">
+                                <div className="role_card_row">
+                                    <span className="role_card_row_label">Alcance</span>
+                                    <span className="role_card_scope">{role.scopeLevel != null ? (SCOPE_LABELS[role.scopeLevel] ?? `Nivel ${role.scopeLevel}`) : 'No aplica'}</span>
+                                </div>
+                                <div className="role_card_row">
+                                    <span className="role_card_row_label">Creado</span>
+                                    <span>{formatDate(role.createdAt)}</span>
+                                </div>
+                            </div>
+
+                            <div className="role_card_actions">
+                                <Button text="Gestionar permisos" icon={ShieldCheck} size="sm" onClick={() => openManageRolePermissions(role)} />
+                                <Button text="Editar" icon={Pencil} size="sm" color="secondary" onClick={() => openRoleEdit(role)} />
+                                    <Button text="Eliminar" icon={Trash2} size="sm" color="danger" onClick={() => openRoleDelete(role)} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
             )}
 
             <EditRegisterPermission
-                isOpen={isEditOpen}
-                onClose={closeEdit}
-                onSubmit={handleSubmit}
-                mode="edit"
-                form={form ?? createForm}
-                setField={setField}
-                isSaving={isSaving}
-            />
-            <EditRegisterPermission
-                isOpen={isCreateOpen}
-                onClose={closeCreate}
-                onSubmit={handleCreateSubmit}
-                mode="create"
-                form={createForm}
-                setField={setCreateField}
-                isSaving={isCreating}
+                isOpen={isPermissionModalOpen}
+                onClose={closePermissionModal}
+                onSubmit={handlePermissionSubmit}
+                mode={permissionModalMode ?? 'create'}
+                form={permissionForm}
+                setField={setPermissionField}
+                isSaving={isSavingPermission}
             />
             <Dialog
                 isOpen={isDeleteOpen}
@@ -204,26 +211,15 @@ const PermissionsPage = () => {
             />
 
             <CreateEditRole
-                isOpen={isRoleEditOpen}
-                onClose={closeRoleEdit}
+                isOpen={isRoleModalOpen}
+                onClose={closeRoleModal}
                 onSubmit={handleRoleSubmit}
-                mode="edit"
-                roleKey={editingRole?.key ?? ''}
-                onKeyChange={() => {}}
-                form={roleForm ?? roleCreateForm}
+                mode={roleModalMode ?? 'create'}
+                roleKey={roleForm.key}
+                onKeyChange={(value) => setRoleField('key')(value)}
+                form={roleForm}
                 setField={setRoleField}
                 isSaving={isSavingRole}
-            />
-            <CreateEditRole
-                isOpen={isRoleCreateOpen}
-                onClose={closeRoleCreate}
-                onSubmit={handleRoleCreateSubmit}
-                mode="create"
-                roleKey={roleCreateForm.key}
-                onKeyChange={setRoleCreateField('key')}
-                form={roleCreateForm}
-                setField={setRoleCreateField}
-                isSaving={isCreatingRole}
             />
             <ManageRolePermissions
                 isOpen={isManageRolePermissionsOpen}
@@ -232,6 +228,8 @@ const PermissionsPage = () => {
                 catalog={permissionCatalog}
                 assignedKeys={assignedRoleKeys}
                 onToggle={toggleRolePermission}
+                syncToUsers={syncRoleToUsers}
+                onSyncChange={setSyncRoleToUsers}
                 onSave={saveManageRolePermissions}
                 isLoading={isLoadingRolePermissions}
                 isSaving={isSavingRolePermissions}

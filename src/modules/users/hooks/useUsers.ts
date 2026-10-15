@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import ManageUserService from '../service/manageUserService';
-import UserPermissionService from '../service/userPermissionService';
-import PermissionService from '../../system/service/permissionService';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
-import { usePermission } from '../../../shared/hooks/usePermission';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import toast from '../../../shared/utils/toast';
 import { isManagedRole } from '../utils/userConstants';
 import { isUserFormValid, toUserPayload, userFormFromDetail } from '../utils/userForm';
 import type { PaginationMeta } from '../../../shared/interfaces/pagination.interface';
-import type { PermissionAdmin } from '../../system/interfaces/permission.interface';
 import type { ManagedRole, UserAdmin, UserFormValues } from '../interfaces/user.interface';
 
 const PAGE_LIMIT = 20; // igual al default de paginationQuerySchema en el backend
@@ -42,15 +38,6 @@ const useUsers = () => {
     const [isLoadingDetail, setIsLoadingDetail] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
-    // El catálogo de permisos y los permisos directos de un usuario son exclusivos de system.
-    const can = usePermission();
-    const canManagePermissions = can('system.full_access');
-    const [permissionCatalog, setPermissionCatalog] = useState<PermissionAdmin[]>([]);
-    const [managingUser, setManagingUser] = useState<UserAdmin | null>(null);
-    const [assignedKeys, setAssignedKeys] = useState<string[]>([]);
-    const [isLoadingPermissions, setIsLoadingPermissions] = useState(false);
-    const [isSavingPermissions, setIsSavingPermissions] = useState(false);
-
     const setPage = (page: number) => setPagination((prev) => ({ ...prev, page }));
 
     // Toda búsqueda o filtro nuevo vuelve a la primera página.
@@ -78,17 +65,6 @@ const useUsers = () => {
         loadCountries();
         loadRoles();
     }, [loadCountries, loadRoles]);
-
-    useEffect(() => {
-        if (!canManagePermissions) return;
-        let active = true;
-
-        PermissionService.listCatalog()
-            .then((catalog) => { if (active) setPermissionCatalog(catalog); })
-            .catch((err) => { if (active) toast.error(handleApiError(err)); });
-
-        return () => { active = false; };
-    }, [canManagePermissions]);
 
     useEffect(() => {
         let active = true;
@@ -165,49 +141,6 @@ const useUsers = () => {
         }
     };
 
-    // Permisos directos ──────────────────────────────────────────────────────────────────────
-
-    // Abre el modal de permisos y trae los directos que ya tiene asignados este usuario.
-    const openManagePermissions = async (row: UserAdmin) => {
-        setManagingUser(row);
-        setIsLoadingPermissions(true);
-        try {
-            const keys = await UserPermissionService.getByUserId(row.publicId);
-            setAssignedKeys(keys);
-        } catch (err) {
-            toast.error(handleApiError(err));
-            setManagingUser(null);
-        } finally {
-            setIsLoadingPermissions(false);
-        }
-    };
-
-    const closeManagePermissions = () => {
-        setManagingUser(null);
-        setAssignedKeys([]);
-    };
-
-    const togglePermission = (key: string) => {
-        setAssignedKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
-    };
-
-    // Manda siempre el set completo tildado — el backend reemplaza, no diferencia altas de bajas.
-    const saveManagePermissions = async () => {
-        if (!managingUser) return;
-
-        setIsSavingPermissions(true);
-        toast.loading('Guardando permisos...');
-        try {
-            const result = await UserPermissionService.update(managingUser.publicId, assignedKeys);
-            toast.success(result.message);
-            closeManagePermissions();
-        } catch (err) {
-            toast.error(handleApiError(err));
-        } finally {
-            setIsSavingPermissions(false);
-        }
-    };
-
     return {
         items, isLoading,
         pagination, setPage,
@@ -215,9 +148,6 @@ const useUsers = () => {
         roleFilter, setRoleFilter, roleOptions, roleLabel,
         countryFilter, setCountryFilter, countryOptions,
         editing, editValues, isLoadingDetail, isSaving, isEditValid, openEdit, closeEdit, setEditField, handleSubmitEdit,
-        canManagePermissions, permissionCatalog,
-        isManagePermissionsOpen: managingUser !== null, managingUser, assignedKeys, isLoadingPermissions, isSavingPermissions,
-        openManagePermissions, closeManagePermissions, togglePermission, saveManagePermissions,
     };
 };
 

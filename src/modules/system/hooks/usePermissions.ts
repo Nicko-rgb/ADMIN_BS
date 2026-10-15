@@ -53,6 +53,8 @@ const toRoleEditForm = (item: RoleAdmin): Required<UpdateRolePayload> => ({
  * dos porque comparten página y el catálogo de permisos ya cargado acá alimenta también el
  * picker de ManageRolePermissions, sin duplicar el fetch.
  */
+type FormModalMode = 'create' | 'edit';
+
 export const usePermissions = () => {
     // ── Catálogo de permisos ────────────────────────────────────────────────
     const [items, setItems] = useState<PermissionAdmin[]>([]);
@@ -68,19 +70,17 @@ export const usePermissions = () => {
     const [groupFilter, setGroupFilter] = useState('');
     const [groupOptions, setGroupOptions] = useState<string[]>([]);
 
-    const [editingId, setEditingId] = useState<number | null>(null);
-    const [form, setForm] = useState<Required<UpdatePermissionPayload> | null>(null);
-    const [isSaving, setIsSaving] = useState(false);
-
-    const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [createForm, setCreateForm] = useState<CreatePermissionPayload>(EMPTY_CREATE_FORM);
-    const [isCreating, setIsCreating] = useState(false);
+    // Modal único de permiso — el modo decide si guarda por create o por update.
+    const [permissionModalMode, setPermissionModalMode] = useState<FormModalMode | null>(null);
+    const [editingPermissionId, setEditingPermissionId] = useState<number | null>(null);
+    const [permissionForm, setPermissionForm] = useState<CreatePermissionPayload>(EMPTY_CREATE_FORM);
+    const [isSavingPermission, setIsSavingPermission] = useState(false);
 
     const [deletingItem, setDeletingItem] = useState<PermissionAdmin | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    // Catálogo completo, sin paginar — reusado por el picker de ManageRolePermissions (evita un
-    // segundo fetch: es la misma data que ya trae listCatalog()).
+    // Servida dinámica, sin paginar — reusada por el picker de ManageRolePermissions (evita un
+    // segundo fetch: es la misma data que ya trae listAssignable()).
     const [permissionCatalog, setPermissionCatalog] = useState<PermissionAdmin[]>([]);
 
     // ── Roles ────────────────────────────────────────────────────────────────
@@ -88,19 +88,18 @@ export const usePermissions = () => {
     const [isRolesLoading, setIsRolesLoading] = useState(true);
     const [roleReloadToken, setRoleReloadToken] = useState(0);
 
-    const [editingRole, setEditingRole] = useState<RoleAdmin | null>(null);
-    const [roleForm, setRoleForm] = useState<Required<UpdateRolePayload> | null>(null);
+    // Modal único de rol — misma idea que el de permiso: el modo decide el submit.
+    const [roleModalMode, setRoleModalMode] = useState<FormModalMode | null>(null);
+    const [editingRoleId, setEditingRoleId] = useState<number | null>(null);
+    const [roleForm, setRoleForm] = useState<CreateRolePayload>(EMPTY_ROLE_CREATE_FORM);
     const [isSavingRole, setIsSavingRole] = useState(false);
-
-    const [isRoleCreateOpen, setIsRoleCreateOpen] = useState(false);
-    const [roleCreateForm, setRoleCreateForm] = useState<CreateRolePayload>(EMPTY_ROLE_CREATE_FORM);
-    const [isCreatingRole, setIsCreatingRole] = useState(false);
 
     const [deletingRole, setDeletingRole] = useState<RoleAdmin | null>(null);
     const [isDeletingRole, setIsDeletingRole] = useState(false);
 
     const [managingRole, setManagingRole] = useState<RoleAdmin | null>(null);
     const [assignedRoleKeys, setAssignedRoleKeys] = useState<string[]>([]);
+    const [syncRoleToUsers, setSyncRoleToUsers] = useState(false);
     const [isLoadingRolePermissions, setIsLoadingRolePermissions] = useState(false);
     const [isSavingRolePermissions, setIsSavingRolePermissions] = useState(false);
 
@@ -133,11 +132,11 @@ export const usePermissions = () => {
         return () => { active = false; };
     }, []);
 
-    // Catálogo completo de permisos — se carga una sola vez, alimenta el picker de ManageRolePermissions.
+    // Servida dinámica — se carga una sola vez, alimenta el picker de ManageRolePermissions.
     useEffect(() => {
         let active = true;
 
-        PermissionService.listCatalog()
+        PermissionService.listAssignable()
             .then((catalog) => { if (active) setPermissionCatalog(catalog); })
             .catch((err) => { if (active) toast.error(handleApiError(err)); });
 
@@ -170,63 +169,42 @@ export const usePermissions = () => {
 
     const reload = () => setReloadToken((token) => token + 1);
 
-    const openEdit = (item: PermissionAdmin) => {
-        setEditingId(item.id);
-        setForm(toEditForm(item));
+    const openPermissionCreate = () => {
+        setPermissionForm(EMPTY_CREATE_FORM);
+        setEditingPermissionId(null);
+        setPermissionModalMode('create');
     };
 
-    const closeEdit = () => {
-        setEditingId(null);
-        setForm(null);
+    const openPermissionEdit = (item: PermissionAdmin) => {
+        setEditingPermissionId(item.id);
+        setPermissionForm(toEditForm(item));
+        setPermissionModalMode('edit');
     };
 
-    const setField = (name: keyof UpdatePermissionPayload) => (value: string | null) => {
-        setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
+    const closePermissionModal = () => setPermissionModalMode(null);
+
+    const setPermissionField = (name: keyof CreatePermissionPayload) => (value: string | null) => {
+        setPermissionForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const handlePermissionSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (editingId === null || !form) return;
+        if (!permissionModalMode) return;
+        if (permissionModalMode === 'edit' && editingPermissionId === null) return;
 
-        setIsSaving(true);
-        toast.loading('Guardando cambios...');
+        setIsSavingPermission(true);
+        toast.loading(permissionModalMode === 'create' ? 'Registrando permiso...' : 'Guardando cambios...');
         try {
-            const result = await PermissionService.update(editingId, trimValues(form));
+            const result = permissionModalMode === 'create'
+                ? await PermissionService.create(trimValues(permissionForm))
+                : await PermissionService.update(editingPermissionId!, trimValues(permissionForm));
             toast.success(result.message);
-            closeEdit();
+            closePermissionModal();
             reload();
         } catch (err) {
             toast.error(handleApiError(err));
         } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const openCreate = () => {
-        setCreateForm(EMPTY_CREATE_FORM);
-        setIsCreateOpen(true);
-    };
-
-    const closeCreate = () => setIsCreateOpen(false);
-
-    const setCreateField = (name: keyof CreatePermissionPayload) => (value: string | null) => {
-        setCreateForm((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleCreateSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        setIsCreating(true);
-        toast.loading('Registrando permiso...');
-        try {
-            const result = await PermissionService.create(trimValues(createForm));
-            toast.success(result.message);
-            closeCreate();
-            reload();
-        } catch (err) {
-            toast.error(handleApiError(err));
-        } finally {
-            setIsCreating(false);
+            setIsSavingPermission(false);
         }
     };
 
@@ -274,63 +252,42 @@ export const usePermissions = () => {
 
     const reloadRoles = () => setRoleReloadToken((token) => token + 1);
 
+    const openRoleCreate = () => {
+        setRoleForm(EMPTY_ROLE_CREATE_FORM);
+        setEditingRoleId(null);
+        setRoleModalMode('create');
+    };
+
     const openRoleEdit = (item: RoleAdmin) => {
-        setEditingRole(item);
-        setRoleForm(toRoleEditForm(item));
+        setEditingRoleId(item.id);
+        setRoleForm({ key: item.key, ...toRoleEditForm(item) });
+        setRoleModalMode('edit');
     };
 
-    const closeRoleEdit = () => {
-        setEditingRole(null);
-        setRoleForm(null);
-    };
+    const closeRoleModal = () => setRoleModalMode(null);
 
-    const setRoleField = (name: keyof UpdateRolePayload) => (value: string | number | boolean | null) => {
-        setRoleForm((prev) => (prev ? { ...prev, [name]: value } : prev));
+    const setRoleField = (name: keyof CreateRolePayload) => (value: string | number | boolean | null) => {
+        setRoleForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleRoleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!editingRole || !roleForm) return;
+        if (!roleModalMode) return;
+        if (roleModalMode === 'edit' && editingRoleId === null) return;
 
         setIsSavingRole(true);
-        toast.loading('Guardando cambios...');
+        toast.loading(roleModalMode === 'create' ? 'Registrando rol...' : 'Guardando cambios...');
         try {
-            const result = await PermissionService.updateRole(editingRole.id, trimValues(roleForm));
+            const result = roleModalMode === 'create'
+                ? await PermissionService.createRole(trimValues(roleForm))
+                : await PermissionService.updateRole(editingRoleId!, trimValues(roleForm));
             toast.success(result.message);
-            closeRoleEdit();
+            closeRoleModal();
             reloadRoles();
         } catch (err) {
             toast.error(handleApiError(err));
         } finally {
             setIsSavingRole(false);
-        }
-    };
-
-    const openRoleCreate = () => {
-        setRoleCreateForm(EMPTY_ROLE_CREATE_FORM);
-        setIsRoleCreateOpen(true);
-    };
-
-    const closeRoleCreate = () => setIsRoleCreateOpen(false);
-
-    const setRoleCreateField = (name: keyof CreateRolePayload) => (value: string | number | boolean | null) => {
-        setRoleCreateForm((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleRoleCreateSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        setIsCreatingRole(true);
-        toast.loading('Registrando rol...');
-        try {
-            const result = await PermissionService.createRole(trimValues(roleCreateForm));
-            toast.success(result.message);
-            closeRoleCreate();
-            reloadRoles();
-        } catch (err) {
-            toast.error(handleApiError(err));
-        } finally {
-            setIsCreatingRole(false);
         }
     };
 
@@ -354,9 +311,10 @@ export const usePermissions = () => {
         }
     };
 
-    // Abre el modal de permisos base y trae los que ya tiene asignados este rol.
+    // Abre el modal de plantilla del rol y trae las keys que ya tiene.
     const openManageRolePermissions = async (row: RoleAdmin) => {
         setManagingRole(row);
+        setSyncRoleToUsers(false);
         setIsLoadingRolePermissions(true);
         try {
             const keys = await PermissionService.getRolePermissions(row.id);
@@ -372,21 +330,22 @@ export const usePermissions = () => {
     const closeManageRolePermissions = () => {
         setManagingRole(null);
         setAssignedRoleKeys([]);
+        setSyncRoleToUsers(false);
     };
 
     const toggleRolePermission = (key: string) => {
         setAssignedRoleKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
     };
 
-    // Manda siempre el set completo tildado — el backend reemplaza, aplica de inmediato a todos
-    // los usuarios de ese rol (no hace falta que renueven sesión).
+    // Manda siempre el set completo tildado — el backend reemplaza la plantilla.
+    // Con sync tildado, además propaga el diff a los usuarios existentes de ese rol.
     const saveManageRolePermissions = async () => {
         if (!managingRole) return;
 
         setIsSavingRolePermissions(true);
         toast.loading('Guardando permisos...');
         try {
-            const result = await PermissionService.replaceRolePermissions(managingRole.id, assignedRoleKeys);
+            const result = await PermissionService.replaceRolePermissions(managingRole.id, assignedRoleKeys, syncRoleToUsers);
             toast.success(result.message);
             closeManageRolePermissions();
         } catch (err) {
@@ -403,17 +362,17 @@ export const usePermissions = () => {
         search, setSearch,
         moduleFilter, setModuleFilter, moduleOptions,
         groupFilter, setGroupFilter, groupOptions,
-        isEditOpen: editingId !== null, form, setField, openEdit, closeEdit, handleSubmit, isSaving,
-        isCreateOpen, createForm, openCreate, closeCreate, setCreateField, handleCreateSubmit, isCreating,
+        isPermissionModalOpen: permissionModalMode !== null, permissionModalMode,
+        permissionForm, setPermissionField, openPermissionCreate, openPermissionEdit, closePermissionModal, handlePermissionSubmit, isSavingPermission,
         deletingItem, isDeleteOpen: deletingItem !== null, openDelete, closeDelete, confirmDelete, isDeleting,
 
         // Roles
         roleItems, isRolesLoading,
         permissionCatalog,
-        isRoleEditOpen: editingRole !== null, editingRole, roleForm, setRoleField, openRoleEdit, closeRoleEdit, handleRoleSubmit, isSavingRole,
-        isRoleCreateOpen, roleCreateForm, openRoleCreate, closeRoleCreate, setRoleCreateField, handleRoleCreateSubmit, isCreatingRole,
+        isRoleModalOpen: roleModalMode !== null, roleModalMode,
+        roleForm, setRoleField, openRoleCreate, openRoleEdit, closeRoleModal, handleRoleSubmit, isSavingRole,
         deletingRole, isRoleDeleteOpen: deletingRole !== null, openRoleDelete, closeRoleDelete, confirmRoleDelete, isDeletingRole,
-        isManageRolePermissionsOpen: managingRole !== null, managingRole, assignedRoleKeys, isLoadingRolePermissions, isSavingRolePermissions,
+        isManageRolePermissionsOpen: managingRole !== null, managingRole, assignedRoleKeys, syncRoleToUsers, setSyncRoleToUsers, isLoadingRolePermissions, isSavingRolePermissions,
         openManageRolePermissions, closeManageRolePermissions, toggleRolePermission, saveManageRolePermissions,
     };
 };

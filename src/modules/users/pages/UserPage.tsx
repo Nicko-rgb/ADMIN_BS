@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Pencil, Search, ShieldCheck, UploadCloud, UserCog, Users as UsersIcon, X } from 'lucide-react';
 import { Table, TableActions, TableImage } from '../../../shared/components/Table';
 import type { TableAction, TableColumn } from '../../../shared/components/Table';
@@ -10,7 +11,7 @@ import useUsers from '../hooks/useUsers';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { DOCUMENT_TYPE_LABELS, ROLE_MANAGE_PERMISSIONS, isManagedRole } from '../utils/userConstants';
 import { FormUserManage } from '../components/FormUserManage';
-import { ManageUserPermissions } from '../components/ManageUserPermissions';
+import { ManageUserPermissions, MANAGE_USER_PERMS } from '../components/ManageUserPermissions';
 import type { UserAdmin, DocumentType } from '../interfaces/user.interface';
 import '../styles/UserPage.css';
 
@@ -24,10 +25,10 @@ const UserCatalog = () => {
         roleFilter, setRoleFilter, roleOptions, roleLabel,
         countryFilter, setCountryFilter, countryOptions,
         editing, editValues, isLoadingDetail, isSaving, isEditValid, openEdit, closeEdit, setEditField, handleSubmitEdit,
-        canManagePermissions, permissionCatalog,
-        isManagePermissionsOpen, managingUser, assignedKeys, isLoadingPermissions, isSavingPermissions,
-        openManagePermissions, closeManagePermissions, togglePermission, saveManagePermissions,
     } = useUsers();
+
+    // Objetivo del modal de permisos — con solo el publicId el modal carga y guarda solo.
+    const [managingUser, setManagingUser] = useState<{ publicId: string; name: string } | null>(null);
 
     // Editar exige el permiso de gestión del rol de esa fila.
     const rowActions = (row: UserAdmin): TableAction[] => {
@@ -35,8 +36,8 @@ const UserCatalog = () => {
         if (isManagedRole(row.role) && can(ROLE_MANAGE_PERMISSIONS[row.role])) {
             actions.push({ label: 'Editar', icon: Pencil, variant: 'edit', onClick: () => openEdit(row) });
         }
-        if (canManagePermissions) {
-            actions.push({ label: 'Gestionar permisos', icon: ShieldCheck, variant: 'view', onClick: () => openManagePermissions(row) });
+        if (can(...MANAGE_USER_PERMS)) {
+            actions.push({ label: 'Gestionar permisos', icon: ShieldCheck, variant: 'view', onClick: () => setManagingUser({ publicId: row.publicId, name: row.name }) });
         }
         return actions;
     };
@@ -125,17 +126,11 @@ const UserCatalog = () => {
                     </form>
                 )}
             </Modal>
-            {canManagePermissions && (
+            {can(...MANAGE_USER_PERMS) && (
                 <ManageUserPermissions
-                    isOpen={isManagePermissionsOpen}
-                    onClose={closeManagePermissions}
+                    publicId={managingUser?.publicId ?? null}
                     userName={managingUser?.name ?? ''}
-                    catalog={permissionCatalog}
-                    assignedKeys={assignedKeys}
-                    onToggle={togglePermission}
-                    onSave={saveManagePermissions}
-                    isLoading={isLoadingPermissions}
-                    isSaving={isSavingPermissions}
+                    onClose={() => setManagingUser(null)}
                 />
             )}
         </div>

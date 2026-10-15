@@ -30,32 +30,28 @@ export interface CompanyAdmin {
     createdAt: string;
 }
 
-// País del dueño en el detalle — el único `country` con `id` que envía el backend
-// (owner.person.country). El `country` de la empresa NO trae id.
-export interface CompanyOwnerCountry extends CountryDisplay {
-    id: number;
-}
-
-// Dueño en el detalle (toCompanyDetailDto) — con publicId y datos de persona.
-export interface CompanyOwner {
+// Usuario asignado a la empresa o a alguna de sus sucursales — todos los roles llegan acá,
+// el dueño (super_admin) se extrae en el front filtrando por role.
+export interface CompanyUser {
     publicId: string;
     firstName: string | null;
     lastName: string | null;
     email: string | null;
     phone: string | null;
+    role: ManagedRole;
     documentType: DocumentType | null;
     documentNumber: string | null;
     dateBirth: string | null;
-    country: CompanyOwnerCountry | null;
+    country: { id: number; name: string; flagUrl: string; phoneCode: string } | null;
+    sucursales: { publicId: string; name: string | null }[];
 }
 
-// Ubigeo en el detalle (toCompanyDetailDto) — solo el string ya formateado.
+// Ubigeo en el detalle — solo el string ya formateado.
 export interface CompanyUbigeo {
     formatted: string;
 }
 
-// Sucursal en la grilla del detalle — { publicId, name, address, ubigeo } con el ubigeo
-// ya formateado como string; el detalle completo para editar vive en sucursal.interface.ts.
+// Sucursal en la grilla del detalle.
 export interface CompanySubsidiary {
     publicId: string;
     name: string;
@@ -64,21 +60,8 @@ export interface CompanySubsidiary {
     status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE' | null;
 }
 
-// Usuario asignado a la empresa o a alguna de sus sucursales — el dueño no entra acá, viene
-// aparte en `owner`. `sucursales` trae una entrada por asignación (puede estar en varias).
-export interface CompanyUser {
-    publicId: string;
-    firstName: string | null;
-    lastName: string | null;
-    email: string | null;
-    phone: string | null;
-    role: ManagedRole;
-    sucursales: { publicId: string; name: string | null }[];
-}
-
-// Detalle de una empresa (toCompanyDetailDto) — se busca por publicId, nunca ids internos.
-// El `country` de la empresa es solo display (sin id); el detalle no trae `plan`
-// (el plan/uso se consulta aparte con usePlanUsage).
+// Detalle de una empresa — `owner` ya no existe como campo separado;
+// el frontend lo extrae de `users` filtrando role === 'super_admin'.
 export interface CompanyDetail {
     publicId: string;
     name: string;
@@ -89,7 +72,6 @@ export interface CompanyDetail {
     isEnabled: CompanyEnabled | null;
     country: CountryDisplay | null;
     ubigeo: CompanyUbigeo | null;
-    owner: CompanyOwner | null;
     subsidiaries: CompanySubsidiary[];
     users: CompanyUser[];
     createdAt: string;

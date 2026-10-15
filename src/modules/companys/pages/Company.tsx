@@ -1,4 +1,5 @@
-import { Settings, Pencil, Store, Building2, User, Plus, Users, UploadCloud, UserCog, X, MapPin, Globe, Gift } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, Pencil, Store, Building2, User, Plus, Users, UploadCloud, UserCog, X, MapPin, Globe, Gift, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Header, Button, Modal, LoadingScreen, NotFoundScreen, FormActions, PlanUsageBar, ForbiddenScreen } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
@@ -6,6 +7,7 @@ import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { DOCUMENT_TYPE_LABELS, ROLE_LABELS, ROLE_MANAGE_PERMISSIONS } from '../../users/utils/userConstants';
 import FormUserManage from '../../users/components/FormUserManage';
+import { ManageUserPermissions, MANAGE_USER_PERMS } from '../../users/components/ManageUserPermissions';
 import CompanyEdit from '../components/CompanyEdit';
 import UserAsingSucursal from '../components/UserAsingSucursal';
 import useCompany from '../hooks/useCompany';
@@ -38,6 +40,10 @@ const Company = () => {
     const canManageSucursales = can('sucursal.create');
     const canManageCompanyUsers = can(ROLE_MANAGE_PERMISSIONS.administrador, ROLE_MANAGE_PERMISSIONS.empleado);
 
+    // Modal de permisos directos — con solo el publicId el modal carga y guarda solo.
+    const [managingUser, setManagingUser] = useState<{ publicId: string; name: string } | null>(null);
+    const canManagePermissions = can(...MANAGE_USER_PERMS);
+
     if (isLoading) {
         return <LoadingScreen message="Cargando empresa..." size="lg" />;
     }
@@ -58,6 +64,7 @@ const Company = () => {
         return null;
     }
 
+    const owner = company.users.find((u) => u.role === 'super_admin') ?? null;
     const isPrimary = company.publicId === planUsage?.primaryCompany?.publicId;
 
     return (
@@ -126,36 +133,36 @@ const Company = () => {
                     <div className="title_card">
                         <User size={22} />
                         <h3>Información del dueño</h3>
-                        {company.owner && canEditOwner && <Button text="Editar" size="sm" icon={Pencil} onClick={openEditOwner} />}
+                        {owner && canEditOwner && <Button text="Editar" size="sm" icon={Pencil} onClick={openEditOwner} />}
                     </div>
-                    {company.owner ? (
+                    {owner ? (
                         <>
                             <div className="company_detail_row">
                                 <span className="company_detail_label">Nombre</span>
-                                <span>{`${company.owner.firstName} ${company.owner.lastName}`}</span>
+                                <span>{`${owner.firstName} ${owner.lastName}`}</span>
                             </div>
                             <div className="company_detail_row">
                                 <span className="company_detail_label">Correo</span>
-                                <span>{company.owner.email ?? '—'}</span>
+                                <span>{owner.email ?? '—'}</span>
                             </div>
                             <div className="company_detail_row">
                                 <span className="company_detail_label">Teléfono</span>
-                                <span>{formatPhone(company.owner.country?.phoneCode, company.owner.phone) || '—'}</span>
+                                <span>{formatPhone(owner.country?.phoneCode, owner.phone) || '—'}</span>
                             </div>
                             <div className="company_detail_row">
                                 <span className="company_detail_label">Documento</span>
                                 <span>
-                                    {company.owner.documentType
-                                        ? `${DOCUMENT_TYPE_LABELS[company.owner.documentType]} · ${company.owner.documentNumber}`
+                                    {owner.documentType
+                                        ? `${DOCUMENT_TYPE_LABELS[owner.documentType]} · ${owner.documentNumber}`
                                         : '—'}
                                 </span>
                             </div>
                             <div className="company_detail_row">
                                 <span className="company_detail_label">País</span>
-                                {company.owner.country ? (
+                                {owner.country ? (
                                     <div className="company_detail_country">
-                                        <img src={company.owner.country.flagUrl} alt={company.owner.country.name} />
-                                        <span>{company.owner.country.name}</span>
+                                        <img src={owner.country.flagUrl} alt={owner.country.name} />
+                                        <span>{owner.country.name}</span>
                                     </div>
                                 ) : '—'}
                             </div>
@@ -230,8 +237,17 @@ const Company = () => {
                                 </div>
                                 <div className="info">
                                     <span>{user.email ?? '—'}</span>
-                                    <span>{formatPhone(company.country?.phoneCode, user.phone) || '—'}</span>
+                                    <span>{formatPhone(user.country?.phoneCode, user.phone) || '—'}</span>
+                                    {user.documentType && (
+                                        <span>{DOCUMENT_TYPE_LABELS[user.documentType]} · {user.documentNumber ?? '—'}</span>
+                                    )}
                                 </div>
+                                {user.country && (
+                                    <div className="user_country">
+                                        <img src={user.country.flagUrl} alt={user.country.name} />
+                                        <span>{user.country.name}</span>
+                                    </div>
+                                )}
                                 <div className="user_sucursales">
                                     {user.sucursales.map((sucursal) => (
                                         <span className="sucursal_pill" key={sucursal.publicId}>
@@ -239,6 +255,28 @@ const Company = () => {
                                         </span>
                                     ))}
                                 </div>
+                                {canManagePermissions && (
+                                    <div className="user_card_actions">
+                                        <Button
+                                            text="Permisos"
+                                            size="sm"
+                                            icon={ShieldCheck}
+                                            color="secondary"
+                                            onClick={() => setManagingUser({
+                                                publicId: user.publicId,
+                                                name: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || user.email || '—',
+                                            })}
+                                        />
+                                        <Button
+                                            text="Gestionar"
+                                            size="sm"
+                                            icon={UserCog}
+                                            color="secondary"
+                                            disabled
+                                            onClick={() => {}}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -259,7 +297,7 @@ const Company = () => {
             />
 
             {canEditOwner && (
-                <Modal isOpen={isEditOwnerOpen} onClose={closeEditOwner} title="Editar dueño" icon={UserCog} size="lg">
+                <Modal isOpen={isEditOwnerOpen} onClose={closeEditOwner} title="Editar dueño" icon={UserCog} size="md">
                     {isLoadingOwnerDetail || !ownerEditValues ? (
                         <LoadingScreen message="Cargando datos del dueño..." size="sm" />
                     ) : (
@@ -279,6 +317,14 @@ const Company = () => {
                     onClose={closeUserModal}
                     subsidiaries={company.subsidiaries}
                     onSaved={retry}
+                />
+            )}
+
+            {canManagePermissions && (
+                <ManageUserPermissions
+                    publicId={managingUser?.publicId ?? null}
+                    userName={managingUser?.name ?? ''}
+                    onClose={() => setManagingUser(null)}
                 />
             )}
         </div>

@@ -11,8 +11,8 @@ import type { CreateRolePayload, UpdateRolePayload } from '../interfaces/role.in
  */
 class PermissionService {
     // ── Catálogo de permisos ────────────────────────────────────────────────
-    // Sin `search`, list() pagina; con `search`, el backend busca por key/label y devuelve todos
-    // los resultados sin paginar. `module`/`group` filtran, combinables.
+    // list() siempre pagina (manda page/limit); listAssignable() trae la servida
+    // dinámica para pickers. `search`/`module`/`group` filtran en ambos casos.
     static async list(page: number, limit: number, search?: string, module?: string, group?: string): Promise<PaginatedResponse<PermissionAdmin>> {
         const res = await apiService.get('/system/permissions', { params: { page, limit, search: search || undefined, module: module || undefined, group: group || undefined } });
         return { data: res.data.data, pagination: res.data.pagination };
@@ -24,9 +24,10 @@ class PermissionService {
         return res.data.data;
     }
 
-    // Catálogo completo, sin paginar — para pickers de checkboxes (ej. asignar permisos a un usuario o a un rol).
-    static async listCatalog(): Promise<PermissionAdmin[]> {
-        const res = await apiService.get('/system/permissions/catalog');
+    // Servida dinámica para pickers — system ve todo, el resto solo lo repartible.
+    // Sin page/limit el backend trae todo.
+    static async listAssignable(): Promise<PermissionAdmin[]> {
+        const res = await apiService.get('/system/permissions/assignable');
         return res.data.data;
     }
 
@@ -73,9 +74,10 @@ class PermissionService {
         return res.data.data;
     }
 
-    // Reemplaza el set completo — aplica de inmediato a todos los usuarios de ese rol.
-    static async replaceRolePermissions(id: number, permissionKeys: string[]): Promise<{ data: string[]; message: string }> {
-        const res = await apiService.put(`/system/roles/${id}/permissions`, { permission_keys: permissionKeys });
+    // Reemplaza la plantilla del rol. Con syncUsers, propaga el diff a los
+    // usuarios existentes de ese rol; sin él, solo cambia futuros usuarios.
+    static async replaceRolePermissions(id: number, permissionKeys: string[], syncUsers = false): Promise<{ data: string[]; message: string }> {
+        const res = await apiService.put(`/system/roles/${id}/permissions`, { permission_keys: permissionKeys, sync_users: syncUsers });
         return { data: res.data.data, message: res.data.message };
     }
 }

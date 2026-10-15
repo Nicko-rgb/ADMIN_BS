@@ -23,4 +23,5 @@ export interface LoginAdminResponse {
     user: SessionUser;
     permissions: string[];
     companyIds: number[];
+    scopeLevel: number | null;
 }

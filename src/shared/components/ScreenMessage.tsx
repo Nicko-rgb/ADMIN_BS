@@ -1,5 +1,6 @@
+import type { ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SearchX, ShieldAlert } from 'lucide-react';
+import { Inbox, SearchX, ShieldAlert } from 'lucide-react';
 import { Button } from './Button';
 import '../styles/ScreenMessage.css';
 
@@ -66,6 +67,45 @@ export const NotFoundScreen = ({
         </div>
     );
 };
+
+interface EmptyScreenProps {
+    /** Título del estado, ej. "No hay roles registrados". */
+    title?: string;
+    /** Detalle opcional, ej. cómo crear el primer registro. */
+    message?: string;
+    /** Ícono — por defecto una bandeja vacía. */
+    icon?: ComponentType<{ size?: number; className?: string }>;
+    /** Escala — `md` para una sección de página, `sm` para un slot chico. */
+    size?: ScreenMessageSize;
+    /** Si se pasa junto a onAction, agrega un botón de acción (ej. "Nuevo rol"). */
+    actionText?: string;
+    onAction?: () => void;
+}
+
+/**
+ * Lista/tabla/grid sin registros — estado vacío dentro de una página ya
+ * cargada. No confundir con `NotFoundScreen` (recurso inexistente, con botón
+ * Volver) — acá el usuario está donde debe estar, solo que aún no hay datos.
+ */
+export const EmptyScreen = ({
+    title = 'Sin registros',
+    message,
+    icon: Icon = Inbox,
+    size = 'md',
+    actionText,
+    onAction,
+}: EmptyScreenProps) => (
+    <div className={`screen_message screen_message_${size}`}>
+        <Icon className="screen_message_icon" />
+        <h2>{title}</h2>
+        {message && <p>{message}</p>}
+        {actionText && onAction && (
+            <div className="screen_message_actions">
+                <Button text={actionText} color="secondary" onClick={onAction} />
+            </div>
+        )}
+    </div>
+);
 
 interface ForbiddenScreenProps extends ScreenMessageActions {
     title?: string;

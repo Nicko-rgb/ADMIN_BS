@@ -149,13 +149,14 @@ export const useCompany = () => {
     const [isSavingOwner, setIsSavingOwner] = useState(false);
 
     const openEditOwner = async () => {
-        if (!company?.owner) return;
+        const owner = company?.users.find((u) => u.role === 'super_admin') ?? null;
+        if (!owner) return;
 
         setIsEditOwnerOpen(true);
         setOwnerEditValues(null);
         setIsLoadingOwnerDetail(true);
         try {
-            const detail = await ManageUserService.getById('super_admin', company.owner.publicId);
+            const detail = await ManageUserService.getById('super_admin', owner.publicId);
             setOwnerEditValues(userFormFromDetail('super_admin', detail, false));
         } catch (err) {
             toast.error(handleApiError(err));
@@ -178,12 +179,13 @@ export const useCompany = () => {
 
     const handleSubmitOwnerEdit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!company?.owner || !ownerEditValues || !isOwnerEditValid) return;
+        const owner = company?.users.find((u) => u.role === 'super_admin') ?? null;
+        if (!owner || !ownerEditValues || !isOwnerEditValid) return;
 
         setIsSavingOwner(true);
         toast.loading('Guardando cambios...');
         try {
-            const result = await ManageUserService.update('super_admin', company.owner.publicId, toUserPayload('super_admin', 'edit', ownerEditValues));
+            const result = await ManageUserService.update('super_admin', owner.publicId, toUserPayload('super_admin', 'edit', ownerEditValues));
             toast.success(result.message);
             closeEditOwner();
             reload();
