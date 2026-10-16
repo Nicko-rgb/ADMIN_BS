@@ -132,7 +132,7 @@
 
         .form_textarea {
             resize: vertical;
-            min-height: 100px;
+            /* min-height: 100px; */
         }
 
         .input_icon {

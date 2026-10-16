@@ -89,7 +89,7 @@ export const SucursalForm = ({ onClose, companyPublicId, sucursalPublicId, onSav
 
                     <FormSection title="Descripción">
                         <FormRow>
-                            <TextAreaField name="description" label="Descripción (Opcional)" value={form.description} onChange={(e) => setField('description')(e.target.value)} />
+                            <TextAreaField name="description" rows={2} label="Descripción (Opcional)" value={form.description} onChange={(e) => setField('description')(e.target.value)} />
                         </FormRow>
                     </FormSection>
 

@@ -12,9 +12,6 @@ import toast from '../../../shared/utils/toast';
 import type { PermissionAdmin, PermissionModule } from '../../system/interfaces/permission.interface';
 import '../styles/ManageUserPermissions.css';
 
-// Mismos permisos que exige la ruta en el backend — para el gate del botón/modal.
-export const MANAGE_USER_PERMS = ['system.full_access', 'user.manage_all', 'user.administrator_manage', 'user.employee_manage'] as const;
-
 interface ManageUserPermissionsProps {
     /** Usuario objetivo — null = modal cerrado. Con solo esto el modal carga y guarda solo. */
     publicId: string | null;
@@ -49,7 +46,7 @@ const groupByModuleAndGroupName = (catalog: PermissionAdmin[]): GroupedByModule 
 /** Modal autocontenido de permisos directos de un usuario — un checkbox por permiso repartible, agrupados en tarjetas por módulo y grupo. Manda siempre el set completo tildado al guardar (reemplazo, no diff). */
 export const ManageUserPermissions = ({ publicId, userName, onClose, onSaved }: ManageUserPermissionsProps) => {
     const can = usePermission();
-    const canManagePermissions = can(...MANAGE_USER_PERMS);
+    const canManagePermissions = can('user.permission_manage');
     const [permissionCatalog, setPermissionCatalog] = useState<PermissionAdmin[]>([]);
     const [assignedKeys, setAssignedKeys] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);

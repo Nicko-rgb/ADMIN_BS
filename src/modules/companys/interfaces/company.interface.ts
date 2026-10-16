@@ -46,8 +46,14 @@ export interface CompanyUser {
     sucursales: { publicId: string; name: string | null }[];
 }
 
-// Ubigeo en el detalle — solo el string ya formateado.
+// Ubigeo en el detalle — ids de catálogo para precargar el form + string formateado.
 export interface CompanyUbigeo {
+    id: number;
+    district: string;
+    province: string | null;
+    provinceId: number | null;
+    department: string | null;
+    departmentId: number | null;
     formatted: string;
 }
 
@@ -70,7 +76,7 @@ export interface CompanyDetail {
     phoneCell: string;
     phone: string | null;
     isEnabled: CompanyEnabled | null;
-    country: CountryDisplay | null;
+    country: { id: number; name: string; flagUrl: string; phoneCode: string } | null;
     ubigeo: CompanyUbigeo | null;
     subsidiaries: CompanySubsidiary[];
     users: CompanyUser[];

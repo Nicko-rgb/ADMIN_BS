@@ -11,7 +11,7 @@ import useUsers from '../hooks/useUsers';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { DOCUMENT_TYPE_LABELS, ROLE_MANAGE_PERMISSIONS, isManagedRole } from '../utils/userConstants';
 import { FormUserManage } from '../components/FormUserManage';
-import { ManageUserPermissions, MANAGE_USER_PERMS } from '../components/ManageUserPermissions';
+import { ManageUserPermissions } from '../components/ManageUserPermissions';
 import type { UserAdmin, DocumentType } from '../interfaces/user.interface';
 import '../styles/UserPage.css';
 
@@ -36,7 +36,7 @@ const UserCatalog = () => {
         if (isManagedRole(row.role) && can(ROLE_MANAGE_PERMISSIONS[row.role])) {
             actions.push({ label: 'Editar', icon: Pencil, variant: 'edit', onClick: () => openEdit(row) });
         }
-        if (can(...MANAGE_USER_PERMS)) {
+        if (can('user.permission_manage')) {
             actions.push({ label: 'Gestionar permisos', icon: ShieldCheck, variant: 'view', onClick: () => setManagingUser({ publicId: row.publicId, name: row.name }) });
         }
         return actions;
@@ -126,7 +126,7 @@ const UserCatalog = () => {
                     </form>
                 )}
             </Modal>
-            {can(...MANAGE_USER_PERMS) && (
+            {can('user.permission_manage') && (
                 <ManageUserPermissions
                     publicId={managingUser?.publicId ?? null}
                     userName={managingUser?.name ?? ''}

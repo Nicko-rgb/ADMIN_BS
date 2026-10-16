@@ -1,0 +1,59 @@
+.medible_image {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+
+    .medible_image_header {
+        h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text);
+        }
+    }
+
+    .medible_image_image {
+        width: 100%;
+        max-height: 280px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+    }
+
+    .medible_image_meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: .8rem;
+
+        .medible_image_filename {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: var(--font-secondary);
+            font-size: 1.3rem;
+            color: var(--text-soft);
+        }
+
+        .medible_image_filesize {
+            flex-shrink: 0;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+    }
+
+    .medible_image_description {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--text-soft);
+    }
+
+    .medible_image_input {
+        display: none;
+    }
+}

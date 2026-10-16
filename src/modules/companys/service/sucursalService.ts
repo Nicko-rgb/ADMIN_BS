@@ -1,6 +1,13 @@
 import { apiService } from '../../../shared/utils/apiService';
 import type { SucursalDetail, SucursalPayload } from '../interfaces/sucursal.interface';
 
+export interface BannerFile {
+    publicId: string;
+    url: string;
+    fileName: string;
+    description: string | null;
+}
+
 // Alta y edición de sucursal — companyPublicId (alta) es el public_id de la empresa padre, publicId (detalle/edición) es el propio de la sucursal.
 class SucursalService {
     static async register(companyPublicId: string, payload: SucursalPayload): Promise<{ data: SucursalDetail; message: string }> {
@@ -16,6 +23,26 @@ class SucursalService {
     static async update(publicId: string, payload: SucursalPayload): Promise<{ data: SucursalDetail; message: string }> {
         const res = await apiService.put(`/sucursals/${publicId}`, payload);
         return { data: res.data.data, message: res.data.message };
+    }
+
+    // Banner/portada — GET trae la actual o null, POST la reemplaza, DELETE la quita.
+    static async getBanner(sucursalPublicId: string): Promise<BannerFile | null> {
+        const res = await apiService.get(`/sucursals/${sucursalPublicId}/banner`);
+        const data = res.data.data;
+        return data ? { publicId: data.publicId, url: data.url, fileName: data.fileName, description: data.description ?? null } : null;
+    }
+
+    static async uploadBanner(sucursalPublicId: string, file: File, description?: string): Promise<BannerFile> {
+        const form = new FormData();
+        form.append('cover', file);
+        if (description?.trim()) form.append('description', description.trim());
+        const res = await apiService.post(`/sucursals/${sucursalPublicId}/banner`, form);
+        const data = res.data.data;
+        return { publicId: data.publicId, url: data.url, fileName: data.fileName, description: data.description ?? null };
+    }
+
+    static async removeBanner(sucursalPublicId: string): Promise<void> {
+        await apiService.delete(`/sucursals/${sucursalPublicId}/banner`);
     }
 }
 

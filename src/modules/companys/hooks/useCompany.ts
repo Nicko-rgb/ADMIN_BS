@@ -8,27 +8,13 @@ import toast from '../../../shared/utils/toast';
 import { usePlanUsage } from '../../../shared/hooks/usePlanUsage';
 import { hasPlanRoom } from '../../../shared/utils/planUsage';
 import CompanyService from '../service/companyService';
-import ManageUserService from '../../users/service/manageUserService';
-import { isUserFormValid, toUserPayload, userFormFromDetail } from '../../users/utils/userForm';
 import { COMPANY_REQUIRED_FIELDS, EMPTY_COMPANY_FORM } from '../utils/tenantForm';
 import useTenantForm from './useTenantForm';
 import type { CompanyDetail } from '../interfaces/company.interface';
-import type { UserFormValues } from '../../users/interfaces/user.interface';
 
 export type CompanyErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 
-// Detalle de una empresa — trae el publicId de la URL (/companys/company/:publicId) y carga
-// país, ubigeo formateado, dueño y sucursales en un solo fetch. El 404 (publicId inexistente)
-// y el 403 (empresa fuera del scope del usuario, ver company.service.ts::getByPublicId en el
-// backend) se distinguen por status para que la página elija entre NotFoundScreen y
-// ForbiddenScreen — cualquier otro error queda como 'unknown', mismo mensaje genérico.
-//
-// También agrupa la edición de empresa y de dueño (botones "Editar" de Company.tsx) — mismo
-// patrón que useUsers.ts (un hook por página, listado+edición juntos). La edición de empresa
-// reusa useTenantForm (mismo que el paso 1 del wizard de alta), precargado con los datos
-// ya traídos acá, sin fetch adicional. La edición de dueño usa FormUserManage (rol super_admin) —
-// trae el detalle completo por id, la autoedición del propio perfil vive aparte en /home/profile
-// (useProfile).
+// Detalle de una empresa — carga país, ubigeo formateado, usuarios (incluyendo dueño) y sucursales.
 export const useCompany = () => {
     const { publicId } = useParams<{ publicId: string }>();
 
@@ -81,19 +67,17 @@ export const useCompany = () => {
     const openEditCompany = () => {
         if (!company) return;
         setShowCompanyEditErrors(false);
-        // El detalle no trae ids de país/ubigeo (solo display) — la cascada arranca vacía
-        // y el usuario reelige ubicación al guardar.
         preload(
             {
                 name: company.name,
                 document: company.document,
-                country_id: 0,
-                ubigeo_id: 0,
+                country_id: company.country?.id ?? 0,
+                ubigeo_id: company.ubigeo?.id ?? 0,
                 address: company.address,
                 phone_cell: company.phoneCell,
                 phone: company.phone ?? '',
             },
-            { departmentId: 0, provinceId: 0 },
+            { departmentId: company.ubigeo?.departmentId ?? 0, provinceId: company.ubigeo?.provinceId ?? 0 },
         );
         setIsEditCompanyOpen(true);
     };
@@ -130,7 +114,7 @@ export const useCompany = () => {
         }
     };
 
-    // Modal de alta de usuario de sucursal — su estado y su envío viven en useUserAsingSucursal.
+    // Modal de alta de usuario de sucursal
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     const openUserModal = () => {
         if (!hasPlanRoom(planUsage?.users)) {
@@ -141,65 +125,20 @@ export const useCompany = () => {
 
     const closeUserModal = () => setIsUserModalOpen(false);
 
-    // Edición de dueño ───────────────────────────────────────────────────────────────────────
-    // FormUserManage sobre el rol super_admin (GET/PUT /users/manage/super_admin/:id).
-    const [isEditOwnerOpen, setIsEditOwnerOpen] = useState(false);
-    const [ownerEditValues, setOwnerEditValues] = useState<UserFormValues | null>(null);
-    const [isLoadingOwnerDetail, setIsLoadingOwnerDetail] = useState(false);
-    const [isSavingOwner, setIsSavingOwner] = useState(false);
-
-    const openEditOwner = async () => {
-        const owner = company?.users.find((u) => u.role === 'super_admin') ?? null;
-        if (!owner) return;
-
-        setIsEditOwnerOpen(true);
-        setOwnerEditValues(null);
-        setIsLoadingOwnerDetail(true);
-        try {
-            const detail = await ManageUserService.getById('super_admin', owner.publicId);
-            setOwnerEditValues(userFormFromDetail('super_admin', detail, false));
-        } catch (err) {
-            toast.error(handleApiError(err));
-            setIsEditOwnerOpen(false);
-        } finally {
-            setIsLoadingOwnerDetail(false);
-        }
-    };
-
-    const closeEditOwner = () => {
-        setIsEditOwnerOpen(false);
-        setOwnerEditValues(null);
-    };
-
-    const setOwnerEditField = <K extends keyof UserFormValues>(field: K, value: UserFormValues[K]) => {
-        setOwnerEditValues((prev) => (prev ? { ...prev, [field]: value } : prev));
-    };
-
-    const isOwnerEditValid = ownerEditValues !== null && isUserFormValid('super_admin', 'edit', ownerEditValues);
-
-    const handleSubmitOwnerEdit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const owner = company?.users.find((u) => u.role === 'super_admin') ?? null;
-        if (!owner || !ownerEditValues || !isOwnerEditValid) return;
-
-        setIsSavingOwner(true);
-        toast.loading('Guardando cambios...');
-        try {
-            const result = await ManageUserService.update('super_admin', owner.publicId, toUserPayload('super_admin', 'edit', ownerEditValues));
-            toast.success(result.message);
-            closeEditOwner();
-            reload();
-        } catch (err) {
-            toast.error(handleApiError(err));
-        } finally {
-            setIsSavingOwner(false);
-        }
-    };
-
     return {
-        company, isLoading, errorStatus, errorMessage, retry: reload, planUsage, notificationsTier,
+        company,
+        isLoading,
+        errorStatus,
+        errorMessage,
+        retry: reload,
+        planUsage,
+        notificationsTier,
 
-        isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany, handleSubmitCompanyEdit,
+        isEditCompanyOpen,
+        openEditCompany,
+        closeEditCompany,
+        isSavingCompany,
+        handleSubmitCompanyEdit,
         companyEditProps: {
             ...companyEditFields,
             errors: showCompanyEditErrors ? companyEditErrors : {},
@@ -207,10 +146,9 @@ export const useCompany = () => {
 
         openRegisterSucursal,
 
-        isUserModalOpen, openUserModal, closeUserModal,
-
-        isEditOwnerOpen, openEditOwner, closeEditOwner, isLoadingOwnerDetail, isSavingOwner, isOwnerEditValid, handleSubmitOwnerEdit,
-        ownerEditValues, setOwnerEditField,
+        isUserModalOpen,
+        openUserModal,
+        closeUserModal,
     };
 };
 

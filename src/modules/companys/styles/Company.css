@@ -1,160 +1,243 @@
 .company_detail_page {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1.4rem;
 
-    /* ── Hero: identidad + acciones en una sola fila ─────────────────────────
-       Antes era un bloque centrado tipo perfil personal; una empresa encaja
-       mejor con el mismo lenguaje horizontal que .company_card en
-       CompanysPage.css (ícono/avatar + título + acción), así el detalle se
-       siente continuación del listado en vez de una plantilla genérica. */
-    .company_hero {
+    /* ── Hero / Banner unificado ────────────────────────────── */
+    .company_hero_banner {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-        max-width: 1000px;
-        width: 100%;
-        margin: 0 auto;
-        padding: 1.6rem;
+        flex-direction: column;
+        gap: 1.4rem;
+        padding: 1.8rem 2rem;
 
-        .company_hero_identity {
+        .company_hero_main {
             display: flex;
             align-items: center;
-            gap: 1.2rem;
-            min-width: 0;
+            justify-content: space-between;
+            gap: 1.6rem;
+            flex-wrap: wrap;
 
-            .company_avatar {
+            .company_hero_avatar {
                 flex-shrink: 0;
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                background: var(--primary);
-                color: var(--text-white);
-                font-size: 2.2rem;
+                width: 64px;
+                height: 64px;
+                border-radius: 14px;
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover, var(--primary)) 100%);
+                color: var(--text-white, #fff);
+                font-size: 2.6rem;
                 font-weight: 700;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
             }
 
-            .company_hero_text {
+            .company_hero_content {
                 display: flex;
                 flex-direction: column;
-                gap: .3rem;
+                gap: .4rem;
+                flex: 1;
                 min-width: 0;
 
                 .company_hero_title_row {
                     display: flex;
                     align-items: center;
                     gap: .8rem;
+                    flex-wrap: wrap;
 
                     h1 {
-                        font-size: 2rem;
+                        font-size: 2.2rem;
                         font-weight: 700;
                         color: var(--text);
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
+                        line-height: 1.2;
+                    }
+
+                    .status_badge {
+                        padding: .25rem .8rem;
+                        border-radius: 999px;
+                        font-size: 1.2rem;
+                        font-weight: 600;
+
+                        &.active {
+                            background: var(--success-soft);
+                            color: var(--success-text);
+                        }
+
+                        &.inactive {
+                            background: var(--danger-soft);
+                            color: var(--danger-text);
+                        }
+
+                        &.pending {
+                            background: var(--warning-soft);
+                            color: var(--warning-text);
+                        }
                     }
 
                     .company_plan_badge {
                         display: inline-flex;
                         align-items: center;
                         gap: .4rem;
-                        flex-shrink: 0;
-                        padding: .3rem .8rem;
+                        padding: .25rem .8rem;
                         border-radius: 999px;
                         background: var(--primary-light);
                         color: var(--primary);
-                        font-size: 1.4rem;
+                        font-size: 1.25rem;
+                        font-weight: 600;
+                    }
+
+                    .company_primary_badge {
+                        display: inline-flex;
+                        align-items: center;
+                        padding: .25rem .8rem;
+                        border-radius: 999px;
+                        background: var(--purple-soft, rgba(139, 92, 246, 0.12));
+                        color: var(--purple-text, #7c3aed);
+                        font-size: 1.25rem;
                         font-weight: 600;
                     }
                 }
 
-                .company_hero_subtitle {
-                    font-size: 1.3rem;
+                .company_hero_document {
+                    font-size: 1.35rem;
                     color: var(--text-muted);
+                    font-weight: 500;
                 }
             }
 
             .company_hero_actions {
                 display: flex;
+                align-items: center;
                 gap: .8rem;
                 flex-shrink: 0;
             }
         }
-    }
 
-    /* ── Información: una sola card partida en dos columnas ──────────────────
-       Antes eran dos cards lado a lado (empresa: 7 filas, dueño: 5) — con
-       bordes/sombra propios cada una, la diferencia de alto quedaba a la
-       vista (bordes inferiores desalineados). Una sola card comparte un único
-       borde/sombra: la columna más corta simplemente termina antes, sin dejar
-       un borde suelto más arriba que el de al lado. */
-    .company_info_card {
-        max-width: 1000px;
-        width: 100%;
-        margin: 0 auto;
-        padding: 1.6rem 2rem;
-        display: flex;
-        gap: 3rem;
-        flex-wrap: wrap;
+        /* Metadatos rápidos de la empresa */
+        .company_hero_meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: .9rem 1.4rem;
+            padding: 1.2rem 1.4rem;
+            background: var(--color-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
 
-        .company_info_column {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            gap: 1rem;
-
-            .company_detail_row {
+            .meta_item {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                gap: 1rem;
-                font-size: 1.4rem;
+                gap: .7rem;
+                font-size: 1.35rem;
+                color: var(--text);
+                min-width: 0;
 
-                .company_detail_label {
+                svg {
+                    color: var(--primary);
                     flex-shrink: 0;
-                    color: var(--text-muted);
                 }
 
-                span:not(.company_detail_label) {
-                    color: var(--text);
-                    font-weight: 500;
-                    text-align: right;
+                span {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
 
-                /* Pais */
-                .company_detail_country {
-                    display: flex;
+                .meta_country {
+                    display: inline-flex;
                     align-items: center;
-                    justify-content: flex-end;
-                    gap: .6rem;
+                    gap: .5rem;
                     min-width: 0;
-                    flex: 1;
-                    color: var(--text);
-                    font-weight: 500;
 
                     img {
-                        width: 25px;
+                        width: 20px;
+                        height: 14px;
                         border-radius: 2px;
-                        object-fit: contain;
+                        object-fit: cover;
+                        flex-shrink: 0;
                     }
 
-                    .ellipsis {
-                        min-width: 0;
+                    span {
                         overflow: hidden;
-                        white-space: nowrap;
                         text-overflow: ellipsis;
+                        white-space: nowrap;
                     }
                 }
             }
         }
+
+        /* Fila de información resumida del dueño */
+        .company_hero_owner {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding-top: .2rem;
+
+            .owner_label {
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--text-soft);
+                text-transform: uppercase;
+                letter-spacing: .5px;
+
+                svg {
+                    color: var(--primary);
+                }
+            }
+
+            .owner_chips_list {
+                display: flex;
+                align-items: center;
+                gap: .6rem;
+                flex-wrap: wrap;
+
+                .owner_chip {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: .5rem;
+                    padding: .4rem .9rem;
+                    border-radius: 20px;
+                    font-size: 1.3rem;
+                    background: var(--color-bg);
+                    border: 1px solid var(--border);
+                    color: var(--text-soft);
+                    font-weight: 500;
+
+                    svg {
+                        color: var(--text-muted);
+                        flex-shrink: 0;
+                    }
+
+                    &.name_chip {
+                        background: var(--primary-light);
+                        border-color: transparent;
+                        color: var(--primary);
+                        font-weight: 600;
+                    }
+
+                    .owner_country_flag {
+                        width: 16px;
+                        height: 12px;
+                        border-radius: 2px;
+                        object-fit: cover;
+                        flex-shrink: 0;
+                    }
+                }
+            }
+
+            .owner_empty {
+                font-size: 1.3rem;
+                font-style: italic;
+                color: var(--text-muted);
+            }
+        }
     }
 
+    /* ── Secciones compartidas (Sucursales y Usuarios) ─────── */
     .section_company {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 1.2rem;
         padding: 1.6rem 2rem;
     }
 
@@ -174,6 +257,7 @@
         }
     }
 
+    /* ── Grid de Sucursales ────────────────────────────────── */
     .company_subsidiaries_grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -216,27 +300,27 @@
                 align-items: center;
                 gap: .8rem;
                 min-width: 0;
-            }
 
-            .avatar {
-                flex-shrink: 0;
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: var(--primary);
-                color: var(--text-white);
-                font-size: 2rem;
-                font-weight: 700;
-            }
+                .avatar {
+                    flex-shrink: 0;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: var(--primary);
+                    color: var(--text-white, #fff);
+                    font-size: 2rem;
+                    font-weight: 700;
+                }
 
-            .name {
-                min-width: 0;
-                font-size: 1.6rem;
-                font-weight: 600;
-                color: var(--text);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                .name {
+                    min-width: 0;
+                    font-size: 1.6rem;
+                    font-weight: 600;
+                    color: var(--text);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
             }
 
             .info {
@@ -258,7 +342,7 @@
 
                     span {
                         font-size: 1.4rem;
-                        text-wrap: nowrap;
+                        white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
                     }
@@ -272,6 +356,7 @@
         }
     }
 
+    /* ── Grid de Usuarios ──────────────────────────────────── */
     .users_grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -292,40 +377,40 @@
                 justify-content: space-between;
                 gap: .8rem;
                 min-width: 0;
-            }
 
-            .name {
-                min-width: 0;
-                font-size: 1.6rem;
-                font-weight: 600;
-                color: var(--text);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .role {
-                flex-shrink: 0;
-                padding: 3px 10px;
-                border-radius: 20px;
-                font-size: 1.2rem;
-                font-weight: 600;
-                background: var(--gray-medium);
-                color: var(--text-soft);
-
-                &.super_admin {
-                    background: var(--success-soft);
-                    color: var(--success-text);
+                .name {
+                    min-width: 0;
+                    font-size: 1.6rem;
+                    font-weight: 600;
+                    color: var(--text);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
-                &.administrador {
-                    background: var(--purple-soft);
-                    color: var(--purple-text);
-                }
+                .role {
+                    flex-shrink: 0;
+                    padding: 3px 10px;
+                    border-radius: 20px;
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    background: var(--gray-medium);
+                    color: var(--text-soft);
 
-                &.empleado {
-                    background: var(--info-soft);
-                    color: var(--info-text);
+                    &.super_admin {
+                        background: var(--success-soft);
+                        color: var(--success-text);
+                    }
+
+                    &.administrador {
+                        background: var(--purple-soft);
+                        color: var(--purple-text);
+                    }
+
+                    &.empleado {
+                        background: var(--info-soft);
+                        color: var(--info-text);
+                    }
                 }
             }
 
@@ -340,6 +425,22 @@
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                }
+            }
+
+            .user_country {
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+                font-size: 1.3rem;
+                color: var(--text-muted);
+
+                img {
+                    width: 16px;
+                    height: 12px;
+                    border-radius: 2px;
+                    object-fit: cover;
+                    flex-shrink: 0;
                 }
             }
 
@@ -361,28 +462,13 @@
                 }
             }
 
-            .user_country {
-                display: inline-flex;
-                align-items: center;
-                gap: .4rem;
-                font-size: 1.3rem;
-                color: var(--text-muted);
-
-                img {
-                    width: 16px;
-                    height: 12px;
-                    border-radius: 2px;
-                    object-fit: cover;
-                    flex-shrink: 0;
-                }
-            }
-
             .user_card_actions {
                 display: flex;
                 flex-wrap: wrap;
                 gap: .8rem;
                 padding-top: .8rem;
                 border-top: 1px solid var(--border);
+
                 button {
                     flex: 1;
                 }
@@ -390,8 +476,7 @@
         }
     }
 
-    /* Sin sucursales todavía — icono + texto centrados, en vez de una línea
-       itálica sola perdida dentro de la card. */
+    /* Estado vacío */
     .company_empty_state {
         display: flex;
         flex-direction: column;
@@ -406,30 +491,26 @@
         }
     }
 
-    .company_empty_value {
-        color: var(--text-muted);
-        font-style: italic;
-        font-size: 1.4rem;
-    }
-
+    /* ── Responsive ────────────────────────────────────────── */
     @media (max-width: 768px) {
-        .company_hero {
-            flex-direction: column;
-            align-items: flex-start;
-        }
+        .company_hero_banner {
+            padding: 1.4rem;
 
-        .company_info_columns {
-            grid-template-columns: 1fr;
-            gap: 1.6rem;
-        }
+            .company_hero_main {
+                flex-direction: column;
+                align-items: flex-start;
 
-        .company_info_column {
-            padding: 0;
+                .company_hero_actions {
+                    width: 100%;
 
-            &:last-child {
-                border-left: none;
-                border-top: 1px solid var(--border);
-                padding-top: 1.6rem;
+                    button {
+                        flex: 1;
+                    }
+                }
+            }
+
+            .company_hero_meta {
+                grid-template-columns: 1fr;
             }
         }
     }

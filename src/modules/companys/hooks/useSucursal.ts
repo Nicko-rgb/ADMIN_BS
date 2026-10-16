@@ -3,6 +3,9 @@ import { useParams } from 'react-router-dom';
 import { handleApiError, getApiErrorStatus } from '../../../shared/utils/errorHandler';
 import SucursalService from '../service/sucursalService';
 import SucursalConfigService from '../service/sucursalConfigService';
+import SpaceService from '../service/spaceService';
+import type { BannerFile } from '../service/sucursalService';
+import type { SpaceListItem } from '../interfaces/space.interface';
 import type { SucursalDetail } from '../interfaces/sucursal.interface';
 import type { SucursalConfig } from '../interfaces/sucursalConfig.interface';
 
@@ -20,6 +23,10 @@ export const useSucursal = () => {
     // null = sin config o no se pudo cargar — la página igual se muestra; el modal
     // hace su propio fetch con manejo de errores al abrirse.
     const [config, setConfig] = useState<SucursalConfig | null>(null);
+    // Portada actual — null si no hay o no se pudo cargar (no bloquea la página).
+    const [banner, setBanner] = useState<BannerFile | null>(null);
+    // Espacios de la sucursal — endpoint propio con space.view.
+    const [spaces, setSpaces] = useState<SpaceListItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorStatus, setErrorStatus] = useState<SucursalErrorStatus | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
@@ -34,13 +41,17 @@ export const useSucursal = () => {
             setErrorStatus(null);
             setConfig(null);
             try {
-                const [sucursalData, configData] = await Promise.all([
+                const [sucursalData, configData, bannerData, spacesData] = await Promise.all([
                     SucursalService.getByPublicId(publicId),
                     SucursalConfigService.get(publicId).catch(() => null),
+                    SucursalService.getBanner(publicId).catch(() => null),
+                    SpaceService.listBySucursal(publicId).catch(() => []),
                 ]);
                 if (!active) return;
                 setSucursal(sucursalData);
                 setConfig(configData);
+                setBanner(bannerData);
+                setSpaces(spacesData);
             } catch (err) {
                 if (!active) return;
                 const status = getApiErrorStatus(err);
@@ -58,7 +69,21 @@ export const useSucursal = () => {
 
     const reload = () => setReloadToken((token) => token + 1);
 
-    return { publicId, sucursal, config, isLoading, errorStatus, errorMessage, retry: reload };
+    // Recarga solo la portada (tras subir/eliminar desde el modal).
+    const reloadBanner = async () => {
+        if (!publicId) return;
+        const data = await SucursalService.getBanner(publicId).catch(() => null);
+        setBanner(data);
+    };
+
+    // Recarga solo los espacios (tras registrar uno nuevo).
+    const reloadSpaces = async () => {
+        if (!publicId) return;
+        const data = await SpaceService.listBySucursal(publicId).catch(() => []);
+        setSpaces(data);
+    };
+
+    return { publicId, sucursal, config, banner, spaces, isLoading, errorStatus, errorMessage, retry: reload, reloadBanner, reloadSpaces };
 };
 
 export default useSucursal;

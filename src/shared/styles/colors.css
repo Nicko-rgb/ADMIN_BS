@@ -11,6 +11,7 @@
   --primary:        #2c9d75;  /* Rellenos: botón primario, toggle, switch */
   --primary-dark:   #1b7f5c;  /* Dark variant */
   --primary-light:  #21976e2f;  /* Light variant */
+  --accent:         #6e60f02f;  /* Rellenos suaves */
 
   /* ── Superficies ────────────────────────────────────────────────────────── */
   --color-bg:   #f5f8f7;  /* Lienzo de la app y cuerpo del modal */
