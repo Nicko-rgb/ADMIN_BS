@@ -1,37 +1,61 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { Image, ImagePlus, Trash2, UploadCloud, X } from 'lucide-react';
-import { LoadingScreen, EmptyScreen, Button } from './';
+import { EmptyScreen, Button } from './';
 import { TextAreaField, FormActions } from './';
 import { handleApiError } from '../utils/errorHandler';
 import { resolveImageUrl } from '../utils/formatText';
 import toast from '../utils/toast';
 import '../styles/MedibleImage.css';
 
+/** Tipos de archivo multimedia — espeja MEDIA_TYPES del backend (system/interfaces/media.interface.ts). */
+export type MediaFileType = 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT';
+
 export interface MedibleImageFile {
     publicId: string;
     url: string;
     fileName: string;
     description: string | null;
+    /** Tipo del archivo — si es VIDEO, el componente lo muestra como <video>. */
+    type?: MediaFileType;
 }
 
-/** Operaciones que el padre inyecta — el componente no conoce módulos ni endpoints. */
+/**
+ * Modos del componente:
+ * - `register`     — REGISTRAR: siempre vacío, solo permite subir. Tras subir vuelve
+ *                    a vacío (queda listo para el siguiente archivo).
+ * - `read`         — LEER solo lectura: muestra el archivo recibido, sin acciones.
+ * - `read_delete`  — LEER y BORRAR: muestra el archivo recibido y permite eliminarlo.
+ *                    Si el api además trae `uploadImage`, aparece el control de
+ *                    subida para reemplazarlo (ej. la portada, que se reemplaza sola).
+ */
+export type MedibleImageMode = 'register' | 'read' | 'read_delete';
+
+/**
+ * Operaciones que el padre inyecta — el componente no conoce módulos ni endpoints.
+ * El componente NUNCA carga: si el archivo ya existe, se lo pasa en `mediaSelect`.
+ *
+ * La presencia de un método es la habilitación de su acción: si el padre no lo
+ * inyecta, el control no existe. El permiso lo aplica el padre y el backend —
+ * este componente no sabe de roles ni permisos.
+ */
 export interface MedibleImageApi {
-    getImage: () => Promise<MedibleImageFile | null>;
-    uploadImage: (file: File, description?: string) => Promise<MedibleImageFile>;
-    removeImage: () => Promise<void>;
+    /** Sube el archivo — devuelve el registro creado y el mensaje del backend. */
+    uploadImage?: (file: File, description?: string) => Promise<{ data: MedibleImageFile; message: string }>;
+    /** Elimina el archivo — devuelve el mensaje del backend. */
+    removeImage?: () => Promise<{ message: string }>;
 }
 
 interface MedibleImageProps {
-    /** Título de la card (ej. "Portada de la sucursal"). */
-    title?: string;
-    /** Muestra la descripción guardada y permite registrarla al subir. */
+    /** Mododo de uso — 'register' | 'read' | 'read_delete' */
+    mode: MedibleImageMode;
     showDescription?: boolean;
-    /** Sin edición muestra solo lectura (el padre la apaga según permiso). */
-    editable?: boolean;
+    accept?: 'image' | 'media';
     onChanged?: () => void;
-    /** Service del módulo dueño (sucursal, espacio, usuario...) ya apuntando a su entidad. */
-    api: MedibleImageApi;
+    /** Archivo a mostrar — el padre lo carga y lo pasa; el componente no hace fetch. */
+    mediaSelect?: MedibleImageFile | null;
+    /** Operaciones de escritura que el padre habilita. */
+    api?: MedibleImageApi | null;
 }
 
 const formatBytes = (bytes: number): string => {
@@ -41,34 +65,34 @@ const formatBytes = (bytes: number): string => {
     return `${(kb / 1024).toFixed(2)} MB`;
 };
 
+/** Tipos que acepta el input de archivo. */
 const ACCEPTED_IMAGES = 'image/jpeg,image/png,image/webp';
+const ACCEPTED_MEDIA = `${ACCEPTED_IMAGES},video/mp4,video/webm,video/quicktime`;
 
-/** Imagen única de una entidad — el padre inyecta el api del módulo dueño. */
-export const MedibleImage = ({ title = 'Imagen', showDescription = false, editable = true, onChanged, api }: MedibleImageProps) => {
-    const [image, setImage] = useState<MedibleImageFile | null>(null);
+/** ¿La url apunta a un video? — fallback cuando el archivo no trae `type`. */
+const isVideoUrl = (url: string): boolean => /\.(mp4|webm|mov|m4v)$/i.test(url);
+
+/**
+ * Archivo multimedia de una entidad — el padre inyecta el api del módulo dueño.
+ * Tres modos: registrar (siempre vacío), leer (solo lectura) y leer+borrar.
+ */
+export const MedibleImage = ({ mode, showDescription = false, accept = 'image', onChanged, mediaSelect, api }: MedibleImageProps) => {
+    // El permiso NO es del componente: si el padre no inyecta el método, la acción
+    // no existe. El api es el único mecanismo de habilitación (además lo valida
+    // el backend).
+    const canUpload = Boolean(api?.uploadImage);
+    const canRemove = mode === 'read_delete' && Boolean(api?.removeImage);
+    const allowsVideo = accept === 'media';
+    const acceptedTypes = allowsVideo ? ACCEPTED_MEDIA : ACCEPTED_IMAGES;
+
     const [pendingFile, setPendingFile] = useState<File | null>(null);
     const [pendingPreview, setPendingPreview] = useState<string | null>(null);
     const [description, setDescription] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    // Imagen actual al montar.
-    useEffect(() => {
-        let active = true;
-        setIsLoading(true);
-        setPendingFile(null);
-        api.getImage()
-            .then((data) => {
-                if (!active) return;
-                setImage(data);
-                setDescription(data?.description ?? '');
-            })
-            .catch((err) => { if (active) toast.error(handleApiError(err)); })
-            .finally(() => { if (active) setIsLoading(false); });
-        return () => { active = false; };
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- api estable por entidad (la crea el padre)
-    }, []);
+    // El archivo mostrado — siempre viene del padre.
+    const currentImage = mediaSelect ?? null;
 
     // Vista previa del archivo pendiente — se libera al cambiar o guardar.
     useEffect(() => {
@@ -88,13 +112,15 @@ export const MedibleImage = ({ title = 'Imagen', showDescription = false, editab
     };
 
     const handleSave = async () => {
-        if (!pendingFile) return;
+        if (!pendingFile || !api?.uploadImage) return;
         setIsSaving(true);
         try {
-            const saved = await api.uploadImage(pendingFile, showDescription ? description : undefined);
-            setImage(saved);
+            const result = await api.uploadImage(pendingFile, showDescription ? description : undefined);
+            // Tras subir queda listo para el siguiente archivo; en los modos de
+            // lectura, el padre refresca `mediaSelect` con `onChanged`.
             setPendingFile(null);
-            toast.success('Imagen actualizada');
+            setDescription('');
+            toast.success(result.message);
             onChanged?.();
         } catch (err) {
             toast.error(handleApiError(err));
@@ -104,13 +130,11 @@ export const MedibleImage = ({ title = 'Imagen', showDescription = false, editab
     };
 
     const handleRemove = async () => {
-        if (!image) return;
+        if (!currentImage || !api?.removeImage) return;
         setIsSaving(true);
         try {
-            await api.removeImage();
-            setImage(null);
-            setDescription('');
-            toast.success('Imagen eliminada');
+            const result = await api.removeImage();
+            toast.success(result.message);
             onChanged?.();
         } catch (err) {
             toast.error(handleApiError(err));
@@ -119,44 +143,46 @@ export const MedibleImage = ({ title = 'Imagen', showDescription = false, editab
         }
     };
 
-    const previewUrl = pendingPreview ?? (image ? resolveImageUrl(image.url) : null);
-    const shownName = pendingFile?.name ?? image?.fileName ?? null;
+    const previewUrl = pendingPreview ?? (currentImage ? resolveImageUrl(currentImage.url) : null);
+    // El pendiente se detecta por su MIME; el ya guardado, por su `type` o la extensión.
+    const isVideo = pendingFile
+        ? pendingFile.type.startsWith('video/')
+        : Boolean(currentImage && (currentImage.type === 'VIDEO' || isVideoUrl(currentImage.url)));
+    const shownName = pendingFile?.name ?? currentImage?.fileName ?? null;
     // El peso solo se conoce del archivo pendiente (la BD no guarda tamaño).
     const shownSize = pendingFile ? formatBytes(pendingFile.size) : null;
 
     return (
         <div className="medible_image">
-            <div className="medible_image_header">
-                <h3>{title}</h3>
-            </div>
-
-            {isLoading ? (
-                <LoadingScreen message='Cargando imagen...' />
+            {previewUrl ? (
+                isVideo ? (
+                    <video className="medible_image_image" src={previewUrl} controls preload="metadata" />
+                ) : (
+                    <img className="medible_image_image" src={previewUrl} alt={shownName || 'Imagen'} />
+                )
             ) : (
+                <EmptyScreen title={allowsVideo ? 'Sin archivo' : 'Sin imagen'} message='Sin recurso' icon={Image} />
+            )}
+
+            {shownName && (
+                <div className="medible_image_meta">
+                    <span className="medible_image_filename">{shownName}</span>
+                    {shownSize && <span className="medible_image_filesize">{shownSize}</span>}
+                </div>
+            )}
+
+            {showDescription && !pendingFile && currentImage?.description && (
+                <p className="medible_image_description">{currentImage.description}</p>
+            )}
+
+            {(canUpload || canRemove) && (
                 <>
-                    {previewUrl ? (
-                        <img className="medible_image_image" src={previewUrl} alt={title} />
-                    ) : (
-                        <EmptyScreen title='Sin imagen' message='Sin recurso' icon={Image}  />
-                    )}
-
-                    {shownName && (
-                        <div className="medible_image_meta">
-                            <span className="medible_image_filename">{shownName}</span>
-                            {shownSize && <span className="medible_image_filesize">{shownSize}</span>}
-                        </div>
-                    )}
-
-                    {showDescription && !pendingFile && image?.description && (
-                        <p className="medible_image_description">{image.description}</p>
-                    )}
-
-                    {editable && (
+                    {canUpload && (
                         <>
                             <input
                                 ref={inputRef}
                                 type="file"
-                                accept={ACCEPTED_IMAGES}
+                                accept={acceptedTypes}
                                 className="medible_image_input"
                                 onChange={pickFile}
                             />
@@ -169,20 +195,25 @@ export const MedibleImage = ({ title = 'Imagen', showDescription = false, editab
                                     placeholder="Descripción de la imagen (opcional)"
                                 />
                             )}
-                            <FormActions>
-                                <Button text={image || pendingFile ? 'Cambiar' : 'Subir'} icon={ImagePlus} size="md" color="secondary" type="button" onClick={() => inputRef.current?.click()} />
+                        </>
+                    )}
+                    <FormActions>
+                        {canUpload && (
+                            <>
+                                <Button text={currentImage || pendingFile ? 'Cambiar' : 'Subir'} icon={ImagePlus} size="md" color="secondary" type="button" onClick={() => inputRef.current?.click()} />
                                 {pendingFile && (
                                     <>
                                         <Button text="Cancelar" icon={X} size="md" color="secondary" type="button" onClick={() => setPendingFile(null)} />
                                         <Button text="Guardar" icon={UploadCloud} size="md" type="button" onClick={handleSave} loading={isSaving} />
                                     </>
                                 )}
-                                {!pendingFile && image && (
-                                    <Button text="Eliminar" icon={Trash2} size="md" color="danger" type="button" onClick={handleRemove} loading={isSaving} />
-                                )}
-                            </FormActions>
-                        </>
-                    )}
+                            </>
+                        )}
+                        {/* Sin archivo no hay nada que eliminar. */}
+                        {canRemove && currentImage && !pendingFile && (
+                            <Button text="Eliminar" icon={Trash2} size="md" color="danger" type="button" onClick={handleRemove} loading={isSaving} />
+                        )}
+                    </FormActions>
                 </>
             )}
         </div>

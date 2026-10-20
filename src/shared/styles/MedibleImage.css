@@ -2,26 +2,14 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding: 1.6rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-
-    .medible_image_header {
-        h3 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: var(--text);
-        }
-    }
 
     .medible_image_image {
         width: 100%;
-        max-height: 280px;
-        object-fit: cover;
+        max-height: 480px;
+        object-fit: contain;
         border-radius: 8px;
         border: 1px solid var(--border);
+        display: block;
     }
 
     .medible_image_meta {

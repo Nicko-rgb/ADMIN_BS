@@ -25,7 +25,7 @@
         border-radius: 20px;
         font-size: 1.4rem !important;
         font-weight: 600;
-        background: var(--surface-2);
+        background: var(--gray-medium);
         color: var(--text-soft);
     }
 

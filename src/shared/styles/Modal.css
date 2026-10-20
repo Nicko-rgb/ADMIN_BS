@@ -79,7 +79,7 @@
                 color: var(--text-soft);
 
                 &:hover {
-                    background: var(--surface-2);
+                    background: var(--gray-medium);
                     color: var(--text);
                 }
             }

@@ -19,9 +19,9 @@ export const useLogin = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            const session = await AuthService.loginAdmin({ email, password });
+            const { data: session, message } = await AuthService.loginAdmin({ email, password });
             setSession(session);
-            toast.success('Sesión iniciada exitosamente');
+            toast.success(message);
             navigate('/home');
         } catch (err) {
             toast.error(handleApiError(err));

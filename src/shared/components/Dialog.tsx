@@ -29,9 +29,9 @@ const VARIANT_ICON: Record<DialogVariant, DialogIcon> = {
     alert: AlertCircle,
 };
 
-const VARIANT_BUTTON_COLOR: Record<DialogVariant, 'primary' | 'danger' | `#${string}`> = {
+const VARIANT_BUTTON_COLOR: Record<DialogVariant, 'primary' | 'danger' | 'warning'> = {
     primary: 'primary',
-    warning: '#ffc107',
+    warning: 'warning',
     alert: 'danger',
 };
 

@@ -8,26 +8,48 @@ import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import toast from '../../../shared/utils/toast';
 import SpaceService from '../service/spaceService';
-import type { SpaceFormMode, SpaceFormValues } from '../interfaces/space.interface';
+import type { SpaceFormMode, SpaceFormValues, SpaceDetail } from '../interfaces/space.interface';
 import { EMPTY_SPACE_FORM } from '../interfaces/space.interface';
 
 interface SpaceFormProps {
     mode: SpaceFormMode;
     sucursalPublicId: string;
-    initialValues?: SpaceFormValues;
+    spacePublicId?: string; // requerido en modo edit
+    /** Espacio a editar — se mapea internamente a los valores del form. */
+    space?: SpaceDetail;
     onClose: () => void;
     onSaved: () => void;
 }
 
 /**
- * Modal de alta/edición de espacio deportivo — estado y service adentro, sin hook
- * separado: `mode` decide título/botón y a dónde pega el submit. En `edit` precarga
- * `initialValues`; el guardado de edición se habilitará cuando el backend lo exponga
- * (hoy el botón queda deshabilitado en ese modo).
+ * DTO → valores del formulario.
+ *
+ * El DTO viene en camelCase (respuesta de la API) y el form trabaja en
+ * snake_case (payload que espera el endpoint). El mapeo vive acá, junto a su
+ * único consumidor, para que la página no tenga que repetirlo.
  */
-export const SpaceForm = ({ mode, sucursalPublicId, initialValues, onClose, onSaved }: SpaceFormProps) => {
+const toFormValues = (space: SpaceDetail): SpaceFormValues => ({
+    name: space.name,
+    surface_type_id: space.surfaceTypeId,
+    sport_type_id: space.sportTypeId,
+    sport_category_id: space.sportCategoryId,
+    capacity: space.capacity,
+    dimensions: space.dimensions,
+    equipment: space.equipment ?? '',
+    minimum_booking_minutes: space.minimumBookingMinutes,
+    maximum_booking_minutes: space.maximumBookingMinutes,
+});
+
+/**
+ * Modal de alta/edición de espacio deportivo — estado y service adentro, sin hook
+ * separado: `mode` decide título/botón y a dónde pega el submit.
+ * En `create` usa sucursalPublicId para POST a /spaces/:sucursalPublicId.
+ * En `edit` usa spacePublicId para PUT a /spaces/space/:spacePublicId, y precarga
+ * el form con el `space` que le pasa el padre.
+ */
+export const SpaceForm = ({ mode, sucursalPublicId, spacePublicId, space, onClose, onSaved }: SpaceFormProps) => {
     const isEditMode = mode === 'edit';
-    const [form, setForm] = useState<SpaceFormValues>(initialValues ?? EMPTY_SPACE_FORM);
+    const [form, setForm] = useState<SpaceFormValues>(() => (space ? toFormValues(space) : EMPTY_SPACE_FORM));
     const [errors, setErrors] = useState<Partial<Record<keyof SpaceFormValues, string>>>({});
     const [isSaving, setIsSaving] = useState(false);
     const { surfaceTypes, sportTypes, sportCategories, loadSurfaceTypes, loadSportTypes, loadSportCategories } = useCatalogActive();
@@ -63,8 +85,15 @@ export const SpaceForm = ({ mode, sucursalPublicId, initialValues, onClose, onSa
 
         setIsSaving(true);
         try {
-            const result = await SpaceService.register(sucursalPublicId, { ...form, name: form.name.trim(), dimensions: form.dimensions.trim() });
-            toast.success(result.message);
+            const payload = { ...form, name: form.name.trim(), dimensions: form.dimensions.trim() };
+            if (isEditMode) {
+                if (!spacePublicId) throw new Error('spacePublicId requerido para editar');
+                const result = await SpaceService.updateSpace(spacePublicId, payload);
+                toast.success(result.message);
+            } else {
+                const result = await SpaceService.register(sucursalPublicId, payload);
+                toast.success(result.message);
+            }
             onSaved();
             onClose();
         } catch (err) {
@@ -103,15 +132,9 @@ export const SpaceForm = ({ mode, sucursalPublicId, initialValues, onClose, onSa
                 </FormSection>
 
 
-
-
                 <FormActions>
                     <Button text="Cancelar" icon={X} size="lg" color="secondary" type="button" onClick={onClose} />
-                    {isEditMode ? (
-                        <Button text="Guardar" icon={UploadCloud} size="lg" type="submit" loading={isSaving} disabled title="Edición aún no disponible en el backend" />
-                    ) : (
-                        <Button text="Registrar" icon={UploadCloud} size="lg" type="submit" loading={isSaving} />
-                    )}
+                    <Button text={isEditMode ? 'Guardar' : 'Registrar'} icon={UploadCloud} size="lg" type="submit" loading={isSaving} />
                 </FormActions>
             </form>
         </Modal>

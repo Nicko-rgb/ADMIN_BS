@@ -11,7 +11,7 @@
     }
 
     &::-webkit-scrollbar-track {
-        background: var(--surface-2);
+        background: var(--gray-medium);
     }
 
     &::-webkit-scrollbar-thumb {
@@ -117,7 +117,7 @@
     display: block;
 
     &.table_image_empty {
-        background: var(--surface-2);
+        background: var(--gray-medium);
     }
 }
 
@@ -142,7 +142,7 @@
         padding: 6px;
         border: 1px solid transparent;
         border-radius: 6px;
-        background: var(--surface-2);
+        background: var(--gray-medium);
         color: var(--text-soft);
         font-size: 1.2rem;
         font-weight: 600;

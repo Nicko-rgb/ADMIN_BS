@@ -23,6 +23,19 @@ body {
     height: 100%;
 }
 
+/* ── Congelamiento de transiciones durante el cambio de tema ──────────────────
+   Al cambiar data-theme, cada elemento que usa un token de color recalcula su
+   valor. Con `transition` activa, cada uno interpola por separado y el cambio
+   se ve como un barrido lento (el secondary del Button es el peor caso:
+   #e8e8e8 → #141414 pasa por el gris medio). La clase `theme-switching` la
+   aplica applyTheme() durante el swap y la libera tras el primer pintado. */
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+    transition: none !important;
+}
+
 /* Clase para centrar elementos hijos al centro */
 .center {
     display: flex;
@@ -55,7 +68,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--surface-2);
+    background: var(--gray-medium);
     border-radius: 10px;
 }
 
@@ -72,10 +85,12 @@ body {
 
 /* Cards UI */
 .card {
-    background: var(--surface);
-    border-radius: 10px;
-    box-shadow: var(--shadow), var(--shadow), var(--shadow);
-    padding: 20px;
+    background-color: var(--surface);
+    border-radius: 7px; 
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+                0 2px 4px -2px rgb(0 0 0 / 0.1);
+    border: 1px solid var(--gray-light);
+    padding: 15px;
 }
 
 /* Badge de estado activo/inactivo — usado en tablas y listas.

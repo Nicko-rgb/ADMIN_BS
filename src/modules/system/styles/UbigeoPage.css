@@ -21,7 +21,7 @@
             transition: all .2s ease;
 
             &:hover {
-                background: var(--surface-2);
+                background: var(--gray-medium);
                 color: var(--text);
             }
 
@@ -60,7 +60,7 @@
         .ubigeo_tree_list {
             &.accent_country {
                 --tree-accent: var(--primary);
-                --tree-accent-tint: var(--surface-2);
+                --tree-accent-tint: var(--gray-medium);
             }
 
             &.accent_level1 {
@@ -102,11 +102,11 @@
             transition: background .2s ease;
 
             &:hover {
-                background: var(--surface-2);
+                background: var(--gray-medium);
             }
 
             &.expanded {
-                background: var(--tree-accent-tint, var(--surface-2));
+                background: var(--tree-accent-tint, var(--gray-medium));
 
                 .ubigeo_tree_chevron {
                     transform: rotate(90deg);
@@ -155,7 +155,7 @@
                     font-weight: 600;
                     font-family: monospace;
                     color: var(--text-muted);
-                    background: var(--surface-2);
+                    background: var(--gray-medium);
                     border-radius: 4px;
                     padding: .1rem .5rem;
                     flex-shrink: 0;

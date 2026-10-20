@@ -51,7 +51,7 @@
             color: var(--text);
           
             &:hover {
-                background: var(--surface-2);
+                background: var(--gray-medium);
             }
 
             .plan_features_remove {

@@ -5,12 +5,12 @@ import '../styles/Button.css';
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 /** Colores con nombre ya definidos en el sistema de diseño (`shared/styles/colors.css`). */
-type ButtonColorName = 'primary' | 'secondary' | 'danger';
+type ButtonColorName = 'primary' | 'secondary' | 'danger' | 'warning';
 
 /** Nombre de color del sistema, o un hex propio (ej. `'#2c9d75'`) para casos puntuales fuera de la paleta. */
 type ButtonColor = ButtonColorName | `#${string}`;
 
-const NAMED_COLORS: readonly ButtonColorName[] = ['primary', 'secondary', 'danger'];
+const NAMED_COLORS: readonly ButtonColorName[] = ['primary', 'secondary', 'danger', 'warning'];
 const isNamedColor = (color: ButtonColor): color is ButtonColorName =>
     (NAMED_COLORS as readonly string[]).includes(color);
 
@@ -24,6 +24,7 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'chi
      * - `'primary'` (default) — verde de marca, `var(--primary)`.
      * - `'secondary'` — contorno neutro, `var(--border-strong)`.
      * - `'danger'` — rojo, `var(--danger)`.
+     * - `'warning'` — ámbar, `var(--warning)`.
      * - Hex propio, ej. `'#2c9d75'` — para un color puntual fuera de la paleta. Texto queda blanco en este caso.
      * @default 'primary'
      */

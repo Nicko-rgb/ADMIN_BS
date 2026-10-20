@@ -33,3 +33,46 @@ export interface SpaceListItem {
     sport: string | null;
     status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
 }
+
+// Detalle completo de un espacio deportivo — espeja toSpaceDto del backend.
+export interface SpaceDetail {
+    publicId: string;
+    name: string;
+    sport: string | null;
+    sportTypeId: number;
+    surfaceName: string;
+    surfaceTypeId: number;
+    categoryName: string;
+    sportCategoryId: number;
+    capacity: number | null;
+    dimensions: string;
+    equipment: string | null;
+    minimumBookingMinutes: number;
+    maximumBookingMinutes: number;
+    status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
+    createdAt: string;
+}
+
+// Archivo multimedia de un espacio — espeja toMediaDto del backend.
+export interface SpaceMediaFile {
+    publicId: string;
+    url: string;
+    fileName: string;
+    description: string | null;
+    type: 'IMAGE' | 'VIDEO' | 'AUDIO' | 'DOCUMENT';
+    category: 'GALLERY' | 'PROFILE' | 'COVER' | 'THUMBNAIL' | 'DOCUMENT';
+    isPrimary: boolean;
+    medibleType: string;
+}
+
+// Horario de operación de un espacio — espeja BusinessHour del backend.
+export interface SpaceBusinessHour {
+    hourId: number;
+    dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
+    startTime: string;
+    endTime: string;
+    price: string;
+    isClosed: boolean;
+}
+
+export type SpaceTab = 'gallery' | 'schedule';

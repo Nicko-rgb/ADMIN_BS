@@ -281,17 +281,19 @@ const Sucursal = () => {
                 {spaces.length > 0 ? (
                     <div className="spaces_grid">
                         {spaces.map((space) => (
-                            <div className="space_card" key={space.publicId}>
-                                <span className={`space_status_dot ${STATUS_CLASSNAMES[space.status]}`} title={STATUS_LABELS[space.status]} />
+                            <article className="space_card card" key={space.publicId}>
                                 <div className="header">
                                     <div className="avatar center">{space.name.charAt(0).toUpperCase()}</div>
-                                    <span className="name">{space.name}</span>
+                                    <div className='header_text'>
+                                        <span className="name">{space.name}</span>
+                                        <span className={`status_badge ${STATUS_CLASSNAMES[space.status]}`}>{STATUS_LABELS[space.status]}</span>
+                                    </div>
                                 </div>
                                 <div className="info">
-                                    <p><Dumbbell size={14} /><span>{space.sport ?? '—'}</span></p>
+                                    <p><Dumbbell size={20} /><span>{space.sport}</span></p>
                                 </div>
                                 <Button text='Administrar' color='secondary' icon={Settings} onClick={() => navigate(`/companys/company/space/${space.publicId}`)} />
-                            </div>
+                            </article>
                         ))}
                     </div>
                 ) : (
@@ -320,14 +322,21 @@ const Sucursal = () => {
             {isBannerOpen && publicId && (
                 <Modal isOpen={isBannerOpen} onClose={() => setIsBannerOpen(false)} title="Portada de la sucursal" icon={Image} size="lg">
                     <MedibleImage
-                        title="Portada de la sucursal"
-                        showDescription
-                        editable={canEditBanner}
-                        onChanged={reloadBanner}
+                        mode="read_delete"
+                        onChanged={() => {
+                            reloadBanner();
+                            // Al registrar (o eliminar) la portada, el modal se cierra.
+                            setIsBannerOpen(false);
+                        }}
+                        mediaSelect={banner}
                         api={{
-                            getImage: () => SucursalService.getBanner(publicId),
-                            uploadImage: (file, description) => SucursalService.uploadBanner(publicId, file, description),
-                            removeImage: () => SucursalService.removeBanner(publicId),
+                            // Sin permiso no se inyectan los métodos de escritura →
+                            // no hay controles de subir/borrar.
+                            ...(canEditBanner && {
+                                uploadImage: (file: File, description?: string) =>
+                                    SucursalService.uploadBanner(publicId, file, description),
+                                removeImage: () => SucursalService.removeBanner(publicId),
+                            }),
                         }}
                     />
                 </Modal>

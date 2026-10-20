@@ -1,0 +1,385 @@
+/* Página de detalle de espacio deportivo — hero con info, galería multimedia y horarios.
+   Anidado bajo .page, contenido centrado con max-width 1280px. Escala: html está en 62.5% (1rem = 10px). */
+
+.space_page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding-bottom: 3rem;
+
+    main {
+        margin: 0 auto;
+        max-width: 1280px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    /* ── Portada / Imagen Principal ───────────────────────────────────────────── */
+    .space_hero {
+        position: relative;
+        border-radius: 1.2rem;
+        padding: 1.5rem;
+        overflow: hidden;
+        min-height: 260px;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+
+        .btn_back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 100;
+            width: 40px;
+            height: 33px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-white);
+            backdrop-filter: blur(5px);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cover_placeholder {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.14), transparent 45%),
+                repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 14px),
+                linear-gradient(120deg, var(--primary-dark) 0%, var(--primary) 100%);
+        }
+
+        .cover_image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cover_overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.15) 60%, transparent 100%);
+        }
+
+        .cover_content {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            color: var(--text-white);
+
+            .cover_identity {
+                display: flex;
+                align-items: center;
+                gap: 1.6rem;
+                min-width: 0;
+
+                .cover_avatar {
+                    width: 6.4rem;
+                    height: 6.4rem;
+                    border-radius: 1rem;
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1px solid rgba(255, 255, 255, 0.35);
+                    color: var(--text-white);
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 2.8rem;
+                    font-weight: 700;
+                }
+
+                .cover_text {
+                    min-width: 0;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    font-size: 2.6rem;
+                    line-height: 1.2;
+                    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+                }
+
+                .cover_badges {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.6rem;
+                    margin-top: 0.4rem;
+
+                    .status_badge {
+                        padding: 3px 10px;
+                        border-radius: 20px;
+                        font-weight: 600;
+                        font-size: 1.2rem;
+
+                        &.active {
+                            background: var(--success-soft);
+                            color: var(--success-text);
+                        }
+
+                        &.inactive {
+                            background: var(--danger-soft);
+                            color: var(--danger-text);
+                        }
+
+                        &.maintenance {
+                            background: var(--warning-soft);
+                            color: var(--warning-text);
+                        }
+                    }
+                }
+            }
+        }
+
+        .cover_actions {
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+    }
+
+    /* ── Tarjeta de información en chips ──────────────────────────────────────── */
+    .space_details_card {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        .overview_group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            text-wrap: nowrap;
+
+            .group_label {
+                display: inline-flex;
+                align-items: center;
+                gap: .5rem;
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: .5px;
+
+                svg {
+                    color: var(--primary);
+                }
+            }
+
+            .chips_row {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: .7rem;
+
+                .info_chip {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: .6rem;
+                    padding: .5rem 1rem;
+                    border-radius: 20px;
+                    font-size: 1.35rem;
+                    font-weight: 500;
+                    background: var(--color-bg);
+                    border: 1px solid var(--border);
+                    color: var(--text);
+
+                    svg {
+                        color: var(--primary);
+                        flex-shrink: 0;
+                    }
+
+                    &.highlight {
+                        background: var(--primary-light);
+                        border-color: transparent;
+                        color: var(--primary);
+                        font-weight: 600;
+                    }
+
+                    &.muted {
+                        color: var(--text-muted);
+
+                        svg {
+                            color: var(--text-muted);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* ── Sección de Galería Multimedia o Horarios de Operación ────────────────────────────────────────────── */
+    .section_tab_view {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        .tab_section_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: .8rem;
+            border-bottom: 1px solid var(--border);
+
+            .title_group {
+                display: flex;
+                align-items: center;
+                gap: .8rem;
+                color: var(--primary);
+
+                h3 {
+                    margin: 0;
+                    font-size: 1.6rem;
+                    font-weight: 600;
+                    color: var(--text);
+                }
+            }
+
+            .media_count {
+                font-size: 1.3rem;
+                color: var(--text-soft);
+                background: var(--color-bg);
+                padding: 0.3rem 0.8rem;
+                border-radius: 20px;
+            }
+        }
+
+        .tab_section_empty {
+            padding: 4rem 2rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+        }
+
+        /* ── Grilla de archivos de la galería ───────────────────────────────── */
+        .media_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.2rem;
+
+            .media_item {
+                margin: 0;
+                position: relative;
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                overflow: hidden;
+                background: var(--color-bg);
+
+                img,
+                video {
+                    width: 100%;
+                    aspect-ratio: 16 / 9;
+                    object-fit: cover;
+                    display: block;
+                }
+
+                /* Preview clickeable — abre el visor del archivo en modo lectura */
+                .media_item_preview {
+                    display: block;
+                    width: 100%;
+                    padding: 0;
+                    border: none;
+                    background: none;
+                    cursor: pointer;
+
+                    img {
+                        transition: transform .25s ease;
+                    }
+
+                    &:hover img {
+                        transform: scale(1.03);
+                    }
+                }
+
+                /* Botón de eliminar — aparece al hover sobre la imagen */
+                .media_item_delete {
+                    position: absolute;
+                    top: .8rem;
+                    right: .8rem;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: rgba(0, 0, 0, .6);
+                    color: var(--text-white);
+                    border: none;
+                    cursor: pointer;
+                    backdrop-filter: blur(4px);
+                    opacity: 0;
+                    transition: opacity .2s ease, background .2s ease;
+
+                    &:hover {
+                        background: var(--danger);
+                    }
+                }
+
+                &:hover .media_item_delete {
+                    opacity: 1;
+                }
+
+                figcaption {
+                    padding: .8rem 1rem;
+                    font-size: 1.2rem;
+                    color: var(--text-soft);
+                    border-top: 1px solid var(--border);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+
+        /* ── Listado de horarios ───────────────────────────────────────────── */
+        .schedule_list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+
+            li {
+                padding: .9rem 1.2rem;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                font-size: 1.4rem;
+                color: var(--text);
+            }
+        }
+    }
+
+    @media (max-width: 640px) {
+        .space_hero {
+            .cover {
+                .cover_content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .cover_avatar {
+                    width: 5.6rem;
+                    height: 5.6rem;
+                }
+
+                .cover_text {
+                    font-size: 2.2rem;
+                }
+            }
+        }
+
+        .gallery_grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+    }
+}

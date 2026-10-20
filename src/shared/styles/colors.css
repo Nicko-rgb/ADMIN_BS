@@ -1,10 +1,15 @@
 /**
  * Sistema de color del panel admin.
  *
- * Una sola familia neutra con matiz verde (sin azul), y una escala de
- * superficies real en ambos modos: color-bg < surface, con los
- * inputs hundidos por debajo de la card en oscuro. El verde de marca es el
- * mismo en claro y oscuro; solo cambian sus variantes de texto y hover.
+ * Una sola familia neutra (gris ceniso, R=G=B) y una escala de superficies
+ * real en ambos modos: color-bg < surface, con los inputs hundidos por debajo
+ * de la card en oscuro. El verde de marca es el mismo en claro y oscuro; solo
+ * cambian sus variantes de texto y hover.
+ *
+ * La familia de grises es VERDADERA — sin matiz verde ni azul — para que no
+ * compita con el color de marca: --gray-light / --gray-medium / --gray-dark
+ * son los tres escalones de una superficie neutra (fondo sutil, fondo de
+ * tabla/botón secundario, hover).
  */
 :root {
   /* ── Marca ──────────────────────────────────────────────────────────────── */
@@ -14,20 +19,21 @@
   --accent:         #6e60f02f;  /* Rellenos suaves */
 
   /* ── Superficies ────────────────────────────────────────────────────────── */
-  --color-bg:   #f5f8f7;  /* Lienzo de la app y cuerpo del modal */
+  --color-bg:   #f4f4f4;  /* Lienzo de la app y cuerpo del modal */
   --surface:    #ffffff;  /* Cards, sidebar, tabla, secciones de formulario */
   --input-bg:   #ffffff;  /* Inputs */
-  --gray-light: #faf6f6;
-  --gray-medium: #e3e9e7;
+  --gray-light: #f5f5f5;  /* Superficie sutil: hover de fila, fondos suaves */
+  --gray-medium: #e8e8e8; /* Superficie neutra: thead, botón secundario, chips */
+  --gray-dark:  #dadada;  /* Hover del botón secundario */
 
   /* ── Bordes ─────────────────────────────────────────────────────────────── */
-  --border:        #e3e9e7;  /* Hairline: cards, filas, divisores */
-  --border-strong: #ccd6d2;  /* Inputs y botón secundario */
+  --border:        #e5e5e5;  /* Hairline: cards, filas, divisores */
+  --border-strong: #cfcfcf;  /* Inputs y botón secundario */
 
   /* ── Texto ──────────────────────────────────────────────────────────────── */
-  --text:        #1c201e;
+  --text:        #1a1a1a;
   --text-soft:   #3d3d3d;  /* Labels, ítems de menú, texto secundario */
-  --text-muted:  #64748b;  /* Placeholders, encabezados de tabla */
+  --text-muted:  #6b6b6b;  /* Placeholders, encabezados de tabla */
   --text-white:  #ffffff;
 
   /* ── Semánticos ─────────────────────────────────────────────────────────── */
@@ -54,10 +60,10 @@
 
   /* ── Elevación ──────────────────────────────────────────────────────────── */
   --ring:      rgba(44, 157, 117, .16);      /* Halo de foco */
-  --shadow:    0 1px 2px rgba(22, 33, 29, .05);
-  --shadow-md: 0 4px 12px rgba(22, 33, 29, .07);
-  --shadow-lg: 0 16px 44px rgba(22, 33, 29, .14);
-  --overlay:   rgba(16, 26, 22, .38);        /* Fondo de modal/dialog */
+  --shadow:    0 1px 2px rgba(0, 0, 0, .05);
+  --shadow-md: 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 4px 6px -4px rgb(0 0 0 / 0.2);
+  --overlay:   rgba(0, 0, 0, .38);            /* Fondo de modal/dialog */
 
   /* ── Tipografía ─────────────────────────────────────────────────────────── */
   --font-primary:   'Poppins', sans-serif;
@@ -65,23 +71,24 @@
 }
 
 /* ── Modo oscuro ─────────────────────────────────────────────────────────────
- * El texto principal se mantiene en 86% de luminosidad y los inputs quedan por
- * debajo de la card, para que la interfaz no emita más luz de la necesaria.
- * ────────────────────────────────────────────────────────────────────────── */
+  * El texto principal se mantiene en 86% de luminosidad y los inputs quedan por
+  * debajo de la card, para que la interfaz no emita más luz de la necesaria.
+  * ────────────────────────────────────────────────────────────────────────── */
 [data-theme="dark"] {
   --primary-dark:  #1b7353;
 
-  --color-bg:   #0d1110;
-  --surface:    #1c1b1b;
-  --input-bg:   #101514;
-  --gray-light: #1c1b1b;
-  --gray-medium: #151a18;
+  --color-bg:   #0e0e0e;
+  --surface:    #1a1a1a;
+  --input-bg:   #121212;
+  --gray-light: #1c1c1c;
+  --gray-medium: #141414;
+  --gray-dark:  #1d1d1d;
 
-  --border:        #232b28;
-  --border-strong: #2e3835;
+  --border:        #262626;
+  --border-strong: #333333;
 
-  --text:        #d9dfdc;
-  --text-soft:   #b7b4b4;
+  --text:        #dcdcdc;
+  --text-soft:   #b8b8b8;
   --text-muted:  #909090;
 
   --success-text: #55c79e;
@@ -103,7 +110,7 @@
 
   --ring:      rgba(44, 157, 117, .28);
   --shadow:    0 1px 2px rgba(0, 0, 0, .4);
-  --shadow-md: 0 6px 18px rgba(0, 0, 0, .5);
-  --shadow-lg: 0 20px 52px rgba(0, 0, 0, .62);
+  --shadow-md: 0 2px 4px -2px rgb(0 0 0 / 0.2);
+  --shadow-lg: 0 4px 6px -4px rgb(0 0 0 / 0.4);
   --overlay:   rgba(0, 0, 0, .58);
 }

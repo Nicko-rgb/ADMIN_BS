@@ -12,6 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
     <title>Login - Admin BS</title>
+    <script>
+      // Aplica el tema ANTES del primer pintado — si no, la app arranca en claro
+      // y después salta a oscuro cuando React monta (flash). El formato de
+      // localStorage y la clave son los del hook useAppLayout (controlador único).
+      try {
+        if (localStorage.getItem('admin-theme') === 'true') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) { /* localStorage bloqueado — se queda en claro */ }
+    </script>
   </head>
   <body>
     <div id="root"></div>

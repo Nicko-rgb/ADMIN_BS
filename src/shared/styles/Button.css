@@ -7,7 +7,15 @@ button {
     outline: none;
     cursor: pointer;
     font-weight: 500;
-    transition: all .3s linear;
+    /* Transiciones acotadas a las propiedades que realmente cambian. Con `all` + `linear`,
+       el salto del secondary (#e8e8e8 → #141414) se interpola por el gris medio —donde el
+       ojo es más sensible— y se lee como un flash; `ease` lo suaviza sin perder el cambio. */
+    transition:
+        background-color .25s ease,
+        border-color .25s ease,
+        color .25s ease,
+        opacity .2s ease,
+        transform .15s ease;
 }
 
 .btn_app {
@@ -43,11 +51,17 @@ button {
         background-color: var(--gray-medium);
         border: 1px solid var(--border-strong);
         color: var(--text-soft);
-        &:hover:not(:disabled) { background-color: var(--color-bg); color: var(--text); }
+        &:hover:not(:disabled) { background-color: var(--gray-dark); color: var(--text); }
     }
 
     &.btn_app_danger {
         background-color: var(--danger);
+        color: var(--text-white);
+        &:hover:not(:disabled) { filter: brightness(0.92); }
+    }
+
+    &.btn_app_warning {
+        background-color: var(--warning);
         color: var(--text-white);
         &:hover:not(:disabled) { filter: brightness(0.92); }
     }

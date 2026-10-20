@@ -4,9 +4,9 @@ import type { LoginAdminPayload, LoginAdminResponse, PasswordRequestPayload, Pas
 export class AuthService {
 
     // Login del panel admin
-    static async loginAdmin(payload: LoginAdminPayload): Promise<LoginAdminResponse> {
+    static async loginAdmin(payload: LoginAdminPayload): Promise<{ data: LoginAdminResponse; message: string }> {
         const res = await apiService.post('/auth/login', payload);
-        return res.data.data;
+        return { data: res.data.data, message: res.data.message };
     }
 
     // Envía el enlace de recuperación de contraseña (clientes y administrativos)

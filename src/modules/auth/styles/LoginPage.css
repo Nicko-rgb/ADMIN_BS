@@ -1,29 +1,32 @@
-/* Paleta fija en claro: el login no cambia con el modo oscuro */
+/* Paleta fija en claro: el login no cambia con el modo oscuro.
+   Réplica de la paleta clara de shared/styles/colors.css — la página vive fuera
+   del AppLayout, así que el data-theme="dark" de <html> la alcanzaría. */
 .login_page {
     --primary: #2c9d75;
-    --primary-dark: #1f7d5c;
-    --color-bg: #f5f8f7;
+    --primary-dark: #1b7f5c;
+    --color-bg: #f4f4f4;
     --surface: #ffffff;
-    --surface-2: #edf2f0;
-    --gray-medium: #e3e9e7;
+    --gray-light: #f5f5f5;
+    --gray-medium: #e8e8e8;
+    --gray-dark: #d4d4d4;
     --input-bg: #ffffff;
-    --border: #e4ebe8;
-    --border-strong: #d3ddd9;
-    --text: #13201b;
-    --text-soft: #3f4a46;
-    --text-muted: #66726e;
+    --border: #e5e5e5;
+    --border-strong: #cfcfcf;
+    --text: #1a1a1a;
+    --text-soft: #3d3d3d;
+    --text-muted: #6b6b6b;
     --text-white: #ffffff;
     --danger: #e66a6a;
     --danger-text: #ce3732;
     --ring: rgba(44, 157, 117, .2);
-    --shadow-lg: 0 16px 44px rgba(22, 33, 29, .14);
-    --overlay: rgba(16, 26, 22, .38);
+    --shadow-lg: 0 16px 44px rgba(0, 0, 0, .14);
+    --overlay: rgba(0, 0, 0, .38);
 
     position: relative;
     min-height: 100vh;
     overflow: hidden;
     color: var(--text);
-    background: linear-gradient(180deg, #ffffff 0%, #f3faf7 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
 
     .login_background {
         position: absolute;
@@ -56,7 +59,7 @@
         background: rgba(255, 255, 255, .9);
         border: 1px solid var(--border);
         border-radius: 20px;
-        box-shadow: 0 24px 60px rgba(16, 64, 46, .14);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, .14);
         backdrop-filter: blur(16px);
         animation: login_rise .6s cubic-bezier(.2, .8, .2, 1) both;
 

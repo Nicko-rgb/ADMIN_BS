@@ -32,17 +32,21 @@ class SucursalService {
         return data ? { publicId: data.publicId, url: data.url, fileName: data.fileName, description: data.description ?? null } : null;
     }
 
-    static async uploadBanner(sucursalPublicId: string, file: File, description?: string): Promise<BannerFile> {
+    static async uploadBanner(sucursalPublicId: string, file: File, description?: string): Promise<{ data: BannerFile; message: string }> {
         const form = new FormData();
         form.append('cover', file);
         if (description?.trim()) form.append('description', description.trim());
         const res = await apiService.post(`/sucursals/${sucursalPublicId}/banner`, form);
         const data = res.data.data;
-        return { publicId: data.publicId, url: data.url, fileName: data.fileName, description: data.description ?? null };
+        return {
+            data: { publicId: data.publicId, url: data.url, fileName: data.fileName, description: data.description ?? null },
+            message: res.data.message,
+        };
     }
 
-    static async removeBanner(sucursalPublicId: string): Promise<void> {
-        await apiService.delete(`/sucursals/${sucursalPublicId}/banner`);
+    static async removeBanner(sucursalPublicId: string): Promise<{ message: string }> {
+        const res = await apiService.delete(`/sucursals/${sucursalPublicId}/banner`);
+        return { message: res.data.message };
     }
 }
 
