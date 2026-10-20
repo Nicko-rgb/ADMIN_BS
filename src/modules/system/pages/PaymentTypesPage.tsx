@@ -100,7 +100,7 @@ const PaymentTypesPage = () => {
                 onClose={closeDelete}
                 title="Eliminar tipo de pago"
                 description={`¿Seguro que deseas eliminar "${deletingPaymentType?.name}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeleting ? 'Eliminando...' : 'Eliminar', onClick: confirmDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeDelete }}
             />

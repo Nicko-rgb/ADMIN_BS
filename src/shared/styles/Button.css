@@ -66,6 +66,12 @@ button {
         &:hover:not(:disabled) { filter: brightness(0.92); }
     }
 
+    &.btn_app_info {
+        background-color: var(--info);
+        color: var(--text-white);
+        &:hover:not(:disabled) { filter: brightness(0.92); }
+    }
+
     /* Color hex propio — llega vía la custom property --btn-custom-color que
        pone Button.tsx en `style`; sin shade de hover fijo por ser un color
        arbitrario, se oscurece con un filtro en vez de un background nuevo. */

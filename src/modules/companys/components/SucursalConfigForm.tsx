@@ -65,7 +65,7 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, o
                     />
 
                     {activeTab === 'operativo' && (
-                        <>
+                        <div className="anim_content_in">
                             <FormSection title="Horarios y Estado" icon={Clock}>
                                 <FormRow>
                                     <InputField name="opening_time" label="Apertura" type="time" value={form.opening_time} onChange={(e) => setField('opening_time')(e.target.value)} required error={errors.opening_time} />
@@ -99,26 +99,28 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, o
                                     <TextAreaField name="features" label="Características (Opcional)" value={form.features} onChange={(e) => setField('features')(e.target.value)} placeholder="Estacionamiento, Vestuarios, Ducha..." error={errors.features} />
                                 </FormRow>
                             </FormSection>
-                        </>
+                        </div>
                     )}
 
                     {activeTab === 'redes' && (
-                        <FormSection title="Redes y WhatsApp" icon={Share2}>
-                            <FormRow>
-                                <InputField name="social_facebook" label="Facebook (Opcional)" type="url" value={form.social_facebook} onChange={(e) => setField('social_facebook')(e.target.value)} placeholder="https://facebook.com/..." error={errors.social_facebook} />
-                                <InputField name="social_instagram" label="Instagram (Opcional)" value={form.social_instagram} onChange={(e) => setField('social_instagram')(e.target.value)} placeholder="https://instagram.com/..." error={errors.social_instagram} />
-                            </FormRow>
-                            <FormRow>
-                                <InputField name="social_tiktok" label="TikTok (Opcional)" value={form.social_tiktok} onChange={(e) => setField('social_tiktok')(e.target.value)} placeholder="https://tiktok.com/..." error={errors.social_tiktok} />
-                                <InputField name="social_youtube" label="YouTube (Opcional)" value={form.social_youtube} onChange={(e) => setField('social_youtube')(e.target.value)} placeholder="https://youtube.com/..." error={errors.social_youtube} />
-                            </FormRow>
-                            <FormRow>
-                                <InputField name="social_whatsapp" label="WhatsApp (Opcional)" numberOnly="integer" value={form.social_whatsapp} onChange={(e) => setField('social_whatsapp')(e.target.value)} placeholder="51987654321" error={errors.social_whatsapp} />
-                            </FormRow>
-                            <FormRow>
-                                <TextAreaField name="whatsapp_message" label="Mensaje de WhatsApp (Opcional)" value={form.whatsapp_message} onChange={(e) => setField('whatsapp_message')(e.target.value)} placeholder="Hola, quiero reservar..." error={errors.whatsapp_message} />
-                            </FormRow>
-                        </FormSection>
+                        <div className="anim_content_in">
+                            <FormSection title="Redes y WhatsApp" icon={Share2}>
+                                <FormRow>
+                                    <InputField name="social_facebook" label="Facebook (Opcional)" type="url" value={form.social_facebook} onChange={(e) => setField('social_facebook')(e.target.value)} placeholder="https://facebook.com/..." error={errors.social_facebook} />
+                                    <InputField name="social_instagram" label="Instagram (Opcional)" value={form.social_instagram} onChange={(e) => setField('social_instagram')(e.target.value)} error={errors.social_instagram} />
+                                </FormRow>
+                                <FormRow>
+                                    <InputField name="social_tiktok" label="TikTok (Opcional)" value={form.social_tiktok} onChange={(e) => setField('social_tiktok')(e.target.value)} error={errors.social_tiktok} />
+                                    <InputField name="social_youtube" label="YouTube (Opcional)" value={form.social_youtube} onChange={(e) => setField('social_youtube')(e.target.value)} error={errors.social_youtube} />
+                                </FormRow>
+                                <FormRow>
+                                    <InputField name="social_whatsapp" label="WhatsApp (Opcional)" numberOnly="integer" value={form.social_whatsapp} onChange={(e) => setField('social_whatsapp')(e.target.value)} placeholder="51987654321" error={errors.social_whatsapp} />
+                                </FormRow>
+                                <FormRow>
+                                    <TextAreaField name="whatsapp_message" label="Mensaje de WhatsApp (Opcional)" value={form.whatsapp_message} onChange={(e) => setField('whatsapp_message')(e.target.value)} placeholder="Hola, quiero reservar..." error={errors.whatsapp_message} />
+                                </FormRow>
+                            </FormSection>
+                        </div>
                     )}
 
                     <FormActions>

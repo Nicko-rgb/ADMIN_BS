@@ -118,7 +118,7 @@ const PlansPage = () => {
                 onClose={closeDelete}
                 title="Eliminar plan"
                 description={`¿Seguro que deseas eliminar "${deletingPlan?.name}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeleting ? 'Eliminando...' : 'Eliminar', onClick: confirmDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeDelete }}
             />

@@ -1,0 +1,121 @@
+/**
+ * Animaciones compartidas de la app — keyframes + clases utilitarias.
+ *
+ * Se importa una sola vez (App.tsx) para que cualquier componente use una
+ * animación con solo agregar la clase, sin volver a escribir los @keyframes.
+ *
+ * Uso:
+ *   <div className="anim_slide_in_y from_top">…</div>
+ *
+ * Duración y easing se ajustan por custom property (valores por defecto):
+ *   --anim-duration  (por defecto .25s)
+ *   --anim-easing    (por defecto ease-out)
+ *
+ * Desplazamiento (define desde dónde entra/sale):
+ *   --anim-y-from / --anim-y-to   (eje vertical)
+ *   --anim-x-from / --anim-x-to   (eje horizontal)
+ *   --anim-scale-from / --anim-scale-to  (escala)
+ *
+ * Las clases `from_top` / `from_bottom` / `from_left` / `from_right` ya traen
+ * los valores por defecto de cada dirección.
+ */
+
+/* ── Fundido ──────────────────────────────────────────────────────────────── */
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* ── Desplazamiento vertical ─────────────────────────────────────────────── */
+@keyframes slide-in-y {
+    from { opacity: 0; transform: translateY(var(--anim-y-from, -16px)) scale(var(--anim-scale-from, 1)); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes slide-out-y {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(var(--anim-y-to, -12px)) scale(var(--anim-scale-to, 1)); }
+}
+
+/* ── Desplazamiento horizontal ───────────────────────────────────────────── */
+@keyframes slide-in-x {
+    from { opacity: 0; transform: translateX(var(--anim-x-from, -16px)) scale(var(--anim-scale-from, 1)); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes slide-out-x {
+    from { opacity: 1; transform: translateX(0) scale(1); }
+    to { opacity: 0; transform: translateX(var(--anim-x-to, -12px)) scale(var(--anim-scale-to, 1)); }
+}
+
+/* ── Escala ──────────────────────────────────────────────────────────────── */
+@keyframes scale-in {
+    from { opacity: 0; transform: scale(var(--anim-scale-from, .96)); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes scale-out {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(var(--anim-scale-to, .96)); }
+}
+
+/* ── Entrada con rebote suave ────────────────────────────────────────────── */
+@keyframes pop-in {
+    0% { opacity: 0; transform: scale(.9); }
+    60% { opacity: 1; transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Aparición de contenido EN SU LUGAR ─────────────────────────────────────
+   Para secciones/cards que cambian de pestaña: no hay viaje de entrada, solo
+   un fundido con un desplazamiento mínimo. Es la versión "suave" de
+   slide-in-y — esa es para elementos que entran a la pantalla (modales). */
+@keyframes content-in {
+    from { opacity: 0; transform: translateY(var(--anim-y-from, 8px)); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Igual que content-in pero cayendo desde arriba (paneles que se despliegan). */
+@keyframes content-in-down {
+    from { opacity: 0; transform: translateY(var(--anim-y-from, -8px)); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Clases utilitarias ──────────────────────────────────────────────────── */
+.anim_fade_in { animation: fade-in var(--anim-duration, .25s) var(--anim-easing, ease-out) both; }
+.anim_fade_out { animation: fade-out var(--anim-duration, .25s) var(--anim-easing, ease-in) both; }
+.anim_slide_in_y { animation: slide-in-y var(--anim-duration, .25s) var(--anim-easing, cubic-bezier(.2, .8, .2, 1)) both; }
+.anim_slide_out_y { animation: slide-out-y var(--anim-duration, .2s) var(--anim-easing, ease-in) both; }
+.anim_slide_in_x { animation: slide-in-x var(--anim-duration, .25s) var(--anim-easing, cubic-bezier(.2, .8, .2, 1)) both; }
+.anim_slide_out_x { animation: slide-out-x var(--anim-duration, .2s) var(--anim-easing, ease-in) both; }
+.anim_scale_in { animation: scale-in var(--anim-duration, .25s) var(--anim-easing, cubic-bezier(.2, .8, .2, 1)) both; }
+.anim_scale_out { animation: scale-out var(--anim-duration, .2s) var(--anim-easing, ease-in) both; }
+.anim_pop_in { animation: pop-in var(--anim-duration, .3s) var(--anim-easing, cubic-bezier(.2, .8, .2, 1)) both; }
+.anim_content_in { animation: content-in var(--anim-duration, .28s) var(--anim-easing, cubic-bezier(.2, .8, .2, 1)) both; }
+.anim_content_in_down { animation: content-in-down var(--anim-duration, .28s) var(--anim-easing, cubic-bezier(.2, .8, .2, 1)) both; }
+
+/* ── Escalonado ────────────────────────────────────────────────────────────
+   Aplica content-in a los hijos uno detrás de otro (grillas de tarjetas que
+   aparecen de a una). El delay se define por --anim-stagger-step. */
+.anim_stagger > * {
+    animation: content-in var(--anim-duration, .28s) var(--anim-easing, cubic-bezier(.2, .8, .2, 1)) both;
+    animation-delay: calc(var(--anim-stagger-step, .04s) * var(--anim-stagger-index, 0));
+}
+
+.anim_stagger > *:nth-child(1) { --anim-stagger-index: 1; }
+.anim_stagger > *:nth-child(2) { --anim-stagger-index: 2; }
+.anim_stagger > *:nth-child(3) { --anim-stagger-index: 3; }
+.anim_stagger > *:nth-child(4) { --anim-stagger-index: 4; }
+.anim_stagger > *:nth-child(5) { --anim-stagger-index: 5; }
+.anim_stagger > *:nth-child(n+6) { --anim-stagger-index: 6; }
+
+/* ── Direcciones por defecto ─────────────────────────────────────────────── */
+.from_top { --anim-y-from: -20px; --anim-y-to: -12px; }
+.from_bottom { --anim-y-from: 20px; --anim-y-to: 12px; }
+.from_left { --anim-x-from: -20px; --anim-x-to: -12px; }
+.from_right { --anim-x-from: 20px; --anim-x-to: 12px; }

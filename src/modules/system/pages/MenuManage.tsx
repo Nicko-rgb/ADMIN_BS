@@ -101,7 +101,7 @@ const MenuManage = () => {
                 onClose={closeDelete}
                 title="Eliminar ítem de menú"
                 description={`¿Seguro que deseas eliminar "${deletingItem?.label}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeleting ? 'Eliminando...' : 'Eliminar', onClick: confirmDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeDelete }}
             />

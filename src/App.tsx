@@ -1,6 +1,7 @@
 
 import './shared/styles/colors.css';
 import './shared/styles/global.css';
+import './shared/styles/animations.css';
 import './shared/styles/Button.css'
 
 import { Suspense } from 'react';

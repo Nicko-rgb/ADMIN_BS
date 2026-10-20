@@ -4,6 +4,7 @@ import { handleApiError, getApiErrorStatus } from '../../../shared/utils/errorHa
 import toast from '../../../shared/utils/toast';
 import SpaceService from '../service/spaceService';
 import type { SpaceDetail, SpaceBusinessHour, SpaceMediaFile, SpaceTab } from '../interfaces/space.interface';
+import type { EntityStatus } from '../interfaces/sucursal.interface';
 
 export type SpaceErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 
@@ -17,7 +18,7 @@ const DAY_LABELS = {
     SUNDAY: 'Domingo',
 } as const;
 
-const DAY_ORDER: (keyof typeof DAY_LABELS)[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+// const DAY_ORDER: (keyof typeof DAY_LABELS)[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
 const formatTime = (time: string) => time.slice(0, 5);
 
@@ -46,6 +47,8 @@ export const useSpace = () => {
     // la acción calling handleDeleteMedia.
     const [mediaToDelete, setMediaToDelete] = useState<SpaceMediaFile | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    // Cambio de estado del espacio en curso (switch de estado).
+    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
     useEffect(() => {
         if (!spacePublicId) return;
@@ -108,7 +111,7 @@ export const useSpace = () => {
         if (!mediaToDelete || !spacePublicId) return;
         setIsDeleting(true);
         try {
-            const response = await SpaceService.removeMedia(spacePublicId, mediaToDelete.publicId);
+            const response = await SpaceService.removeMedia(spacePublicId)(mediaToDelete.publicId);
             toast.success(response.message);
             setMediaToDelete(null);
             reloadMedia();
@@ -116,6 +119,22 @@ export const useSpace = () => {
             toast.error(handleApiError(err));
         } finally {
             setIsDeleting(false);
+        }
+    };
+
+    // Cambia el estado del espacio (switch de estado) — el backend devuelve el
+    // espacio actualizado, se aplica directo al estado sin recargar la página.
+    const handleToggleStatus = async (status: EntityStatus) => {
+        if (!spacePublicId) return;
+        setIsTogglingStatus(true);
+        try {
+            const { data, message } = await SpaceService.toggleStatus(spacePublicId)(status);
+            toast.success(message);
+            setSpace(data);
+        } catch (err) {
+            toast.error(handleApiError(err));
+        } finally {
+            setIsTogglingStatus(false);
         }
     };
 
@@ -140,6 +159,8 @@ export const useSpace = () => {
         setMediaToDelete,
         isDeleting,
         handleDeleteMedia,
+        isTogglingStatus,
+        handleToggleStatus,
     };
 };
 

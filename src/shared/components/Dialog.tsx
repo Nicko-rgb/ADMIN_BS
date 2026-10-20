@@ -1,14 +1,22 @@
-import { useEffect } from 'react';
-import type { ComponentType } from 'react';
-import { X, Info, AlertTriangle, AlertCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { AnimationEvent, ComponentType } from 'react';
+import { X, Info, CircleAlert, CircleCheck } from 'lucide-react';
 import { Button } from './Button';
 import '../styles/Dialog.css';
 
-type DialogVariant = 'primary' | 'warning' | 'alert';
+/**
+ * Variantes del diálogo — cada una define el color (token) del ícono y de la
+ * acción principal:
+ * - `primary` — confirmación normal, verde de marca (`--primary`).
+ * - `danger`  — acción destructiva, rojo (`--danger`).
+ * - `info`    — aviso informativo, azul (`--info`).
+ */
+type DialogVariant = 'primary' | 'danger' | 'info';
 
 interface DialogAction {
     label: string;
     onClick: () => void;
+    icon?: DialogIcon;
 }
 
 interface DialogProps {
@@ -16,6 +24,7 @@ interface DialogProps {
     onClose: () => void;
     title: string;
     description?: string;
+    /** Variante del diálogo — primary (default), danger o info. */
     variant?: DialogVariant;
     primaryAction: DialogAction;
     secondaryAction?: DialogAction;
@@ -24,19 +33,29 @@ interface DialogProps {
 type DialogIcon = ComponentType<{ size?: number; className?: string }>;
 
 const VARIANT_ICON: Record<DialogVariant, DialogIcon> = {
-    primary: Info,
-    warning: AlertTriangle,
-    alert: AlertCircle,
+    primary: CircleCheck,
+    danger: CircleAlert,
+    info: Info,
 };
 
-const VARIANT_BUTTON_COLOR: Record<DialogVariant, 'primary' | 'danger' | 'warning'> = {
+const VARIANT_BUTTON_COLOR: Record<DialogVariant, 'primary' | 'danger' | 'info'> = {
     primary: 'primary',
-    warning: 'warning',
-    alert: 'danger',
+    danger: 'danger',
+    info: 'info',
 };
 
-/** Diálogo de confirmación genérico: ícono/color según variant, descripción y hasta dos botones de acción en el pie. */
+/**
+ * Diálogo de confirmación genérico: ícono con el color de la variante, título,
+ * descripción y hasta dos acciones en el pie (la principal a la derecha).
+ */
 export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary', primaryAction, secondaryAction }: DialogProps) => {
+    // Sigue montado hasta que termina la animación de salida (ignora las de los hijos).
+    const [isRendered, setIsRendered] = useState(isOpen);
+
+    if (isOpen && !isRendered) setIsRendered(true);
+
+    const isClosing = isRendered && !isOpen;
+
     useEffect(() => {
         if (!isOpen) return;
 
@@ -53,17 +72,22 @@ export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary
         };
     }, [isOpen, onClose]);
 
-    if (!isOpen) return null;
+    // Desmonta al terminar la animación de salida del overlay.
+    const handleAnimationEnd = (e: AnimationEvent<HTMLDivElement>) => {
+        if (isClosing && e.target === e.currentTarget) setIsRendered(false);
+    };
+
+    if (!isRendered) return null;
 
     const Icon = VARIANT_ICON[variant];
 
     return (
-        <div className="dialog_overlay" onClick={onClose}>
+        <div className={`dialog_overlay ${isClosing ? 'is_closing' : ''}`} onAnimationEnd={handleAnimationEnd} onClick={onClose}>
             <div className={`dialog_container dialog_${variant}`} onClick={(e) => e.stopPropagation()}>
                 <header className="dialog_header">
                     <h2 className="dialog_title">
                         <span className="dialog_icon">
-                            <Icon size={20} />
+                            <Icon size={16} />
                         </span>
                         {title}
                     </h2>
@@ -80,9 +104,9 @@ export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary
 
                 <footer className="dialog_footer">
                     {secondaryAction && (
-                        <Button text={secondaryAction.label} color="secondary" onClick={secondaryAction.onClick} />
+                        <Button text={secondaryAction.label} size='sm' color="secondary" onClick={secondaryAction.onClick} />
                     )}
-                    <Button text={primaryAction.label} color={VARIANT_BUTTON_COLOR[variant]} onClick={primaryAction.onClick} />
+                    <Button text={primaryAction.label} icon={primaryAction.icon} size='sm' color={VARIANT_BUTTON_COLOR[variant]} onClick={primaryAction.onClick} />
                 </footer>
             </div>
         </div>

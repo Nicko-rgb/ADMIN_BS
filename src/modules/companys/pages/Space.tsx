@@ -1,26 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    ArrowLeft, Image, Clock, Dumbbell,
-    Calendar, Grid, FileText, MapPin, ImagePlus,
-    Pencil,
-    ClockPlus,
-    Trash2,
-} from 'lucide-react';
+import { ArrowLeft, Image, Clock, Dumbbell, Calendar, Grid, FileText, MapPin, ImagePlus, Pencil, ClockPlus, Trash2, } from 'lucide-react';
 import { LoadingScreen, NotFoundScreen, ForbiddenScreen, Button, EmptyScreen, Modal, Dialog } from '../../../shared/components';
-import { MedibleImage } from '../../../shared/components/MedibleImage';
-import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { resolveImageUrl } from '../../../shared/utils/formatText';
-import { Tabs } from '../../../shared/components';
+import { Tabs, MedibleImage } from '../../../shared/components';
 import SpaceForm from '../components/SpaceForm';
+import StatusSwitch from '../components/StatusSwitch';
 import SpaceService from '../service/spaceService';
 import useSpace from '../hooks/useSpace';
 import type { SpaceTab, SpaceMediaFile } from '../interfaces/space.interface';
 import '../styles/Space.css';
-
-const STATUS_LABELS = { ACTIVE: 'Activo', INACTIVE: 'Inactivo', MAINTENANCE: 'Mantenimiento' } as const;
-const STATUS_CLASSNAMES = { ACTIVE: 'active', INACTIVE: 'inactive', MAINTENANCE: 'maintenance' } as const;
 
 const Space = () => {
     const navigate = useNavigate();
@@ -43,11 +33,9 @@ const Space = () => {
         setMediaToDelete,
         isDeleting,
         handleDeleteMedia,
+        isTogglingStatus,
+        handleToggleStatus,
     } = useSpace();
-
-    const can = usePermission();
-    const canEditSpace = can('space.edit');
-    const canManageMedia = can('space.media_manage');
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     // Archivo de la galería abierto en el visor (modo lectura).
@@ -89,20 +77,16 @@ const Space = () => {
                             <div className="cover_avatar center">{space.name.charAt(0).toUpperCase()}</div>
                             <div>
                                 <h1 className="cover_text">{space.name}</h1>
-                                <div className="cover_badges">
-                                    {space.status && (
-                                        <span className={`status_badge ${STATUS_CLASSNAMES[space.status]}`}>
-                                            {STATUS_LABELS[space.status]}
-                                        </span>
-                                    )}
-                                </div>
+                                <StatusSwitch
+                                    value={space.status}
+                                    onChange={handleToggleStatus}
+                                    disabled={isTogglingStatus}
+                                />
                             </div>
                         </div>
                     </div>
                     <div className="cover_actions">
-                        {canEditSpace && (
-                            <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
-                        )}
+                        <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
                     </div>
                 </section>
 
@@ -193,7 +177,7 @@ const Space = () => {
 
                     {/* ── Sección de Galería Multimedia ────────────────────────────────── */}
                     {activeTab === 'gallery' && (
-                        <section className="section_tab_view gallerys card">
+                        <section className="section_tab_view card anim_content_in">
                             <div className="tab_section_header">
                                 <div className="title_group">
                                     <Image size={20} />
@@ -224,17 +208,15 @@ const Space = () => {
                                                     <img src={resolveImageUrl(file.url)} alt={file.description || file.fileName} />
                                                 </button>
                                             )}
-                                            {canManageMedia && (
-                                                <button
-                                                    type="button"
-                                                    className="media_item_delete"
-                                                    onClick={() => setMediaToDelete(file)}
-                                                    aria-label={`Eliminar ${file.fileName}`}
-                                                    title="Eliminar archivo"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            )}
+                                            <button
+                                                type="button"
+                                                className="media_item_delete"
+                                                onClick={() => setMediaToDelete(file)}
+                                                aria-label={`Eliminar ${file.fileName}`}
+                                                title="Eliminar archivo"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
                                             <figcaption>{file.description || file.fileName}</figcaption>
                                         </figure>
                                     ))}
@@ -247,7 +229,7 @@ const Space = () => {
 
                     {/* ── Sección de Horarios de Operación ─────────────────────────────── */}
                     {activeTab === 'schedule' && (
-                        <section className="section_tab_view schedules card">
+                        <section className="section_tab_view schedules card anim_content_in">
                             <div className="tab_section_header">
                                 <div className="title_group">
                                     <Clock size={20} />
@@ -270,23 +252,18 @@ const Space = () => {
                 </div>
             </main>
 
-            {/* ── Visor de un archivo de la galería (modo lectura) ──────────────────── */}
-            <Modal
+            {/* ── Visor de un archivo de la galería ─────────────────────────────────── */}
+            <MedibleImage
                 isOpen={mediaToView !== null}
                 onClose={() => setMediaToView(null)}
                 title={mediaToView?.description || mediaToView?.fileName || 'Archivo'}
                 icon={Image}
-                size="lg"
-            >
-                {mediaToView && (
-                    <MedibleImage
-                        mode="read"
-                        accept="media"
-                        mediaSelect={mediaToView}
-                        api={null}
-                    />
-                )}
-            </Modal>
+                accept="media"
+                showDescription
+                media={mediaToView}
+                remove={spacePublicId ? SpaceService.removeMedia(spacePublicId) : undefined}
+                onChanged={() => { reloadMedia(); setMediaToView(null); }}
+            />
 
             {/* ── Confirmación de borrado de un archivo de la galería ───────────────── */}
             <Dialog
@@ -294,36 +271,27 @@ const Space = () => {
                 onClose={() => setMediaToDelete(null)}
                 title="Eliminar archivo"
                 description={`¿Seguro que querés eliminar "${mediaToDelete?.description || mediaToDelete?.fileName}" de la galería? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{
                     label: isDeleting ? 'Eliminando...' : 'Eliminar',
                     onClick: handleDeleteMedia,
+                    icon: Trash2,
                 }}
                 secondaryAction={{ label: 'Cancelar', onClick: () => setMediaToDelete(null) }}
             />
 
             {/* ── Modales de sección — UN solo estado de apertura (isPanelModalOpen);
                    cuál se muestra lo decide la pestaña activa (activeTab). ───────── */}
-            <Modal
+            <MedibleImage
                 isOpen={isPanelModalOpen && activeTab === 'gallery'}
                 onClose={closePanelModal}
                 title="Galería del espacio"
                 icon={Image}
-                size="lg"
-            >
-                <MedibleImage
-                    mode="register"
-                    accept="media"
-                    onChanged={() => {
-                        reloadMedia();
-                        closePanelModal();
-                    }}
-                    api={{
-                        uploadImage: (file: File, description?: string) =>
-                            SpaceService.uploadMedia(spacePublicId!, file, description),
-                    }}
-                />
-            </Modal>
+                showDescription
+                accept="media"
+                save={spacePublicId ? SpaceService.uploadMedia(spacePublicId) : undefined}
+                onChanged={() => { reloadMedia(); closePanelModal(); }}
+            />
 
             {/* TODO: modal de horarios — falta el componente de gestión de
                 BusinessHour (backend sin endpoint todavía). */}

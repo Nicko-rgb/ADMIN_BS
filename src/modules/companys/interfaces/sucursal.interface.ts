@@ -1,7 +1,17 @@
+import type { ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import type { CountryDisplay } from '../../../shared/interfaces/catalog.interface';
 import type { TenantFormErrors } from '../utils/tenantForm';
 
-export type SucursalStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
+/**
+ * Estado de las entidades operativas — sucursal y espacio deportivo comparten el
+ * mismo juego de estados (ENUM del backend). Vive acá y se reexporta desde los
+ * demás contratos del módulo (espacio, service, componentes).
+ */
+export type EntityStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
+
+/** Estado de la sucursal — alias de EntityStatus (mismo ENUM en backend). */
+export type SucursalStatus = EntityStatus;
 
 // Espacio de la sede (toSucursalDto → spaces) — nombre, deporte y estado.
 export interface SucursalSpace {
@@ -77,4 +87,15 @@ export interface SucursalPayload {
     longitude?: number | null;
     description?: string | null;
     website?: string | null;
+}
+
+export interface InfoChipProps {
+    icon?: LucideIcon,
+    image?: string | null,
+    value?: string | number | null,
+    title?: string,
+    className?: string,
+    href?: string | null,
+    trailingIcon?: LucideIcon,
+    children?: ReactNode,
 }

@@ -88,7 +88,7 @@ const SportTypesPage = () => {
                 onClose={closeDelete}
                 title="Eliminar deporte"
                 description={`¿Seguro que deseas eliminar "${deletingSportType?.name}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeleting ? 'Eliminando...' : 'Eliminar', onClick: confirmDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeDelete }}
             />

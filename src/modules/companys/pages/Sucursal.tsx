@@ -1,24 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaFacebook, FaInstagram, FaTiktok, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import type { IconType } from 'react-icons';
 import {
     Store, Pencil, Settings, Phone, MapPin, FileText,
     CalendarDays, BriefcaseBusiness, Clock, Dumbbell, Plus,
-    Image, ArrowLeft, Globe, Sparkles, ExternalLink,
+    Image, ArrowLeft, Globe, Sparkles, ExternalLink, Share2,
 } from 'lucide-react';
 import { MedibleImage } from '../../../shared/components/MedibleImage';
 import SucursalService from '../service/sucursalService';
 import { resolveImageUrl } from '../../../shared/utils/formatText';
-import { LoadingScreen, NotFoundScreen, ForbiddenScreen, PlanUsageBar, Button, Modal, EmptyScreen } from '../../../shared/components';
+import { LoadingScreen, NotFoundScreen, ForbiddenScreen, PlanUsageBar, Button, EmptyScreen } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
 import SucursalForm from '../components/SucursalForm';
 import SucursalConfigForm from '../components/SucursalConfigForm';
+import StatusSwitch from '../components/StatusSwitch';
 import SpaceForm from '../components/SpaceForm';
 import usePlanUsage from '../../../shared/hooks/usePlanUsage';
 import useSucursal from '../hooks/useSucursal';
+import type { InfoChipProps } from '../interfaces/sucursal.interface';
 import '../styles/Sucursal.css';
 
 const STATUS_LABELS = { ACTIVE: 'Activa', INACTIVE: 'Inactiva', MAINTENANCE: 'Mantenimiento' } as const;
@@ -27,19 +30,54 @@ const STATUS_CLASSNAMES = { ACTIVE: 'active', INACTIVE: 'inactive', MAINTENANCE:
 // 'HH:mm:ss' de la DB → 'HH:mm' para mostrar.
 const shortTime = (value: string) => value.slice(0, 5);
 
+const InfoChip = ({ icon: Icon, image, value, title, className, href, trailingIcon: TrailingIcon, children }: InfoChipProps) => {
+    if (value == null && !image && !children) return null;
+
+    const content = children ?? (<> {image && <img src={image} alt="" className="chip_flag" />} {Icon && <Icon size={14} />} <span>{value}</span> {TrailingIcon && <TrailingIcon size={15} />} </>);
+    if (href) { return (<a href={href} target="_blank" rel="noreferrer" title={title} className={`info_chip clickable ${className ?? ''}`}>{content}</a>); }
+    return (<span title={title} className={`info_chip ${className ?? ''}`}>{content}</span>);
+};
+
 // Detalle de una sucursal — portada hero + tarjeta consolidada de datos en chips + recursos deportivos.
 const Sucursal = () => {
     const navigate = useNavigate();
     const { publicId, sucursal, config, banner, spaces, isLoading, errorStatus, errorMessage, retry, reloadBanner, reloadSpaces } = useSucursal();
     const { planUsage, reloadPlanUsage } = usePlanUsage(sucursal?.companyPublicId ?? undefined);
-
     const can = usePermission();
     const canEditBanner = can('sucursal.edit');
-
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isConfigOpen, setIsConfigOpen] = useState(false);
     const [isBannerOpen, setIsBannerOpen] = useState(false);
     const [isSpaceOpen, setIsSpaceOpen] = useState(false);
+    // Redes desplegadas en abanico (táctil / clic).
+    const [isSocialsOpen, setIsSocialsOpen] = useState(false);
+    const fanRef = useRef<HTMLDivElement>(null);
+    const closeTimer = useRef<number | undefined>(undefined);
+
+    // El abanico se abre al entrar (hover/foco) y se cierra con retardo para
+    // que el puntero pueda cruzar el hueco hasta una red sin cerrarlo antes.
+    const openSocialsFan = () => {
+        if (closeTimer.current) window.clearTimeout(closeTimer.current);
+        setIsSocialsOpen(true);
+    };
+
+    const closeSocialsFan = () => {
+        if (closeTimer.current) window.clearTimeout(closeTimer.current);
+        closeTimer.current = window.setTimeout(() => setIsSocialsOpen(false), 220);
+    };
+
+    // Toque fuera del abanico → se cierra (móvil).
+    useEffect(() => {
+        if (!isSocialsOpen) return;
+        const handleOutside = (event: PointerEvent) => {
+            if (!fanRef.current?.contains(event.target as Node)) setIsSocialsOpen(false);
+        };
+        document.addEventListener('pointerdown', handleOutside);
+        return () => document.removeEventListener('pointerdown', handleOutside);
+    }, [isSocialsOpen]);
+
+    // Limpia el timer al desmontar la página.
+    useEffect(() => () => { if (closeTimer.current) window.clearTimeout(closeTimer.current); }, []);
 
     if (isLoading) {
         return <LoadingScreen message="Cargando sucursal..." size="lg" />;
@@ -81,73 +119,90 @@ const Sucursal = () => {
         ? config.features.split(',').map((f) => f.trim()).filter(Boolean)
         : [];
 
+    // Ángulo de cada red en el abanico — el CSS no puede calcular el seno/coseno,
+    // así que el reparto angular se hace acá (círculo completo, arrancando arriba).
+    const fanAngles = socials.map((_, idx) => {
+        const total = socials.length;
+        if (total === 1) return 0;
+        return -90 + (360 / total) * idx;
+    });
+
     return (
         <div className="sucursal_page">
             <section className="sucursal_hero">
                 <div className="cover">
                     <button className="btn_back" onClick={() => navigate(-1)}><ArrowLeft /></button>
-                    {canEditBanner && <button className="btn_bg_sucursal" title="Cambiar portada" onClick={() => setIsBannerOpen(true)}><Image size={16} /></button>}
+                    <div className='config_top'>
+                        {canEditBanner && <button className="btn_bg_sucursal" title="Cambiar portada" onClick={() => setIsBannerOpen(true)}><Image size={16} /></button>}
+                        {can('sucursal.config') && (<Button text="Configurar" size="xs" icon={Settings} color="secondary" onClick={() => setIsConfigOpen(true)} />)}
+                    </div>
                     {banner ? (
                         <img className="cover_image" src={resolveImageUrl(banner.url)} alt={`Portada de ${sucursal.name}`} />
                     ) : (
                         <div className="cover_placeholder" aria-hidden />
                     )}
                     <div className="cover_overlay" />
-                    <div className="cover_content">
-                        <div className="cover_identity">
-                            <div className="cover_avatar center"><Store size={30} /></div>
-                            <div>
-                                <h1 className="cover_text">
-                                    {sucursal.name}
-                                    {sucursal.status && (
-                                        <span className={`status_badge ${STATUS_CLASSNAMES[sucursal.status]}`}>
-                                            {STATUS_LABELS[sucursal.status]}
-                                        </span>
-                                    )}
-                                </h1>
-                                <div className="cover_socials">
-                                    {socials.length > 0 ? (
-                                        socials.map(({ href, label, key, Icon }) => (
-                                            <a
-                                                key={label}
-                                                href={href}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                title={label}
-                                                aria-label={label}
-                                                className={`center cover_social_link ${key}`}
-                                            >
-                                                <Icon size={18} aria-hidden />
-                                            </a>
-                                        ))
-                                    ) : (
-                                        <span className="cover_socials_empty">Sin redes sociales</span>
-                                    )}
-                                </div>
-                            </div>
+                    <div className="cover_identity">
+                        <div className="cover_avatar center"><Store size={30} /></div>
+                        <div>
+                            <h1 className="cover_text">
+                                {sucursal.name}
+                            </h1>
+                            <StatusSwitch value={sucursal.status} onChange={(e) => { }} />
                         </div>
                     </div>
                     <div className="cover_actions">
+                        <div className="cover_socials">
+                        {socials.length > 0 && (
+                            <div
+                                ref={fanRef}
+                                className={`cover_socials_fan ${isSocialsOpen ? 'is_open' : ''}`}
+                                onMouseEnter={openSocialsFan}
+                                onMouseLeave={closeSocialsFan}
+                                onFocus={openSocialsFan}
+                                onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) closeSocialsFan(); }}
+                            >
+                                <button
+                                    type="button"
+                                    className="cover_socials_trigger"
+                                    aria-label="Ver redes sociales"
+                                    aria-expanded={isSocialsOpen}
+                                    onClick={openSocialsFan}
+                                >
+                                    <Share2 size={18} aria-hidden />
+                                </button>
+                                {socials.map(({ href, label, key, Icon }, idx) => (
+                                    <a
+                                        key={label}
+                                        href={href}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        title={label}
+                                        aria-label={label}
+                                        className={`center cover_social_link ${key}`}
+                                        style={{ '--fan-angle': `${fanAngles[idx]}deg`, '--fan-delay': `${idx * 45}ms` } as CSSProperties}
+                                    >
+                                        <Icon size={16} aria-hidden />
+                                    </a>
+                                ))}
+                            </div>
+                        )}
                         {can('company.view') && (
                             <Button text="Mi Empresa" size="sm" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
                         )}
                         {can('sucursal.edit') && (
                             <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
                         )}
-                        {can('sucursal.config') && (
-                            <Button text="Configurar" size="sm" icon={Settings} color="secondary" onClick={() => setIsConfigOpen(true)} />
-                        )}
+                    </div>
                     </div>
                 </div>
 
                 {/* ── Tarjeta de información organizada en chips ──── */}
                 <div className="card sucursal_details_card">
-                    {sucursal.description && (
-                        <div className="sucursal_description_box">
-                            <FileText size={18} />
-                            <p>{sucursal.description}</p>
-                        </div>
-                    )}
+                    <div className="sucursal_description_box">
+                        <FileText size={18} />
+                        <p>{sucursal.description || 'Sin descripción'}</p>
+                    </div>
 
                     <div className="overview_groups">
                         {/* Grupo: Ubicación y Contacto */}
@@ -156,97 +211,37 @@ const Sucursal = () => {
                                 <MapPin size={14} /> Ubicación y Contacto
                             </span>
                             <div className="chips_row">
-                                <span className="info_chip" title="Dirección">
-                                    <MapPin size={14} />
-                                    <span>{sucursal.address || '—'}</span>
-                                </span>
-
-                                {sucursal.country && (
-                                    <span className="info_chip" title="País y Ubigeo">
-                                        <img src={sucursal.country.flagUrl} alt="" className="chip_flag" />
-                                        <span>
-                                            {sucursal.country.name}
-                                            {sucursal.ubigeo?.formatted ? ` · ${sucursal.ubigeo.formatted}` : ''}
-                                        </span>
-                                    </span>
-                                )}
-
-                                {sucursal.latitude && sucursal.longitude && (
-                                    <a
-                                        href={`https://www.google.com/maps?q=${sucursal.latitude},${sucursal.longitude}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="info_chip clickable"
-                                        title="Abrir en Google Maps"
-                                    >
-                                        <Globe size={14} />
-                                        <span>GPS: {sucursal.latitude}, {sucursal.longitude}</span>
-                                        <ExternalLink size={15} />
-                                    </a>
-                                )}
-
-                                <span className="info_chip" title="Teléfono celular">
-                                    <Phone size={14} />
-                                    <span>{formatPhone(sucursal.country?.phoneCode, sucursal.phoneCell) || '—'}</span>
-                                </span>
-
-                                {sucursal.phone && (
-                                    <span className="info_chip" title="Teléfono fijo">
-                                        <Phone size={14} />
-                                        <span>Fijo: {sucursal.phone}</span>
-                                    </span>
-                                )}
-
-                                {sucursal.website && (
-                                    <a
-                                        href={sucursal.website.startsWith('http') ? sucursal.website : `https://${sucursal.website}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="info_chip clickable"
-                                        title="Visitar sitio web"
-                                    >
-                                        <Globe size={14} />
-                                        <span>{sucursal.website}</span>
-                                        <ExternalLink size={15} />
-                                    </a>
-                                )}
+                                <InfoChip icon={MapPin} value={sucursal.address} />
+                                <InfoChip image={sucursal.country?.flagUrl} value={[sucursal.country?.name, sucursal.ubigeo?.formatted].filter(Boolean).join(' · ')} />
+                                <InfoChip
+                                    icon={Globe}
+                                    value={`GPS: ${sucursal.latitude}, ${sucursal.longitude}`}
+                                    href={`https://www.google.com/maps?q=${sucursal.latitude},${sucursal.longitude}`}
+                                    trailingIcon={ExternalLink}
+                                />
+                                <InfoChip icon={Phone} value={formatPhone(sucursal.country?.phoneCode, sucursal.phoneCell)} />
+                                {sucursal.phone && (<InfoChip icon={Phone} value={`Fijo: ${sucursal.phone}`} />)}
+                                <InfoChip icon={Globe} value={sucursal.website} href={sucursal.website} trailingIcon={ExternalLink} />
                             </div>
                         </div>
 
                         {/* Grupo: Operatividad */}
                         <div className="overview_group">
                             <span className="group_label">
-                                <Clock size={14} /> Operativo
+                                <Clock size={14} /> Operativo y Redes
                             </span>
                             <div className="chips_row">
                                 {config?.openingTime && config?.closingTime ? (
-                                    <span className="info_chip highlight" title="Horario de atención">
-                                        <Clock size={14} />
-                                        <span>{shortTime(config.openingTime)} – {shortTime(config.closingTime)}</span>
-                                    </span>
-                                ) : (
-                                    <span className="info_chip muted" title="Horario sin definir">
-                                        <Clock size={14} />
-                                        <span>Horario no definido</span>
-                                    </span>
-                                )}
+                                    <InfoChip
+                                        icon={Clock}
+                                        value={`${shortTime(config.openingTime)} – ${shortTime(config.closingTime)}`}
+                                        className="highlight"
+                                    />
+                                ) : (<span className="config_empty_hint">Sin configuración...</span>)}
+                                {config?.minPrice && (<InfoChip value={`Desde S/ ${config.minPrice}`} className="highlight_green" />)}
+                                <InfoChip icon={CalendarDays} value={`Registrada el ${formatDate(sucursal.createdAt)}`} />
 
-                                {config?.minPrice ? (
-                                    <span className="info_chip highlight_green" title="Precio mínimo">
-                                        <span>Desde S/ {config.minPrice}</span>
-                                    </span>
-                                ) : null}
-
-                                <span className="info_chip" title="Fecha de registro">
-                                    <CalendarDays size={14} />
-                                    <span>Registrada el {formatDate(sucursal.createdAt)}</span>
-                                </span>
-
-                                {!config && (
-                                    <div className="config_unconfigured">
-                                        <span className="config_empty_hint">Sin configuración operativa</span>
-                                    </div>
-                                )}
+                                {!config && (<span className="config_empty_hint">Sin configuración...</span>)}
                             </div>
                         </div>
 
@@ -258,10 +253,7 @@ const Sucursal = () => {
                                 </span>
                                 <div className="chips_row">
                                     {featuresList.map((feature, idx) => (
-                                        <span className="info_chip feature_chip" key={idx}>
-                                            <Sparkles size={14} />
-                                            <span>{feature}</span>
-                                        </span>
+                                        <InfoChip icon={Sparkles} value={feature} className="feature_chip" key={idx} />
                                     ))}
                                 </div>
                             </div>
@@ -319,28 +311,17 @@ const Sucursal = () => {
                 />
             )}
 
-            {isBannerOpen && publicId && (
-                <Modal isOpen={isBannerOpen} onClose={() => setIsBannerOpen(false)} title="Portada de la sucursal" icon={Image} size="lg">
-                    <MedibleImage
-                        mode="read_delete"
-                        onChanged={() => {
-                            reloadBanner();
-                            // Al registrar (o eliminar) la portada, el modal se cierra.
-                            setIsBannerOpen(false);
-                        }}
-                        mediaSelect={banner}
-                        api={{
-                            // Sin permiso no se inyectan los métodos de escritura →
-                            // no hay controles de subir/borrar.
-                            ...(canEditBanner && {
-                                uploadImage: (file: File, description?: string) =>
-                                    SucursalService.uploadBanner(publicId, file, description),
-                                removeImage: () => SucursalService.removeBanner(publicId),
-                            }),
-                        }}
-                    />
-                </Modal>
-            )}
+            <MedibleImage
+                isOpen={isBannerOpen && !!publicId}
+                onClose={() => setIsBannerOpen(false)}
+                title="Portada de la sucursal"
+                icon={Image}
+                accept="image"
+                media={banner}
+                onChanged={() => { reloadBanner(); setIsBannerOpen(false); }}
+                save={publicId ? SucursalService.uploadBanner(publicId) : undefined}
+                remove={publicId ? SucursalService.removeBanner(publicId) : undefined}
+            />
 
             {isSpaceOpen && publicId && (
                 <SpaceForm

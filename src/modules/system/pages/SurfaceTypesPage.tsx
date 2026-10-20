@@ -71,7 +71,7 @@ const SurfaceTypesPage = () => {
                 onClose={closeDelete}
                 title="Eliminar superficie"
                 description={`¿Seguro que deseas eliminar "${deletingSurfaceType?.name}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeleting ? 'Eliminando...' : 'Eliminar', onClick: confirmDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeDelete }}
             />

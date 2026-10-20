@@ -5,12 +5,12 @@ import '../styles/Button.css';
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 /** Colores con nombre ya definidos en el sistema de diseño (`shared/styles/colors.css`). */
-type ButtonColorName = 'primary' | 'secondary' | 'danger' | 'warning';
+type ButtonColorName = 'primary' | 'secondary' | 'danger' | 'warning' | 'info';
 
 /** Nombre de color del sistema, o un hex propio (ej. `'#2c9d75'`) para casos puntuales fuera de la paleta. */
 type ButtonColor = ButtonColorName | `#${string}`;
 
-const NAMED_COLORS: readonly ButtonColorName[] = ['primary', 'secondary', 'danger', 'warning'];
+const NAMED_COLORS: readonly ButtonColorName[] = ['primary', 'secondary', 'danger', 'warning', 'info'];
 const isNamedColor = (color: ButtonColor): color is ButtonColorName =>
     (NAMED_COLORS as readonly string[]).includes(color);
 

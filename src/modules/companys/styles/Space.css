@@ -106,35 +106,6 @@
                     line-height: 1.2;
                     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
                 }
-
-                .cover_badges {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 0.6rem;
-                    margin-top: 0.4rem;
-
-                    .status_badge {
-                        padding: 3px 10px;
-                        border-radius: 20px;
-                        font-weight: 600;
-                        font-size: 1.2rem;
-
-                        &.active {
-                            background: var(--success-soft);
-                            color: var(--success-text);
-                        }
-
-                        &.inactive {
-                            background: var(--danger-soft);
-                            color: var(--danger-text);
-                        }
-
-                        &.maintenance {
-                            background: var(--warning-soft);
-                            color: var(--warning-text);
-                        }
-                    }
-                }
             }
         }
 

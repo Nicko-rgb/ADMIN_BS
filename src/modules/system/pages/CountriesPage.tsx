@@ -100,7 +100,7 @@ const CountriesPage = () => {
                 onClose={closeDelete}
                 title="Eliminar país"
                 description={`¿Seguro que deseas eliminar "${deletingCountry?.country}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeleting ? 'Eliminando...' : 'Eliminar', onClick: confirmDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeDelete }}
             />

@@ -9,6 +9,7 @@ export { Table, TableImage, TableActions } from './Table';
 export type { TableColumn, TableAction, TableActionVariant } from './Table';
 export { LoadingScreen, NotFoundScreen, ForbiddenScreen, EmptyScreen } from './ScreenMessage';
 export { PlanUsageBar } from './PlanUsageBar';
+export { MedibleImage } from './MedibleImage';
 export {
     InputField,
     SelectField,

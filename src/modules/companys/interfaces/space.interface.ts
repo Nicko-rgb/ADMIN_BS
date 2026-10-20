@@ -1,5 +1,7 @@
 // Formulario de alta/edición de espacio deportivo — espeja space.schema.ts del backend
 // (mismos nombres snake_case que espera el endpoint).
+import type { EntityStatus } from './sucursal.interface';
+
 export interface SpaceFormValues {
     name: string;
     surface_type_id: number;
@@ -31,7 +33,7 @@ export interface SpaceListItem {
     publicId: string;
     name: string;
     sport: string | null;
-    status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
+    status: EntityStatus;
 }
 
 // Detalle completo de un espacio deportivo — espeja toSpaceDto del backend.
@@ -49,7 +51,7 @@ export interface SpaceDetail {
     equipment: string | null;
     minimumBookingMinutes: number;
     maximumBookingMinutes: number;
-    status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
+    status: EntityStatus;
     createdAt: string;
 }
 

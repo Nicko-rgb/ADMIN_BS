@@ -40,14 +40,19 @@
                 backdrop-filter: blur(5px);
             }
 
-            .btn_bg_sucursal {
+            .config_top {
+                display: flex;
+                gap: 1rem;
                 position: absolute;
                 top: 15px;
                 right: 15px;
                 z-index: 100;
-                width: 32px;
-                height: 32px;
-                border-radius: 5px;
+
+                .btn_bg_sucursal {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 5px;
+                }
             }
 
             .cover_placeholder {
@@ -73,89 +78,111 @@
                 background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.15) 60%, transparent 100%);
             }
 
-            .cover_content {
+            .cover_identity {
+                display: flex;
                 position: relative;
                 width: 100%;
-                display: flex;
-                flex-direction: column;
                 gap: 1rem;
                 color: var(--text-white);
 
-                .cover_identity {
+                .cover_avatar {
+                    width: 6.4rem;
+                    height: 6.4rem;
+                    border-radius: 1rem;
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1px solid rgba(255, 255, 255, 0.35);
+                    color: var(--text-white);
+                    flex-shrink: 0;
+                }
+
+                .cover_text {
+                    min-width: 0;
+                    display: flex;
+                    gap: 5px;
+                    font-size: 2.6rem;
+                    line-height: 1.2;
+                    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+                }
+
+                .cover_socials {
+                    flex-basis: 100%;
                     display: flex;
                     align-items: center;
-                    gap: 1.6rem;
-                    min-width: 0;
+                    gap: 0.8rem;
+                    /* Aire abajo para que el abanico completo no se corte contra
+                       el borde de la portada. */
+                    margin-bottom: 2.2rem;
 
-                    .cover_avatar {
-                        width: 6.4rem;
-                        height: 6.4rem;
-                        border-radius: 1rem;
-                        background: rgba(255, 255, 255, 0.15);
-                        border: 1px solid rgba(255, 255, 255, 0.35);
-                        color: var(--text-white);
-                        flex-shrink: 0;
-                    }
+                    /* Contenedor del abanico — el hover abre las redes. */
+                    .cover_socials_fan {
+                        position: relative;
+                        z-index: 5;
+                        width: 35px;
+                        height: 35px;
 
-                    .cover_text {
-                        min-width: 0;
-                        display: flex;
-                        gap: 5px;
-                        font-size: 2.6rem;
-                        line-height: 1.2;
-                        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
-                    }
-
-                    .cover_socials {
-                        flex-basis: 100%;
-                        display: flex;
-                        align-items: center;
-                        gap: 0.8rem;
-
-                        .cover_social_link {
+                        /* Disparador: un solo botón que abre/cierra el abanico. */
+                        .cover_socials_trigger {
+                            position: relative;
+                            z-index: 2;
                             width: 35px;
                             height: 35px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: rgba(255, 255, 255, 0.15);
+                            border: 1px solid rgba(255, 255, 255, 0.35);
+                            color: var(--text-white);
+                            cursor: pointer;
+                            transition: background 0.2s ease, transform 0.2s ease;
+
+                            &:hover {
+                                background: rgba(255, 255, 255, 0.28);
+                                transform: translateY(-2px);
+                            }
+                        }
+
+                        /* Cada red se ubica en un ángulo del abanico (--fan-angle). */
+                        .cover_social_link {
+                            position: absolute;
+                            left: 1.75rem;
+                            top: 50%;
+                            z-index: 1;
+                            width: 32px;
+                            height: 32px;
                             border-radius: 50%;
                             background: rgba(255, 255, 255, 0.15);
                             border: 1px solid rgba(255, 255, 255, 0.35);
                             color: var(--text-white);
                             text-decoration: none;
-                            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+                            opacity: 0;
+                            pointer-events: none;
+                            transform:
+                                translate(-50%, -50%) translateY(-0.6rem) rotate(var(--fan-angle)) translateX(1rem) rotate(calc(var(--fan-angle) * -1)) scale(0.4);
+                            transition:
+                                transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                                opacity 0.25s ease,
+                                background 0.2s ease;
 
                             &:hover {
-                                transform: translateY(-2px);
-                            }
-
-                            &.facebook:hover {
-                                background: var(--brand-facebook);
-                                border-color: var(--brand-facebook);
-                            }
-
-                            &.instagram:hover {
-                                background: var(--brand-instagram);
-                                border-color: var(--brand-instagram);
-                            }
-
-                            &.tiktok:hover {
-                                background: var(--brand-tiktok);
-                                border-color: var(--brand-tiktok);
-                            }
-
-                            &.youtube:hover {
-                                background: var(--brand-youtube);
-                                border-color: var(--brand-youtube);
-                            }
-
-                            &.whatsapp:hover {
-                                background: var(--brand-whatsapp);
-                                border-color: var(--brand-whatsapp);
+                                background: rgba(255, 255, 255, 0.28);
                             }
                         }
 
-                        .cover_socials_empty {
-                            font-size: 1.3rem;
-                            color: rgba(255, 255, 255, 0.6);
+                        /* Abierto por el estado (hover/foco/clic en React) — el
+                           hover puro cerraba el abanico al cruzar el hueco. */
+                        &.is_open .cover_social_link {
+                            opacity: 1;
+                            pointer-events: auto;
+                            transform:
+                                translate(-50%, -50%) translateY(-0.6rem) rotate(var(--fan-angle)) translateX(5rem) rotate(calc(var(--fan-angle) * -1)) scale(1);
+                            transition-delay: var(--fan-delay);
                         }
+                    }
+
+                    .cover_socials_empty {
+                        font-size: 1.3rem;
+                        color: rgba(255, 255, 255, 0.6);
                     }
                 }
             }
@@ -164,6 +191,87 @@
                 display: flex;
                 gap: 1rem;
                 z-index: 10;
+
+                .cover_socials {
+                    flex-basis: 100%;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.8rem;
+                    /* Aire abajo para que el abanico completo no se corte contra
+                       el borde de la portada. */
+
+                    /* Contenedor del abanico — el hover abre las redes. */
+                    .cover_socials_fan {
+                        position: relative;
+                        z-index: 5;
+                        width: 35px;
+                        height: 35px;
+
+                        /* Disparador: un solo botón que abre/cierra el abanico. */
+                        .cover_socials_trigger {
+                            position: relative;
+                            z-index: 2;
+                            width: 35px;
+                            height: 35px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: rgba(255, 255, 255, 0.15);
+                            border: 1px solid rgba(255, 255, 255, 0.35);
+                            color: var(--text-white);
+                            cursor: pointer;
+                            transition: background 0.2s ease, transform 0.2s ease;
+
+                            &:hover {
+                                background: rgba(255, 255, 255, 0.28);
+                                transform: translateY(-2px);
+                            }
+                        }
+
+                        /* Cada red se ubica en un ángulo del abanico (--fan-angle). */
+                        .cover_social_link {
+                            position: absolute;
+                            left: 1.75rem;
+                            top: 50%;
+                            z-index: 1;
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            background: rgba(255, 255, 255, 0.15);
+                            border: 1px solid rgba(255, 255, 255, 0.35);
+                            color: var(--text-white);
+                            text-decoration: none;
+                            opacity: 0;
+                            pointer-events: none;
+                            transform:
+                                translate(-50%, -50%) translateY(-0.6rem) rotate(var(--fan-angle)) translateX(1rem) rotate(calc(var(--fan-angle) * -1)) scale(0.4);
+                            transition:
+                                transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                                opacity 0.25s ease,
+                                background 0.2s ease;
+
+                            &:hover {
+                                background: rgba(255, 255, 255, 0.28);
+                            }
+                        }
+
+                        /* Abierto por el estado (hover/foco/clic en React) — el
+                           hover puro cerraba el abanico al cruzar el hueco. */
+                        &.is_open .cover_social_link {
+                            opacity: 1;
+                            pointer-events: auto;
+                            transform:
+                                translate(-50%, -50%) translateY(-0.6rem) rotate(var(--fan-angle)) translateX(5rem) rotate(calc(var(--fan-angle) * -1)) scale(1);
+                            transition-delay: var(--fan-delay);
+                        }
+                    }
+
+                    .cover_socials_empty {
+                        font-size: 1.3rem;
+                        color: rgba(255, 255, 255, 0.6);
+                    }
+                }
             }
         }
 
@@ -294,16 +402,10 @@
                             }
                         }
 
-                        .config_unconfigured {
-                            display: inline-flex;
-                            align-items: center;
-                            gap: .8rem;
-
-                            .config_empty_hint {
-                                font-size: 1.3rem;
-                                font-style: italic;
-                                color: var(--text-muted);
-                            }
+                        .config_empty_hint {
+                            font-size: 1.3rem;
+                            font-style: italic;
+                            color: var(--text-muted);
                         }
                     }
                 }
@@ -441,6 +543,7 @@
                         display: flex;
                         flex-direction: column;
                         align-items: start;
+
                         .name {
                             font-size: 1.6rem;
                             font-weight: 700;

@@ -217,7 +217,7 @@ const UbigeoPage = () => {
                 onClose={closeDelete}
                 title="Eliminar ubigeo"
                 description={`¿Seguro que deseas eliminar "${deletingNode?.name}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeleting ? 'Eliminando...' : 'Eliminar', onClick: confirmDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeDelete }}
             />

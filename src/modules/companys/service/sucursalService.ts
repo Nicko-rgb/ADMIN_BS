@@ -32,21 +32,30 @@ class SucursalService {
         return data ? { publicId: data.publicId, url: data.url, fileName: data.fileName, description: data.description ?? null } : null;
     }
 
-    static async uploadBanner(sucursalPublicId: string, file: File, description?: string): Promise<{ data: BannerFile; message: string }> {
-        const form = new FormData();
-        form.append('cover', file);
-        if (description?.trim()) form.append('description', description.trim());
-        const res = await apiService.post(`/sucursals/${sucursalPublicId}/banner`, form);
-        const data = res.data.data;
-        return {
-            data: { publicId: data.publicId, url: data.url, fileName: data.fileName, description: data.description ?? null },
-            message: res.data.message,
+    /**
+     * Sube la portada. La operación queda bindeada a la sucursal — el que la
+     * usa (MedibleImage) solo aporta el archivo y su descripción.
+     */
+    static uploadBanner(sucursalPublicId: string) {
+        return async (file: File, description?: string): Promise<{ data: BannerFile; message: string }> => {
+            const form = new FormData();
+            form.append('cover', file);
+            if (description) form.append('description', description);
+            const res = await apiService.post(`/sucursals/${sucursalPublicId}/banner`, form);
+            const data = res.data.data;
+            return {
+                data: { publicId: data.publicId, url: data.url, fileName: data.fileName, description: data.description ?? null },
+                message: res.data.message,
+            };
         };
     }
 
-    static async removeBanner(sucursalPublicId: string): Promise<{ message: string }> {
-        const res = await apiService.delete(`/sucursals/${sucursalPublicId}/banner`);
-        return { message: res.data.message };
+    /** Quita la portada. La operación queda bindeada a la sucursal. */
+    static removeBanner(sucursalPublicId: string) {
+        return async (): Promise<{ message: string }> => {
+            const res = await apiService.delete(`/sucursals/${sucursalPublicId}/banner`);
+            return { message: res.data.message };
+        };
     }
 }
 

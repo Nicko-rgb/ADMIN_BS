@@ -1,0 +1,86 @@
+/**
+ * Interruptor de estado de 3 posiciones (ACTIVO · MANTENIMIENTO · INACTIVO).
+ *
+ * El control deslizante es un pill neutro que se desplaza sobre la pista; al
+ *_parar_ toma el fondo suave (soft) del estado y la etiqueta el color de texto
+ * (text) del mismo — el par semántico del sistema, nunca un relleno saturado.
+ */
+.status_switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    padding: 5px;
+    background: var(--gray-light);
+    border-radius: 15px;
+
+    /* Control deslizante — la posición la fija el índice del estado. */
+    .status_switch_thumb {
+        position: absolute;
+        top: 5px;
+        bottom: 5px;
+        left: 5px;
+        width: calc((100% - 1rem) / 3);
+        border-radius: 12px;
+        pointer-events: none;
+        transition:
+            transform .28s cubic-bezier(.2, .8, .2, 1),
+            background-color .25s ease;
+
+        &.is_active {
+            background: var(--success-soft);
+        }
+
+        &.is_maintenance {
+            background: var(--warning-soft);
+        }
+
+        &.is_inactive {
+            background: var(--danger-soft);
+        }
+    }
+
+    .status_switch_option {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .4rem;
+        padding: 3px 5px;
+        border-radius: 12px;
+        width: 100%;
+        border: none;
+        background: transparent;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-soft);
+        margin: auto;
+
+        &:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        &:hover:not(.is_active) {
+            background-color: var(--gray-medium);
+        }
+
+        /* La etiqueta activa toma el color de texto de su par semántico. */
+        &.is_selected {
+            color: var(--text);
+        }
+
+        &.is_selected.is_active {
+            color: var(--success-text);
+        }
+
+        &.is_selected.is_maintenance {
+            color: var(--warning-text);
+        }
+
+        &.is_selected.is_inactive {
+            color: var(--danger-text);
+        }
+    }
+}

@@ -7,6 +7,16 @@
     justify-content: center;
     z-index: 1100;
     padding: 1.5rem;
+    animation: fade-in .2s ease-out both;
+
+    &.is_closing {
+        pointer-events: none;
+        animation: fade-out .2s ease-in both;
+
+        .dialog_container {
+            animation: slide-out-y .2s ease-in both;
+        }
+    }
 
     .dialog_container {
         background: var(--surface);
@@ -14,43 +24,50 @@
         border-radius: 12px;
         box-shadow: var(--shadow-lg);
         width: 100%;
-        max-width: 420px;
+        max-width: 440px;
+        padding: 1.6rem;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        gap: 1.2rem;
+        animation: slide-in-y .25s cubic-bezier(.2, .8, .2, 1) both;
 
+        /* El diálogo cae desde arriba. */
+        --anim-y-from: -20px;
+        --anim-y-to: -12px;
+
+        /* Color de la variante — lo define la clase del contenedor. */
         --dialog-color: var(--primary);
 
         &.dialog_primary { --dialog-color: var(--primary); }
-        &.dialog_warning { --dialog-color: var(--warning-text); }
-        &.dialog_alert { --dialog-color: var(--danger-text); }
+        &.dialog_danger { --dialog-color: var(--danger); }
+        &.dialog_info { --dialog-color: var(--info); }
 
         .dialog_header {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 1rem;
-            padding: 1.2rem 1.5rem;
-            border-bottom: 1px solid var(--border);
 
             .dialog_title {
                 display: flex;
                 align-items: center;
                 gap: .8rem;
+                margin: 0;
                 font-size: 1.6rem;
                 font-weight: 700;
                 color: var(--text);
 
+                /* Círculo sólido con el color de la variante — ícono en blanco. */
                 .dialog_icon {
                     flex-shrink: 0;
-                    width: 32px;
-                    height: 32px;
+                    width: 28px;
+                    height: 28px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     border-radius: 50%;
-                    background: color-mix(in srgb, var(--dialog-color) 15%, transparent);
-                    color: var(--dialog-color);
+                    background: var(--dialog-color);
+                    color: var(--text-white);
                 }
             }
 
@@ -76,9 +93,8 @@
         }
 
         .dialog_body {
-            padding: 1.5rem;
-
             .dialog_description {
+                margin: 0;
                 font-size: 1.4rem;
                 color: var(--text-soft);
                 line-height: 1.5;
@@ -89,8 +105,6 @@
             display: flex;
             justify-content: flex-end;
             gap: .8rem;
-            padding: 1.2rem 1.5rem;
-            border-top: 1px solid var(--border);
         }
     }
 }

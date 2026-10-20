@@ -205,7 +205,7 @@ const PermissionsPage = () => {
                 onClose={closeDelete}
                 title="Eliminar permiso"
                 description={`¿Seguro que deseas eliminar "${deletingItem?.label}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeleting ? 'Eliminando...' : 'Eliminar', onClick: confirmDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeDelete }}
             />
@@ -239,7 +239,7 @@ const PermissionsPage = () => {
                 onClose={closeRoleDelete}
                 title="Eliminar rol"
                 description={`¿Seguro que deseas eliminar el rol "${deletingRole?.label}"? Esta acción no se puede deshacer.`}
-                variant="alert"
+                variant="danger"
                 primaryAction={{ label: isDeletingRole ? 'Eliminando...' : 'Eliminar', onClick: confirmRoleDelete }}
                 secondaryAction={{ label: 'Cancelar', onClick: closeRoleDelete }}
             />
