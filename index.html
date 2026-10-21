@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/icon-32.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,22 +10,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
 
     <title>Login - Admin BS</title>
     <script>
-      // Aplica el tema ANTES del primer pintado — si no, la app arranca en claro
-      // y después salta a oscuro cuando React monta (flash). El formato de
-      // localStorage y la clave son los del hook useAppLayout (controlador único).
-      try {
-        if (localStorage.getItem('admin-theme') === 'true') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
-      } catch (e) { /* localStorage bloqueado — se queda en claro */ }
+        // Aplica el tema ANTES del primer pintado — si no, la app arranca en claro
+        // y después salta a oscuro cuando React monta (flash). El formato de
+        // localStorage y la clave son los del hook useAppLayout (controlador único).
+        try {
+            if (localStorage.getItem('admin-theme') === 'true') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        } catch (e) { /* localStorage bloqueado — se queda en claro */ }
     </script>
-  </head>
-  <body>
+</head>
+
+<body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+</body>
+
 </html>
