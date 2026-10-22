@@ -127,6 +127,7 @@ export const useSpace = () => {
     const handleToggleStatus = async (status: EntityStatus) => {
         if (!spacePublicId) return;
         setIsTogglingStatus(true);
+        toast.loading('Actualizando...')
         try {
             const { data, message } = await SpaceService.toggleStatus(spacePublicId)(status);
             toast.success(message);

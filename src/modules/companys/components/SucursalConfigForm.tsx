@@ -1,20 +1,17 @@
 import { useState } from 'react';
-import type { ComponentType, FormEvent } from 'react';
-import { Settings, Share2, Clock, CircleCheck, CircleX, Wrench, UploadCloud, X } from 'lucide-react';
+import type { FormEvent } from 'react';
+import { Settings, Share2, Clock, UploadCloud, X } from 'lucide-react';
 import { Modal } from '../../../shared/components/Modal';
 import { Button } from '../../../shared/components/Button';
 import { Tabs } from '../../../shared/components/Tabs';
 import { InputField, TextAreaField, FormSection, FormRow, FormActions } from '../../../shared/components';
 import useSucursalConfig from '../hooks/useSucursalConfig';
-import type { SucursalStatus } from '../interfaces/sucursal.interface';
 import type { SucursalConfigFormValues } from '../interfaces/sucursalConfig.interface';
 
 interface SucursalConfigFormProps {
     onClose: () => void;
     // public_id de la sucursal a configurar — el endpoint resuelve el resto.
     sucursalPublicId: string;
-    // Estado actual de la sucursal — valor inicial del segmentado sin config.
-    currentStatus: SucursalStatus | null;
     // Se llama tras guardar — la página recarga para reflejar los cambios.
     onSaved?: () => void;
 }
@@ -29,18 +26,15 @@ const OPERATIVO_FIELDS: (keyof SucursalConfigFormValues)[] = ['opening_time', 'c
  * edición si ya existe (misma llamada PUT upsert). Horarios obligatorios, resto
  * opcional; `features` como texto separado por comas, igual que se guarda en DB.
  * Se monta únicamente mientras está abierto (ver Sucursal.tsx).
+ *
+ * El estado de la sucursal NO se edita acá: se cambia con el StatusSwitch de la
+ * página (PATCH /sucursals/:publicId/status).
  */
-const STATUS_OPTIONS: { value: SucursalStatus; label: string; icon: ComponentType<{ size?: number }> }[] = [
-    { value: 'ACTIVE', label: 'Activa', icon: CircleCheck },
-    { value: 'INACTIVE', label: 'Inactiva', icon: CircleX },
-    { value: 'MAINTENANCE', label: 'Mantenimiento', icon: Wrench },
-];
-
-export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, onSaved }: SucursalConfigFormProps) => {
+export const SucursalConfigForm = ({ onClose, sucursalPublicId, onSaved }: SucursalConfigFormProps) => {
     const {
         form, setField, errors, allErrors,
         isLoadingDetail, isSubmitting, isEditMode, handleSubmit,
-    } = useSucursalConfig({ sucursalPublicId, currentStatus, onClose, onSaved });
+    } = useSucursalConfig({ sucursalPublicId, onClose, onSaved });
 
     const [activeTab, setActiveTab] = useState<ConfigTab>('operativo');
 
@@ -66,28 +60,10 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, currentStatus, o
 
                     {activeTab === 'operativo' && (
                         <div className="anim_content_in">
-                            <FormSection title="Horarios y Estado" icon={Clock}>
+                            <FormSection title="Horarios" icon={Clock}>
                                 <FormRow>
                                     <InputField name="opening_time" label="Apertura" type="time" value={form.opening_time} onChange={(e) => setField('opening_time')(e.target.value)} required error={errors.opening_time} />
                                     <InputField name="closing_time" label="Cierre" type="time" value={form.closing_time} onChange={(e) => setField('closing_time')(e.target.value)} required error={errors.closing_time} />
-                                    <div className="status_segmented" role="radiogroup" aria-label="Estado de la sucursal">
-                                        <label>Estado</label>
-                                        <div>
-                                            {STATUS_OPTIONS.map(({ value, label, icon: Icon }) => (
-                                                <button
-                                                    key={value}
-                                                    type="button"
-                                                    role="radio"
-                                                    aria-checked={form.status === value}
-                                                    className={`option ${value.toLowerCase()}${form.status === value ? ' selected' : ''}`}
-                                                    onClick={() => setField('status')(value)}
-                                                >
-                                                    <Icon size={18} />
-                                                    {label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
                                 </FormRow>
                             </FormSection>
 

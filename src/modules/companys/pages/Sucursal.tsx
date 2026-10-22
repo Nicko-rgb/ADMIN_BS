@@ -41,7 +41,7 @@ const InfoChip = ({ icon: Icon, image, value, title, className, href, trailingIc
 // Detalle de una sucursal — portada hero + tarjeta consolidada de datos en chips + recursos deportivos.
 const Sucursal = () => {
     const navigate = useNavigate();
-    const { publicId, sucursal, config, banner, spaces, isLoading, errorStatus, errorMessage, retry, reloadBanner, reloadSpaces } = useSucursal();
+    const { publicId, sucursal, config, banner, spaces, isLoading, errorStatus, errorMessage, retry, reloadBanner, reloadSpaces, handleToggleStatus, isTogglingStatus } = useSucursal();
     const { planUsage, reloadPlanUsage } = usePlanUsage(sucursal?.companyPublicId ?? undefined);
     const can = usePermission();
     const canEditBanner = can('sucursal.edit');
@@ -148,7 +148,11 @@ const Sucursal = () => {
                             <h1 className="cover_text">
                                 {sucursal.name}
                             </h1>
-                            <StatusSwitch value={sucursal.status} onChange={(e) => { }} />
+                            <StatusSwitch
+                                value={sucursal.status}
+                                onChange={handleToggleStatus}
+                                disabled={isTogglingStatus}
+                            />
                         </div>
                     </div>
                     <div className="cover_actions">
@@ -306,7 +310,6 @@ const Sucursal = () => {
                 <SucursalConfigForm
                     onClose={() => setIsConfigOpen(false)}
                     sucursalPublicId={publicId}
-                    currentStatus={sucursal.status}
                     onSaved={retry}
                 />
             )}

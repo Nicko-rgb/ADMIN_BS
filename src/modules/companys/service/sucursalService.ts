@@ -1,5 +1,5 @@
 import { apiService } from '../../../shared/utils/apiService';
-import type { SucursalDetail, SucursalPayload } from '../interfaces/sucursal.interface';
+import type { SucursalDetail, SucursalPayload, EntityStatus } from '../interfaces/sucursal.interface';
 
 export interface BannerFile {
     publicId: string;
@@ -23,6 +23,14 @@ class SucursalService {
     static async update(publicId: string, payload: SucursalPayload): Promise<{ data: SucursalDetail; message: string }> {
         const res = await apiService.put(`/sucursals/${publicId}`, payload);
         return { data: res.data.data, message: res.data.message };
+    }
+
+    // Cambia el estado de la sucursal (ACTIVE | MAINTENANCE | INACTIVE)
+    static toggleStatus(sucursalPublicId: string) {
+        return async (status: EntityStatus): Promise<{ data: SucursalDetail; message: string }> => {
+            const res = await apiService.patch(`/sucursals/${sucursalPublicId}/status`, { status });
+            return { data: res.data.data, message: res.data.message };
+        };
     }
 
     // Banner/portada — GET trae la actual o null, POST la reemplaza, DELETE la quita.

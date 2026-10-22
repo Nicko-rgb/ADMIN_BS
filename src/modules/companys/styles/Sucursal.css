@@ -431,62 +431,6 @@
         }
     }
 
-    /* ── Segmentado de estado (modal Configurar, tab Operativo) ─────────────── */
-    .form_row {
-        align-items: end;
-    }
-
-    .status_segmented {
-        display: flex;
-        flex-direction: column;
-
-        label {
-            font-weight: 500;
-            font-size: 1.4rem;
-            color: var(--text-muted);
-        }
-
-        div {
-            display: flex;
-            gap: 1rem;
-
-            .option {
-                min-width: 120px;
-                padding: 0.9rem 0.5rem;
-                border-radius: 0.8rem;
-                border: 1px solid var(--border);
-                background: transparent;
-                font-size: 1.3rem;
-                font-weight: 500;
-                opacity: 0.55;
-
-                &:hover {
-                    opacity: 0.85;
-                }
-
-                &.selected {
-                    opacity: 1;
-                    border-color: currentColor;
-
-                    &.active {
-                        background: var(--primary-light);
-                        color: var(--primary);
-                    }
-
-                    &.inactive {
-                        background: var(--danger-soft);
-                        color: var(--danger-text);
-                    }
-
-                    &.maintenance {
-                        background: var(--warning-soft);
-                        color: var(--warning-text);
-                    }
-                }
-            }
-        }
-    }
-
     /* ── Seccion de Espacios Deportivos ─────────────────────────────────────────────────────────── */
     .list_spaces {
         margin: 0 auto;

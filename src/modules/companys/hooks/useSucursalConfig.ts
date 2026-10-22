@@ -5,7 +5,6 @@ import { hasErrors, isValidUrl, type FormErrors } from '../../../shared/utils/fo
 import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
 import SucursalConfigService from '../service/sucursalConfigService';
-import type { SucursalStatus } from '../interfaces/sucursal.interface';
 import type { SucursalConfigFormValues, SucursalConfigPayload } from '../interfaces/sucursalConfig.interface';
 
 export const EMPTY_SUCURSAL_CONFIG_FORM: SucursalConfigFormValues = {
@@ -19,7 +18,6 @@ export const EMPTY_SUCURSAL_CONFIG_FORM: SucursalConfigFormValues = {
     closing_time: '',
     min_price: '',
     features: '',
-    status: 'ACTIVE',
 };
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/;
@@ -81,9 +79,6 @@ const validateConfigForm = (form: SucursalConfigFormValues): FormErrors<Sucursal
 
 interface UseSucursalConfigArgs {
     sucursalPublicId: string;
-    // Estado actual de la sucursal (lo tiene la página) — valor inicial del segmentado
-    // cuando todavía no hay config; si el DTO trae status, ese manda.
-    currentStatus: SucursalStatus | null;
     onClose: () => void;
     // Se llama tras guardar con éxito — la página recarga sucursal+config para reflejar cambios.
     onSaved?: () => void;
@@ -95,8 +90,8 @@ interface UseSucursalConfigArgs {
  * Al guardar hace PUT upsert y cierra; la página no necesita recargarse porque
  * no muestra la config.
  */
-export const useSucursalConfig = ({ sucursalPublicId, currentStatus, onClose, onSaved }: UseSucursalConfigArgs) => {
-    const [form, setForm] = useState<SucursalConfigFormValues>({ ...EMPTY_SUCURSAL_CONFIG_FORM, status: currentStatus ?? 'ACTIVE' });
+export const useSucursalConfig = ({ sucursalPublicId, onClose, onSaved }: UseSucursalConfigArgs) => {
+    const [form, setForm] = useState<SucursalConfigFormValues>({ ...EMPTY_SUCURSAL_CONFIG_FORM });
     const [isLoadingDetail, setIsLoadingDetail] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [hasConfig, setHasConfig] = useState(false);
@@ -121,7 +116,6 @@ export const useSucursalConfig = ({ sucursalPublicId, currentStatus, onClose, on
                     closing_time: detail.closingTime ?? '',
                     min_price: detail.minPrice ?? '',
                     features: detail.features ?? '',
-                    status: detail.status ?? currentStatus ?? 'ACTIVE',
                 });
             })
             .catch((err) => {
@@ -166,7 +160,6 @@ export const useSucursalConfig = ({ sucursalPublicId, currentStatus, onClose, on
                 closing_time: trimmed.closing_time,
                 min_price: trimmed.min_price ? Number(trimmed.min_price) : null,
                 features: trimmed.features || null,
-                status: trimmed.status,
             };
 
             const result = await SucursalConfigService.save(sucursalPublicId, payload);
