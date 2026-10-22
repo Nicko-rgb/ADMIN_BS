@@ -7,15 +7,7 @@ button {
     outline: none;
     cursor: pointer;
     font-weight: 500;
-    /* Transiciones acotadas a las propiedades que realmente cambian. Con `all` + `linear`,
-       el salto del secondary (#e8e8e8 → #141414) se interpola por el gris medio —donde el
-       ojo es más sensible— y se lee como un flash; `ease` lo suaviza sin perder el cambio. */
-    transition:
-        background-color .25s ease,
-        border-color .25s ease,
-        color .25s ease,
-        opacity .2s ease,
-        transform .15s ease;
+    transition: var(--transition);
 }
 
 .btn_app {

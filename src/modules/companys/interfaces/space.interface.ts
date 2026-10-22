@@ -1,6 +1,8 @@
 // Formulario de alta/edición de espacio deportivo — espeja space.schema.ts del backend
 // (mismos nombres snake_case que espera el endpoint).
+import type { LucideIcon } from 'lucide-react';
 import type { EntityStatus } from './sucursal.interface';
+import type { ReactNode } from 'react';
 
 export interface SpaceFormValues {
     name: string;
@@ -78,3 +80,15 @@ export interface SpaceBusinessHour {
 }
 
 export type SpaceTab = 'gallery' | 'schedule';
+
+export interface InfoChipProps {
+    icon?: LucideIcon,
+    value?: string | number | null,
+    className?: string,
+}
+
+export interface GroupChipsProps {
+    title: string,
+    icon: LucideIcon,
+    children: ReactNode
+}

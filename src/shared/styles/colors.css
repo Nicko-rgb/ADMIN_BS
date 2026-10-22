@@ -68,6 +68,8 @@
   /* ── Tipografía ─────────────────────────────────────────────────────────── */
   --font-primary:   'Poppins', sans-serif;
   --font-secondary:  'Outfit', sans-serif;
+
+  --transition: linear all .2s;
 }
 
 /* ── Modo oscuro ─────────────────────────────────────────────────────────────
@@ -75,7 +77,7 @@
   * debajo de la card, para que la interfaz no emita más luz de la necesaria.
   * ────────────────────────────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --primary-dark:  #1b7353;
+  --primary-dark:  #1b7f5c;
 
   --color-bg:   #0e0e0e;
   --surface:    #1a1a1a;

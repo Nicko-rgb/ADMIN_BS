@@ -133,8 +133,8 @@ const Sucursal = () => {
                 <div className="cover">
                     <button className="btn_back" onClick={() => navigate(-1)}><ArrowLeft /></button>
                     <div className='config_top'>
-                        {canEditBanner && <button className="btn_bg_sucursal" title="Cambiar portada" onClick={() => setIsBannerOpen(true)}><Image size={16} /></button>}
-                        {can('sucursal.config') && (<Button text="Configurar" size="xs" icon={Settings} color="secondary" onClick={() => setIsConfigOpen(true)} />)}
+                        {canEditBanner && <button className="btn_bg_sucursal bg_blur" title="Cambiar portada" onClick={() => setIsBannerOpen(true)}><Image size={16} /></button>}
+                        {can('sucursal.config') && (<button className='btn_bg_sucursal bg_blur' onClick={() => setIsConfigOpen(true)}><Settings size={16} /> </button>)}
                     </div>
                     {banner ? (
                         <img className="cover_image" src={resolveImageUrl(banner.url)} alt={`Portada de ${sucursal.name}`} />
@@ -143,7 +143,7 @@ const Sucursal = () => {
                     )}
                     <div className="cover_overlay" />
                     <div className="cover_identity">
-                        <div className="cover_avatar center"><Store size={30} /></div>
+                        <div className="cover_avatar center bg_blur"><Store size={30} /></div>
                         <div>
                             <h1 className="cover_text">
                                 {sucursal.name}

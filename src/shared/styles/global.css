@@ -93,6 +93,19 @@ html.theme-switching *::after {
     padding: 15px;
 }
 
+/* Fondo transparente con blur y sombra */
+.bg_blur {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: var(--shadow-md);
+    color: var(--text-white);
+    text-shadow: 0 0 1px black;
+    svg {
+        filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.3))
+          drop-shadow(-2px -2px 2px rgba(0, 0, 0, 0.3));
+    }
+}
 /* Badge de estado activo/inactivo — usado en tablas y listas.
    Los pares soft + text vienen resueltos por modo desde colors.css, así el color
    no depende de qué haya detrás. */

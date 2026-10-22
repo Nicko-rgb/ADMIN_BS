@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, ComponentType } from 'react';
-import { Image, ImagePlus, Trash2, UploadCloud } from 'lucide-react';
+import { Image, ImagePlus, Scan, Trash2, UploadCloud, X } from 'lucide-react';
 import { EmptyScreen, Button, TextAreaField, FormActions, Modal } from './';
 import { handleApiError } from '../utils/errorHandler';
 import { resolveImageUrl } from '../utils/formatText';
@@ -51,11 +51,6 @@ const formatBytes = (bytes: number): string => {
 /**
  * Visor + gestor de un archivo multimedia (imagen o video) — se muestra dentro
  * de un Modal.
- *
- * El componente no conoce módulos ni endpoints: el padre le pasa el archivo a
- * mostrar (`media`) y las operaciones de escritura (`save` / `remove`).
- * La presencia de una operación es la habilitación de su acción — el permiso
- * lo aplica el padre y el backend.
  */
 export const MedibleImage = ({
     isOpen,
@@ -75,8 +70,8 @@ export const MedibleImage = ({
     const [description, setDescription] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
-    // URL del objeto pendiente — se libera al reemplazarlo o al desmontar.
     const previewUrlRef = useRef<string | null>(null);
+    const [isImageFullscreen, setIsImageFullscreen] = useState(false);
 
     const canSave = Boolean(save);
     const canRemove = Boolean(remove);
@@ -132,81 +127,105 @@ export const MedibleImage = ({
 
     // El archivo en pantalla — el pendiente tiene prioridad sobre el ya guardado.
     const previewUrl = pendingPreview ?? (media ? resolveImageUrl(media.url) : null);
-
     const isVideo = pendingFile
         ? pendingFile.type.startsWith('video/')
         : Boolean(media && (media.type === 'VIDEO' || isVideoUrl(media.url)));
 
     const shownName = pendingFile?.name ?? media?.fileName ?? null;
-    // El peso solo se conoce del archivo pendiente (la BD no guarda tamaño).
     const shownSize = pendingFile ? formatBytes(pendingFile.size) : null;
-    // Sin archivo todavía se registra uno; con archivo (guardado o pendiente) se cambia.
     const pickText = media || pendingFile ? 'Cambiar' : 'Registrar';
 
+    const closeFullScreen = () => {
+        setIsImageFullscreen(false)
+        onClose()
+    }
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={title} icon={icon} size={size}>
-            <div className="medible_image">
-                {canSave && (
-                    <input
-                        ref={inputRef}
-                        type="file"
-                        accept={ACCEPTED_TYPES[accept]}
-                        className="medible_image_input"
-                        onChange={pickFile}
-                    />
-                )}
+        <>
+            <Modal isOpen={isOpen} onClose={onClose} title={title} icon={icon} size={size}>
+                <div className="medible_image">
+                    {canSave && (
+                        <input
+                            ref={inputRef}
+                            type="file"
+                            accept={ACCEPTED_TYPES[accept]}
+                            className="medible_image_input"
+                            onChange={pickFile}
+                        />
+                    )}
 
-                {previewUrl ? (
-                    isVideo ? (
-                        <video className="medible_image_image" src={previewUrl} controls preload="metadata" />
+                    {previewUrl ? (
+                        <div className="box_media">
+                            {isVideo ? (
+                                <video className="medible_image_image" src={previewUrl} controls />
+                            ) : (
+                                <>
+                                    <img className="medible_image_image" src={previewUrl} alt={shownName || 'Imagen'} />
+                                    <Scan className="icon_full_screen bg_blur" onClick={() => setIsImageFullscreen(true)} size={25} />
+                                </>
+                            )}
+                        </div>
                     ) : (
-                        <img className="medible_image_image" src={previewUrl} alt={shownName || 'Imagen'} />
-                    )
-                ) : (
-                    <EmptyScreen title={accept === 'media' ? 'Sin archivo' : 'Sin imagen'} message='Sin recurso' icon={Image} />
-                )}
+                        <EmptyScreen
+                            title={accept === 'media' ? 'Sin archivo' : 'Sin imagen'}
+                            message="Sin recurso"
+                            icon={Image}
+                        />
+                    )}
 
-                {shownName && (
-                    <div className="medible_image_meta">
-                        <span className="medible_image_filename">{shownName}</span>
-                        {shownSize && <span className="medible_image_filesize">{shownSize}</span>}
-                    </div>
-                )}
+                    {shownName && (
+                        <div className="medible_image_meta">
+                            <span className="medible_image_filename">{shownName}</span>
+                            {shownSize && <span className="medible_image_filesize">{shownSize}</span>}
+                        </div>
+                    )}
 
-                {showDescription && pendingFile && (
-                    <TextAreaField
-                        name='media_description'
-                        label='Descripción'
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder='Descripción de la imagen (opcional)'
-                        maxLength={500}
-                        rows={3}
+                    {showDescription && pendingFile && (
+                        <TextAreaField
+                            name='media_description'
+                            label='Descripción'
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder='Descripción de la imagen (opcional)'
+                            maxLength={500}
+                            rows={3}
+                        />
+                    )}
+
+                    {showDescription && !pendingFile && media?.description && (
+                        <p className="medible_image_description">{media.description}</p>
+                    )}
+
+                    {(canSave || canRemove) && (
+                        <FormActions>
+                            {canRemove && media && !pendingFile && (
+                                <Button text='Eliminar' icon={Trash2} size='md' color='danger' type='button' onClick={handleRemove} loading={isSaving} />
+                            )}
+
+                            {canSave && (
+                                <>
+                                    <Button text={pickText} icon={ImagePlus} size='md' color='secondary' type='button' onClick={() => inputRef.current?.click()} />
+                                    {pendingFile && (
+                                        <Button text='Guardar' icon={UploadCloud} size='md' type='button' onClick={handleSave} loading={isSaving} />
+                                    )}
+                                </>
+                            )}
+                        </FormActions>
+                    )}
+                </div>
+            </Modal>
+            {isImageFullscreen && previewUrl && (
+                <div className="medible_image_fullscreen">
+                    <X size={50} onClick={closeFullScreen} className="medible_image_fullscreen_close" />
+
+                    <img
+                        src={previewUrl}
+                        alt={shownName || 'Imagen ampliada'}
+                        className="medible_image_fullscreen_img"
                     />
-                )}
-
-                {showDescription && !pendingFile && media?.description && (
-                    <p className="medible_image_description">{media.description}</p>
-                )}
-
-                {(canSave || canRemove) && (
-                    <FormActions>
-                        {canRemove && media && !pendingFile && (
-                            <Button text='Eliminar' icon={Trash2} size='md' color='danger' type='button' onClick={handleRemove} loading={isSaving} />
-                        )}
-
-                        {canSave && (
-                            <>
-                                <Button text={pickText} icon={ImagePlus} size='md' color='secondary' type='button' onClick={() => inputRef.current?.click()} />
-                                {pendingFile && (
-                                    <Button text='Guardar' icon={UploadCloud} size='md' type='button' onClick={handleSave} loading={isSaving} />
-                                )}
-                            </>
-                        )}
-                    </FormActions>
-                )}
-            </div>
-        </Modal>
+                </div>
+            )}
+        </>
     );
 };
 

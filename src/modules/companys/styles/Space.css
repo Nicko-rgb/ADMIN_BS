@@ -30,19 +30,11 @@
         .btn_back {
             position: absolute;
             top: 15px;
-            left: 15px;
             z-index: 100;
             width: 40px;
             height: 33px;
             border-radius: 5px;
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--text-white);
-            backdrop-filter: blur(5px);
             border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .cover_placeholder {
@@ -54,58 +46,31 @@
                 linear-gradient(120deg, var(--primary-dark) 0%, var(--primary) 100%);
         }
 
-        .cover_image {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
         .cover_overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.15) 60%, transparent 100%);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.15) 32%, transparent 40%);
         }
 
-        .cover_content {
-            position: relative;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .cover_identity {
             color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 10;
 
-            .cover_identity {
-                display: flex;
-                align-items: center;
-                gap: 1.6rem;
-                min-width: 0;
+            .cover_avatar {
+                width: 65px;
+                height: 65px;
+                border-radius: 1rem;
+                font-size: 2.8rem;
+                font-weight: 700;
+            }
 
-                .cover_avatar {
-                    width: 6.4rem;
-                    height: 6.4rem;
-                    border-radius: 1rem;
-                    background: rgba(255, 255, 255, 0.15);
-                    border: 1px solid rgba(255, 255, 255, 0.35);
-                    color: var(--text-white);
-                    flex-shrink: 0;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 2.8rem;
-                    font-weight: 700;
-                }
-
-                .cover_text {
-                    min-width: 0;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 5px;
-                    font-size: 2.6rem;
-                    line-height: 1.2;
-                    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
-                }
+            .cover_text {
+                gap: 5px;
+                font-size: 2.6rem;
+                text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
             }
         }
 
@@ -121,11 +86,13 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
+
         .row {
             display: flex;
             flex-wrap: wrap;
             gap: 2rem;
         }
+
         .overview_group {
             display: flex;
             flex-direction: column;
@@ -161,7 +128,7 @@
                     padding: .5rem 1rem;
                     border-radius: 20px;
                     font-size: 1.35rem;
-                    font-weight: 500;
+                    font-weight: 600;
                     background: var(--color-bg);
                     border: 1px solid var(--border);
                     color: var(--text);
@@ -175,7 +142,6 @@
                         background: var(--primary-light);
                         border-color: transparent;
                         color: var(--primary);
-                        font-weight: 600;
                     }
 
                     &.muted {
@@ -240,36 +206,35 @@
             gap: 1.2rem;
 
             .media_item {
-                margin: 0;
                 position: relative;
                 border: 1px solid var(--border);
                 border-radius: 12px;
                 overflow: hidden;
                 background: var(--color-bg);
 
-                img,
-                video {
-                    width: 100%;
-                    aspect-ratio: 16 / 9;
-                    object-fit: cover;
-                    display: block;
-                }
-
                 /* Preview clickeable — abre el visor del archivo en modo lectura */
                 .media_item_preview {
-                    display: block;
                     width: 100%;
-                    padding: 0;
                     border: none;
-                    background: none;
-                    cursor: pointer;
+                    position: relative;
 
-                    img {
-                        transition: transform .25s ease;
+                    .play_icon {
+                        position: absolute;
+                        border-radius: 50%;
+                        padding: 1rem;
+                        z-index: 10;
                     }
 
-                    &:hover img {
-                        transform: scale(1.03);
+                    img,
+                    video {
+                        width: 100%;
+                        aspect-ratio: 16 / 9;
+                        object-fit: cover;
+                        transition: var(--transition);
+
+                        &:hover {
+                            transform: scale(1.03);
+                        }
                     }
                 }
 
@@ -281,16 +246,11 @@
                     width: 32px;
                     height: 32px;
                     border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     background: rgba(0, 0, 0, .6);
                     color: var(--text-white);
-                    border: none;
-                    cursor: pointer;
                     backdrop-filter: blur(4px);
+                    border: none;
                     opacity: 0;
-                    transition: opacity .2s ease, background .2s ease;
 
                     &:hover {
                         background: var(--danger);
