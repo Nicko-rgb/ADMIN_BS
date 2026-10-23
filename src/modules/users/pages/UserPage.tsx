@@ -113,7 +113,7 @@ const UserCatalog = () => {
                 pagination={pagination}
                 onPageChange={setPage}
             />
-            <Modal isOpen={editing !== null} onClose={closeEdit} title="Editar usuario" icon={UserCog} size="lg">
+            <Modal isOpen={editing !== null} onClose={closeEdit} title="Editar usuario" icon={UserCog} size="md">
                 {isLoadingDetail || !editing || !editValues ? (
                     <LoadingScreen message="Cargando datos del usuario..." size="sm" />
                 ) : (

@@ -80,15 +80,15 @@ const Sucursal = () => {
     useEffect(() => () => { if (closeTimer.current) window.clearTimeout(closeTimer.current); }, []);
 
     if (isLoading) {
-        return <LoadingScreen message="Cargando sucursal..." size="lg" />;
+        return <LoadingScreen message="Cargando sucursal..." size="md" />;
     }
 
     if (errorStatus === 'not_found') {
-        return <NotFoundScreen message={errorMessage || 'La sucursal que buscás no existe.'} />;
+        return <NotFoundScreen message={errorMessage || 'No se pudo encontrar información de esta sucursal' } />;
     }
 
     if (errorStatus === 'forbidden') {
-        return <ForbiddenScreen message={errorMessage || 'No tenés acceso a esta sucursal.'} />;
+        return <ForbiddenScreen message={errorMessage} />;
     }
 
     if (errorStatus === 'unknown') {

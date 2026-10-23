@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Inbox, SearchX, ShieldAlert } from 'lucide-react';
 import { Button } from './Button';
 import '../styles/ScreenMessage.css';
-
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import LoadingJSON from '../../assets/animations/loading2.json'
 type ScreenMessageSize = 'sm' | 'md' | 'lg';
 
 interface LoadingScreenProps {
@@ -20,7 +21,12 @@ interface LoadingScreenProps {
  */
 export const LoadingScreen = ({ message = 'Cargando...', size = 'md' }: LoadingScreenProps) => (
     <div className={`screen_message screen_message_${size}`}>
-        <span className="screen_message_spinner" />
+        <DotLottieReact
+            data={LoadingJSON}
+            autoplay
+            loop
+            className='lottie_file'
+        />
         {message && <p>{message}</p>}
     </div>
 );

@@ -5,7 +5,10 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    box-sizing: border-box;
+    position: relative;
+    .lottie_file {
+        width: 300px;
+    }
 
     h2 {
         color: var(--text);
@@ -51,7 +54,6 @@
     .screen_message_spinner { width: 1.8rem; height: 1.8rem; border-width: 2px; }
     .screen_message_icon { width: 28px; height: 28px; }
     h2 { font-size: 1.5rem; }
-    p { font-size: 1.3rem; }
 }
 
 .screen_message_md {
@@ -61,7 +63,6 @@
     .screen_message_spinner { width: 2.6rem; height: 2.6rem; border-width: 3px; }
     .screen_message_icon { width: 42px; height: 42px; }
     h2 { font-size: 1.8rem; }
-    p { font-size: 1.5rem; }
 }
 
 .screen_message_lg {
@@ -71,7 +72,6 @@
     .screen_message_spinner { width: 3.4rem; height: 3.4rem; border-width: 4px; }
     .screen_message_icon { width: 56px; height: 56px; }
     h2 { font-size: 2.2rem; }
-    p { font-size: 1.7rem; }
 }
 
 @keyframes screen_message_spin {
