@@ -80,23 +80,23 @@ const Sucursal = () => {
     useEffect(() => () => { if (closeTimer.current) window.clearTimeout(closeTimer.current); }, []);
 
     if (isLoading) {
-        return <LoadingScreen message="Cargando sucursal..." size="md" />;
+        return <LoadingScreen message="Cargando sucursal..."/>;
     }
 
     if (errorStatus === 'not_found') {
-        return <NotFoundScreen message={errorMessage || 'No se pudo encontrar información de esta sucursal' } />;
+        return <NotFoundScreen onRetry={retry} message={errorMessage || 'No se pudo encontrar información de esta sucursal' } />;
     }
 
     if (errorStatus === 'forbidden') {
-        return <ForbiddenScreen message={errorMessage} />;
+        return <ForbiddenScreen  message={errorMessage} />;
     }
 
     if (errorStatus === 'unknown') {
-        return <NotFoundScreen title="Ocurrió un error" message={errorMessage} onRetry={retry} />;
+        return <NotFoundScreen message={errorMessage} onRetry={retry} />;
     }
 
     if (!sucursal) {
-        return <NotFoundScreen message="No se pudo encontrar información de esta sucursal" />;
+        return <NotFoundScreen onRetry={retry} message="No se pudo encontrar información de esta sucursal" />;
     }
 
     const goBack = () => navigate(`/companys/company/${sucursal.companyPublicId}`);
@@ -293,7 +293,7 @@ const Sucursal = () => {
                         ))}
                     </div>
                 ) : (
-                    <EmptyScreen icon={Dumbbell} message="Todavía no tiene espacios" title="" size='sm' />
+                    <EmptyScreen icon={Dumbbell} message="Todavía no tiene espacios" size='sm' />
                 )}
             </section>
 

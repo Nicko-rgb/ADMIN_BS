@@ -1,0 +1,249 @@
+/* ── Modal de horarios y precios ─────────────────────────────────────────
+   Tabla de dos paneles: los 7 días a la izquierda (navegación) y el día
+   elegido a la derecha (bloques de horario + toggles). El modal ya trae su
+   propio padding/ancho desde Modal.css; acá solo se arma la grilla interna. */
+.business_hour {
+    display: flex;
+    gap: 1.5rem;
+
+    /* ── Días (izquierda) ─────────────────────────────────────────────── */
+    .bh_days {
+        display: flex;
+        flex-direction: column;
+        gap: .3rem;
+        padding: .6rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--color-bg);
+        min-width: 200px;
+
+        .bh_day {
+            display: flex;
+            flex-direction: column;
+            gap: .15rem;
+            width: 100%;
+            padding: .8rem 1rem;
+            text-align: left;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            background: transparent;
+            transition: var(--transition);
+
+            &:hover {
+                background: var(--gray-light);
+            }
+
+            &:focus-visible {
+                outline: none;
+                box-shadow: 0 0 0 3px var(--ring);
+            }
+
+            &.is_active {
+                background: var(--surface);
+                border-color: var(--primary);
+                box-shadow: var(--shadow);
+            }
+
+            .bh_day_name {
+                font-size: 1.4rem;
+                font-weight: 600;
+                color: var(--text);
+            }
+
+            &.is_active .bh_day_name {
+                color: var(--primary);
+            }
+
+            .bh_day_summary {
+                font-size: 1.15rem;
+                color: var(--text-muted);
+            }
+
+            /* Un día con todos sus bloques cerrados se marca en rojo, igual que
+               el estado "Cerrado" del toggle. */
+            &.is_closed .bh_day_summary {
+                color: var(--danger-text);
+            }
+        }
+    }
+
+    /* ── Día elegido (derecha) ────────────────────────────────────────── */
+    .bh_panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1.4rem;
+        min-width: 0;
+        padding: 1.2rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        width: 100%;
+
+        .bh_panel_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-bottom: .8rem;
+            border-bottom: 1px solid var(--border);
+
+            .bh_panel_title {
+                min-width: 0;
+
+                h3 {
+                    font-size: 1.7rem;
+                    font-weight: 700;
+                    color: var(--text);
+                }
+
+                p {
+                    font-size: 1.2rem;
+                    color: var(--text-muted);
+                }
+            }
+
+            /* El switch del día no debe estirarse como un campo de formulario. */
+            & > .input_group {
+                width: auto;
+                flex-shrink: 0;
+            }
+        }
+
+        .bh_blocks {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: .6rem;
+
+            .bh_blocks_head {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 1.4rem minmax(0, 1fr) 8.5rem 11rem 3.2rem;
+                gap: .8rem;
+                padding: 0 .6rem;
+                font-size: 1.05rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: .5px;
+                color: var(--text-muted);
+            }
+
+            .bh_block {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 1.4rem minmax(0, 1fr) 8.5rem 11rem 3.2rem;
+                align-items: center;
+                gap: .8rem;
+                /* Espacio abajo para el mensaje de error absoluto del InputField. */
+                padding: .6rem .6rem 1.2rem;
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                background: var(--color-bg);
+
+                /* Un bloque cerrado se ve atenuado, pero sigue editable. */
+                &.is_closed {
+                    & > .input_group {
+                        opacity: .75;
+                    }
+                }
+
+                & > .input_group {
+                    min-width: 0;
+                }
+
+                /* Horas escritas a mano: 'HH:mm' tiene que entrar cómodo en la
+                   columna, y la hora se lee mejor centrada. */
+                .form_input {
+                    font-size: 1.35rem;
+                }
+
+                .bh_time {
+                    text-align: center;
+                    letter-spacing: .5px;
+                    font-variant-numeric: tabular-nums;
+                }
+
+                .bh_dash {
+                    text-align: center;
+                    color: var(--text-muted);
+                    font-weight: 600;
+                }
+
+                /* El texto del switch del bloque va más chico: la columna es
+                   angosta y "Cerrado"/"Abierto" ya dicen todo. */
+                .toggle_text {
+                    font-size: 1.2rem;
+                }
+
+                .bh_block_remove {
+                    display: grid;
+                    place-items: center;
+                    width: 3.2rem;
+                    height: 3.2rem;
+                    border: 1px solid var(--border-strong);
+                    border-radius: 6px;
+                    background: var(--surface);
+                    color: var(--danger-text);
+                    transition: var(--transition);
+
+                    &:hover {
+                        background: var(--danger-soft);
+                        border-color: transparent;
+                    }
+                }
+            }
+
+            .bh_emptyy {
+                flex-direction: column;
+                gap: .5rem;
+                border: 1px dashed var(--border-strong);
+                border-radius: 6px;
+                flex: 1;
+            }
+
+            .bh_hint {
+                font-size: 1.15rem;
+                color: var(--text-muted);
+
+                strong {
+                    color: var(--text-soft);
+                    font-weight: 600;
+                }
+            }
+        }
+
+        .form_actions {
+            margin-top: 0;
+        }
+    }
+
+    @media (max-width: 720px) {
+        grid-template-columns: minmax(0, 1fr);
+
+        /* En pantallas angostas los días pasan a una fila scrolleable en vez de
+           apilarse en vertical y empujar el editor fuera de vista. */
+        .bh_days {
+            flex-direction: row;
+            overflow-x: auto;
+
+            .bh_day {
+                flex: 0 0 auto;
+            }
+        }
+
+        .bh_panel {
+            .bh_blocks {
+                .bh_blocks_head {
+                    display: none;
+                }
+
+                .bh_block {
+                    grid-template-columns: minmax(0, 1fr) 1.4rem minmax(0, 1fr);
+
+                    .bh_block_remove {
+                        grid-column: 3;
+                        justify-self: end;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -152,7 +152,6 @@ const PermissionsPage = () => {
                 <LoadingScreen message="Cargando roles..." />
             ) : roleItems.length === 0 ? (
                 <EmptyScreen
-                    title="No hay roles registrados"
                     message="Creá el primer rol para organizar permisos y alcances."
                     actionText="Nuevo rol"
                     onAction={openRoleCreate}

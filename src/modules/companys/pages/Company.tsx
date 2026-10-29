@@ -52,7 +52,7 @@ const Company = () => {
     }
 
     if (errorStatus === 'unknown') {
-        return <NotFoundScreen title="Ocurrió un error" message={errorMessage} onRetry={retry} />;
+        return <NotFoundScreen message={errorMessage} onRetry={retry} />;
     }
 
     if (!company) {
