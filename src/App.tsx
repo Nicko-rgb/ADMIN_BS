@@ -15,11 +15,15 @@ import { bookingsRoutes } from './modules/bookings/index.routes';
 import AppLayout from './shared/components/AppLayout';
 import ProtectedRoute from './shared/components/ProtectedRoute';
 import NotFoundPage from './shared/pages/NotFoundPage';
+
+import PagePrueba from './shared/pages/Prueba';
+import { LoadingScreen } from './shared/components';
+
 // Router raíz: monta el router de cada módulo bajo su propio <Routes> anidado.
 function App() {
     return (
         <Router>
-            <Suspense fallback={<div className="route_loading">Cargando...</div>}>
+            <Suspense fallback={<div className='route_loading'><LoadingScreen message='Cargando módulo...' /></div>}>
                 <Routes>
                     <Route path="/" element={<Navigate to="/auth/login" replace />} />
 
@@ -31,6 +35,9 @@ function App() {
                     <Route path="companys" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{companyRoutes}</Route>
                     <Route path="system" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{systemRoutes}</Route>
                     <Route path="bookings" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{bookingsRoutes}</Route>
+
+                    <Route path='prueba' element={<PagePrueba />} />
+
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </Suspense>

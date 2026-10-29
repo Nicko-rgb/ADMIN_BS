@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Image, Clock, Dumbbell, Calendar, Grid, FileText, MapPin, ImagePlus, Pencil, ClockPlus, Trash2, Play, Users, Info, Box, } from 'lucide-react';
+import { ArrowLeft, Image, Clock, Dumbbell, Calendar, Grid, FileText, MapPin, ImagePlus, Pencil, Trash2, Play, Users, Info, Box, Settings, } from 'lucide-react';
 import { LoadingScreen, NotFoundScreen, ForbiddenScreen, Button, EmptyScreen, Dialog } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { resolveImageUrl } from '../../../shared/utils/formatText';
@@ -35,8 +35,8 @@ const GroupChips = ({ icon: Icon, title, children }: GroupChipsProps) => {
 
 const Space = () => {
     const navigate = useNavigate();
-    const { spacePublicId, space, media, businessHours, isLoading, errorStatus, errorMessage,
-        retry, reloadMedia, activeTab, handleTabChange, isPanelModalOpen, openPanelModal, closePanelModal,
+    const { spacePublicId, space, media, businessHours, isLoading, mLoading, hLoading, errorStatus, errorMessage,
+        retry, reloadMedia, reloadHours, activeTab, handleTabChange, isPanelModalOpen, openPanelModal, closePanelModal,
         mediaToDelete, setMediaToDelete, isDeleting, handleDeleteMedia, isTogglingStatus, handleToggleStatus,
     } = useSpace();
 
@@ -45,19 +45,19 @@ const Space = () => {
     const [mediaToView, setMediaToView] = useState<SpaceMediaFile | null>(null);
 
     if (isLoading) {
-        return <LoadingScreen message="Cargando espacio deportivo..." size="lg" />;
+        return <LoadingScreen message="Cargando espacio..." />;
     }
 
     if (errorStatus === 'not_found') {
-        return <NotFoundScreen message={errorMessage || 'El espacio deportivo que buscás no existe.'} />;
+        return <NotFoundScreen onRetry={retry} message={errorMessage || 'El espacio deportivo que buscás no existe.'} />;
     }
 
     if (errorStatus === 'forbidden') {
-        return <ForbiddenScreen message={errorMessage || 'No tenés acceso a este espacio.'} />;
+        return <ForbiddenScreen onRetry={retry} message={errorMessage || 'No tenés acceso a este espacio.'} />;
     }
 
     if (errorStatus === 'unknown') {
-        return <NotFoundScreen title="Ocurrió un error" message={errorMessage} onRetry={retry} />;
+        return <NotFoundScreen message={errorMessage} onRetry={retry} />;
     }
 
     if (!space || !spacePublicId) {
@@ -65,6 +65,15 @@ const Space = () => {
     }
 
     const goBack = () => navigate(-1);
+
+    const groupedHours = businessHours.reduce((groups, hour) => {
+        if (!groups[hour.dayOfWeek]) {
+            groups[hour.dayOfWeek] = [];
+        }
+
+        groups[hour.dayOfWeek].push(hour);
+        return groups;
+    }, {} as Record<string, typeof businessHours>);
 
     return (
         <div className="space_page">
@@ -113,7 +122,7 @@ const Space = () => {
                             <InfoChip icon={FileText} value={space.equipment} />
                         </GroupChips>
                         <GroupChips icon={Info} title='Información'>
-                                <InfoChip icon={Calendar} value={`Creado el ${formatDate(space.createdAt)}`} />
+                            <InfoChip icon={Calendar} value={`Creado el ${formatDate(space.createdAt)}`} />
                         </GroupChips>
                     </aside>
                 </section>
@@ -138,29 +147,34 @@ const Space = () => {
                                 </div>
                                 <Button text='Añadir' icon={ImagePlus} color='secondary' onClick={openPanelModal} />
                             </div>
-
-                            {media.length > 0 ? (
-                                <div className="media_grid">
-                                    {media.map((file) => (
-                                        <figure className="media_item" key={file.publicId}>
-                                            <button className="media_item_preview" onClick={() => setMediaToView(file)}>
-                                                {file.type === 'VIDEO' ? (
-                                                    <>
-                                                        <Play className='play_icon bg_blur' size={40} />
-                                                        <video src={resolveImageUrl(file.url)} onClick={() => setMediaToView(file)} />
-                                                    </>
-                                                ) : (
-                                                    <img src={resolveImageUrl(file.url)} alt={file.description || file.fileName} />
-                                                )}
-                                            </button>
-                                            <button className="media_item_delete" onClick={() => setMediaToDelete(file)} ><Trash2 size={16} /></button>
-                                            <figcaption>{file.description || file.fileName}</figcaption>
-                                        </figure>
-                                    ))}
-                                </div>
+                            {!mLoading ? (
+                                media.length > 0 ? (
+                                    <div className="media_grid">
+                                        {media.map((file) => (
+                                            <figure className="media_item" key={file.publicId}>
+                                                <button className="media_item_preview" onClick={() => setMediaToView(file)}>
+                                                    {file.type === 'VIDEO' ? (
+                                                        <>
+                                                            <Play className='play_icon bg_blur' size={40} />
+                                                            <video src={resolveImageUrl(file.url)} onClick={() => setMediaToView(file)} />
+                                                        </>
+                                                    ) : (
+                                                        <img src={resolveImageUrl(file.url)} alt={file.description || file.fileName} />
+                                                    )}
+                                                </button>
+                                                <button className="media_item_delete" onClick={() => setMediaToDelete(file)} ><Trash2 size={16} /></button>
+                                                <figcaption>{file.description || file.fileName}</figcaption>
+                                            </figure>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <EmptyScreen icon={Image} message='Agregá fotos o videos del espacio' size='sm' />
+                                )
                             ) : (
-                                <EmptyScreen icon={Image} title='Sin archivos multimedia' message='Agregá fotos o videos del espacio' size='sm' />
+                                <LoadingScreen message='Cargando galería...' size='sm' />
                             )}
+
+
                         </section>
                     )}
 
@@ -172,17 +186,42 @@ const Space = () => {
                                     <Clock size={20} />
                                     <h3>Horarios de Operación</h3>
                                 </div>
-                                <Button text='Añadir' icon={ClockPlus} color='secondary' onClick={openPanelModal} />
+                                <Button text='Configurar' icon={Settings} color='secondary' onClick={openPanelModal} />
                             </div>
+                            {!hLoading ? (
+                                businessHours.length > 0 ? (
+                                    <div className="schedule_box">
+                                        <table className="schedule_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Día</th>
+                                                    <th>Horario</th>
+                                                    <th>Precio</th>
+                                                    <th>Estado</th>
+                                                </tr>
+                                            </thead>
 
-                            {businessHours.length > 0 ? (
-                                <ul className="schedule_list">
-                                    {businessHours.map((hour) => (
-                                        <li key={hour.hourId}>{hour.dayOfWeek}: {hour.startTime} – {hour.endTime}</li>
-                                    ))}
-                                </ul>
+                                            <tbody>
+                                                {Object.entries(groupedHours).map(([day, hours]) =>
+                                                    hours.map((hour, index) => (
+                                                        <tr key={hour.hourId}>
+                                                             {index === 0 && (
+                                                                <td className="schedule_day" rowSpan={hours.length}>{day}</td>
+                                                            )}
+                                                            <td><span className="schedule_time">{hour.startTime} – {hour.endTime}</span></td>
+                                                            <td><span className="schedule_price">S/ {Number(hour.price).toFixed(2)}</span></td>
+                                                            <td><span className={`schedule_status ${hour.isClosed ? 'closed' : 'open'}`}>{hour.isClosed ? 'Cerrado' : 'Abierto'}</span></td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <EmptyScreen message='No hay ningun horario rgistrado' size='sm' />
+                                )
                             ) : (
-                                <EmptyScreen icon={Clock} title='Sin horarios configurados' message='Los horarios de operación se gestionan desde la configuración de la sucursal' size='sm' />
+                                <LoadingScreen message='Cargando horarios...' size='sm' />
                             )}
                         </section>
                     )}
@@ -239,6 +278,9 @@ const Space = () => {
             <BusinessHour
                 isOpen={isPanelModalOpen && activeTab === 'schedule'}
                 onClose={closePanelModal}
+                spacePublicId={spacePublicId}
+                businessHours={businessHours}
+                onSaved={reloadHours}
             />
         </div>
     );

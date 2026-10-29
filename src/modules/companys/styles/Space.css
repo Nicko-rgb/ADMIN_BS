@@ -192,13 +192,6 @@
             }
         }
 
-        .tab_section_empty {
-            padding: 4rem 2rem;
-            text-align: center;
-            border: 1px solid var(--border);
-            border-radius: 18px;
-        }
-
         /* ── Grilla de archivos de la galería ───────────────────────────────── */
         .media_grid {
             display: grid;
@@ -274,20 +267,98 @@
         }
 
         /* ── Listado de horarios ───────────────────────────────────────────── */
-        .schedule_list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: .6rem;
+        .schedule_box {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
 
-            li {
-                padding: .9rem 1.2rem;
-                border: 1px solid var(--border);
-                border-radius: 8px;
-                font-size: 1.4rem;
-                color: var(--text);
+            .schedule_table {
+                width: 100%;
+                border-collapse: collapse;
+                text-align: left;
+
+                th {
+                    padding: 10px;
+                    background: var(--color-bg);
+                    color: var(--primary);
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    white-space: nowrap;
+                }
+
+                td {
+                    padding: 10px;
+                    border-top: 1px solid var(--border);
+                    font-size: 1.4rem;
+                }
+
+                .schedule_day {
+                    width: 30%;
+                    color: var(--text);
+                    border-right: var(--border) solid 1px;
+                    font-weight: 600;
+                    vertical-align: middle;
+                    white-space: nowrap;
+                }
+
+                .schedule_time {
+                    color: var(--text-soft);
+                    font-variant-numeric: tabular-nums;
+                    white-space: nowrap;
+                }
+
+                .schedule_price {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 5px 9px;
+                    border-radius: 6px;
+                    background: var(--success-soft);
+                    color: var(--success-text);
+                    font-size: 13px;
+                    font-weight: 600;
+                    white-space: nowrap;
+                }
+
+                .schedule_status {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 5px 9px;
+                    border-radius: 20px;
+                    font-size: 1.2rem;
+                    font-weight: 600;
+
+                    &::before {
+                        content: '';
+                        width: 8px;
+                        height: 8px;
+                        flex-shrink: 0;
+                        border-radius: 50%;
+                    }
+
+                    &.open {
+                        color: var(--success-text);
+                        background: var(--success-soft);
+
+                        &::before {
+                            background: var(--success-text);
+                        }
+                    }
+
+                    &.closed {
+                        color: var(--text-soft);
+                        background: var(--gray-medium);
+
+                        &::before {
+                            background: #94a3b8;
+                        }
+                    }
+                }
             }
         }
+
     }
 
     @media (max-width: 640px) {

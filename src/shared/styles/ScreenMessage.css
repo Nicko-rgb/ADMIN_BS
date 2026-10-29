@@ -1,79 +1,134 @@
 .screen_message {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
     position: relative;
+    gap: 1.5rem;
+    margin: auto;
+    max-width: 350px;
+    padding: 2rem;
+    text-align: center;
+
     .lottie_file {
         width: 300px;
+        height: 150px;
+    }
+
+    .icon {
+        color: var(--text-muted);
+
+        &.danger {
+            color: var(--danger-text);
+        }
     }
 
     h2 {
-        color: var(--text);
-        margin: 0;
+        font-size: 2rem;
     }
 
     p {
         color: var(--text-soft);
-        max-width: 40ch;
+        font-weight: 500;
         font-size: 1.4rem;
+    }
+
+    /* ── Loading Screen ──────────────────────────────────────── */
+    &.loading_screen {
+        --wave-lift: 3px;
+        --wave-duration: 2s;
+
+        .lottie_file {
+            margin-top: -4rem;
+        }
+
+        p {
+            margin-top: -5rem;
+        }
+
+        /* Ola letra por letra: cada .letter sube y vuelve a su lugar. El delay
+           se inyecta inline desde el JSX según la posición de la letra. */
+        .wave_text {
+            .word {
+                display: inline-block;
+            }
+
+            .letter {
+                display: inline-block;
+                animation: loading_text_wave var(--wave-duration) ease-in-out infinite;
+                will-change: transform;
+            }
+        }
+    }
+
+    /* ── Empty Screen ──────────────────────────────────────── */
+    &.empty_screen {
+        gap: .6rem;
+    }
+
+    /* ── Tamaños global ──────────────────────────────────────── */
+    &.sm {
+        p {
+            font-size: 1.3rem;
+        }
+
+        .lottie_file {
+            width: 200px;
+            height: 100px;
+        }
+    }
+
+    &.md {
+        p {
+            font-size: 1.4rem;
+        }
+    }
+
+    &.lg {
+        p {
+            font-size: 1.5rem;
+        }
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        gap: 1rem;
+
+        &.dos_actions {
+            button {
+                width: 100%;
+            }
+        }
+
+        &.un_actions {
+            button {
+                width: 50%;
+            }
+        }
     }
 }
 
-.screen_message_spinner {
-    display: inline-block;
-    border: 3px solid var(--border);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: screen_message_spin .8s linear infinite;
+/* Ola del texto de carga: sube unos px y vuelve a su posición, con una pausa
+   al final del ciclo para que la onda se lea como "viajera". */
+@keyframes loading_text_wave {
+    0% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(calc(var(--wave-lift, 6px) * -1));
+    }
+
+    50%,
+    100% {
+        transform: translateY(0);
+    }
 }
 
-.screen_message_icon {
-    color: var(--text-muted);
-}
-
-.screen_message_icon_danger {
-    color: var(--danger-text);
-}
-
-.screen_message_actions {
-    display: flex;
-    gap: .8rem;
-}
-
-/* ── Tamaños ───────────────────────────────────────────────────────────────
-   Escalan spinner/ícono/tipografía/espaciado juntos — `sm` para un slot chico
-   (modal, card), `md` (default) para una sección de página, `lg` para página
-   completa. ────────────────────────────────────────────────────────────── */
-.screen_message_sm {
-    gap: .6rem;
-    padding: 1.6rem;
-
-    .screen_message_spinner { width: 1.8rem; height: 1.8rem; border-width: 2px; }
-    .screen_message_icon { width: 28px; height: 28px; }
-    h2 { font-size: 1.5rem; }
-}
-
-.screen_message_md {
-    gap: .8rem;
-    padding: 3.2rem;
-
-    .screen_message_spinner { width: 2.6rem; height: 2.6rem; border-width: 3px; }
-    .screen_message_icon { width: 42px; height: 42px; }
-    h2 { font-size: 1.8rem; }
-}
-
-.screen_message_lg {
-    gap: 1rem;
-    padding: 5rem;
-
-    .screen_message_spinner { width: 3.4rem; height: 3.4rem; border-width: 4px; }
-    .screen_message_icon { width: 56px; height: 56px; }
-    h2 { font-size: 2.2rem; }
-}
-
-@keyframes screen_message_spin {
-    to { transform: rotate(360deg); }
+@media (prefers-reduced-motion: reduce) {
+    .screen_message.loading_screen .wave_text .letter {
+        animation: none;
+    }
 }

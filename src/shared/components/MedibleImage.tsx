@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ChangeEvent, ComponentType } from 'react';
 import { Image, ImagePlus, Scan, Trash2, UploadCloud, X } from 'lucide-react';
 import { EmptyScreen, Button, TextAreaField, FormActions, Modal } from './';
@@ -90,6 +90,20 @@ export const MedibleImage = ({
         setDescription('');
     };
 
+    /** Descarta el archivo pendiente, su vista previa y el visor a pantalla completa. */
+    const resetPending = useCallback(() => {
+        if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = null;
+        setPendingFile(null);
+        setPendingPreview(null);
+        setDescription('');
+        setIsImageFullscreen(false);
+    }, []);
+
+    useLayoutEffect(() => {
+        if (isOpen) resetPending();
+    }, [isOpen, resetPending]);
+
     const pickFile = (e: ChangeEvent<HTMLInputElement>) => {
         setPending(e.target.files?.[0] ?? null);
         e.target.value = '';
@@ -167,7 +181,6 @@ export const MedibleImage = ({
                         </div>
                     ) : (
                         <EmptyScreen
-                            title={accept === 'media' ? 'Sin archivo' : 'Sin imagen'}
                             message="Sin recurso"
                             icon={Image}
                         />

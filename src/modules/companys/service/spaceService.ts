@@ -15,9 +15,9 @@ class SpaceService {
         return res.data.data;
     }
 
-    static async spaceById(spacePublicId: string): Promise<SpaceDetail> {
+    static async spaceById(spacePublicId: string): Promise<{data: SpaceDetail, message: string }> {
         const res = await apiService.get(`/spaces/space/${spacePublicId}/data-space`);
-        return res.data.data;
+        return {data: res.data.data, message: res.data.message};
     }
 
     static async updateSpace(spacePublicId: string, payload: Partial<SpaceFormValues>): Promise<{ data: SpaceDetail; message: string }> {

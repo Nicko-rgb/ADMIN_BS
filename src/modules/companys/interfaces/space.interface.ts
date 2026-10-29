@@ -69,16 +69,6 @@ export interface SpaceMediaFile {
     medibleType: string;
 }
 
-// Horario de operación de un espacio — espeja BusinessHour del backend.
-export interface SpaceBusinessHour {
-    hourId: number;
-    dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
-    startTime: string;
-    endTime: string;
-    price: string;
-    isClosed: boolean;
-}
-
 export type SpaceTab = 'gallery' | 'schedule';
 
 export interface InfoChipProps {
