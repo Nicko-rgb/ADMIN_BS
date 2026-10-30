@@ -3,6 +3,10 @@ import type { LoginAdminPayload, LoginAdminResponse, PasswordRequestPayload, Pas
 
 export class AuthService {
 
+    static async logout(): Promise<void> {
+        await apiService.post('/auth/logout');
+    }
+
     // Login del panel admin
     static async loginAdmin(payload: LoginAdminPayload): Promise<{ data: LoginAdminResponse; message: string }> {
         const res = await apiService.post('/auth/login', payload);

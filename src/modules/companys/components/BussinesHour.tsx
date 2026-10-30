@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { Clock, Plus, Trash2, UploadCloud, X } from 'lucide-react';
-import { Modal, Button, InputField, FormActions, ToggleField, EmptyScreen } from '../../../shared/components';
+import { Clock, Copy, Plus, Trash2, UploadCloud, X } from 'lucide-react';
+import { Modal, Button, InputField, FormActions, ToggleField, CheckboxField, EmptyScreen } from '../../../shared/components';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import toast from '../../../shared/utils/toast';
 import BusinessHourService from '../service/bussinesHourService';
@@ -230,6 +230,8 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
     const [selectedDay, setSelectedDay] = useState<HourDay>('MONDAY');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);
+    const [isCopyOpen, setIsCopyOpen] = useState(false);
+    const [copyDays, setCopyDays] = useState<HourDay[]>([]);
 
     /* La data llega por props: al abrir se copia a un borrador local, así cerrar
        sin guardar no toca nada. Solo se re-siembra al abrir (no cuando la página
@@ -241,6 +243,8 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
         setBlocks(drafts);
         setSelectedDay(drafts[0]?.day ?? 'MONDAY');
         setErrors({});
+        setIsCopyOpen(false);
+        setCopyDays([]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
 
@@ -249,15 +253,6 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
         .sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
 
     const dayClosed = dayBlocks.length > 0 && dayBlocks.every((block) => block.isClosed);
-
-    /** Resumen del día para la lista de la izquierda. */
-    const daySummary = (day: HourDay): string => {
-        const list = blocks.filter((block) => block.day === day);
-        if (list.length === 0) return 'Sin horarios';
-        if (list.every((block) => block.isClosed)) return 'Cerrado';
-        const sorted = [...list].sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
-        return `${sorted[0].startTime} – ${sorted[sorted.length - 1].endTime}`;
-    };
 
     const updateBlock = (key: string, patch: Partial<HourDraft>) => {
         setBlocks((prev) => prev.map((block) => (block.key === key ? { ...block, ...patch } : block)));
@@ -352,6 +347,25 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
         return true;
     };
 
+    const copySchedule = () => {
+        const targets = copyDays.filter((day) => day !== selectedDay);
+        if (isSaving || dayBlocks.length === 0 || targets.length === 0) return;
+
+        const source = normalizeDraftTimes(dayBlocks);
+        if (!validate(source)) return;
+
+        const copies = targets.flatMap((day) =>
+            source.map((block) => ({ ...block, key: newDraftKey(), day })));
+        setBlocks((prev) => [
+            ...prev.filter((block) => block.day !== selectedDay && !targets.includes(block.day)),
+            ...source,
+            ...copies,
+        ]);
+        setIsCopyOpen(false);
+        setCopyDays([]);
+        toast.success('Horarios copiados. Guardá los horarios para aplicar los cambios.');
+    };
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -396,10 +410,15 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
                                 type="button"
                                 className={`bh_day ${day.value === selectedDay ? 'is_active' : ''} ${isClosed ? 'is_closed' : ''}`}
                                 aria-pressed={day.value === selectedDay}
-                                onClick={() => setSelectedDay(day.value)}
+                                aria-label={`${day.label}, ${list.length} bloque${list.length === 1 ? '' : 's'}${isClosed ? ', cerrado' : ''}`}
+                                onClick={() => {
+                                    setSelectedDay(day.value);
+                                    setIsCopyOpen(false);
+                                    setCopyDays([]);
+                                }}
                             >
                                 <span className="bh_day_name">{day.label}</span>
-                                <span className="bh_day_summary">{daySummary(day.value)}</span>
+                                <span className="bh_day_summary center">{list.length}</span>
                             </button>
                         );
                     })}
@@ -408,26 +427,58 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
                 {/* ── Día elegido (derecha) ────────────────────────── */}
                 <form className="bh_panel" onSubmit={handleSubmit} noValidate>
                     <header className="bh_panel_head">
-                        <div className="bh_panel_title">
-                            <h3>{DAYS.find((day) => day.value === selectedDay)?.label}</h3>
-                            <p>
-                                {dayBlocks.length === 0
-                                    ? 'Sin bloques registrados'
-                                    : `${dayBlocks.length} bloque${dayBlocks.length === 1 ? '' : 's'}`}
-                            </p>
-                        </div>
-                        <div className='center' style={{gap: 10}}>
+                        <h3 className="bh_panel_title">{DAYS.find((day) => day.value === selectedDay)?.label}</h3>
+                        <div className="bh_panel_actions">
                             {/* Toggle del DÍA completo: abre o cierra todos sus bloques. */}
                             <ToggleField
                                 name="day_status"
-                                label={dayBlocks.length === 0 ? 'Sin bloques' : dayClosed ? 'Cerrado' : 'Abierto'}
+                                label={dayBlocks.length === 0 ? 'Sin horarios' : dayClosed ? 'Cerrado' : 'Abierto'}
                                 checked={!dayClosed}
                                 disabled={dayBlocks.length === 0}
                                 onChange={(e) => toggleDay(e.target.checked)}
                             />
                             <Button text="Agregar bloque" icon={Plus} color="secondary" size="sm" type='button' onClick={addBlock} />
+                            <Button
+                                text="Copiar"
+                                icon={Copy}
+                                color="secondary"
+                                size="sm"
+                                disabled={dayBlocks.length === 0 || isSaving}
+                                onClick={() => {
+                                    setIsCopyOpen((prev) => !prev);
+                                    setCopyDays([]);
+                                }}
+                            />
                         </div>
                     </header>
+
+                    {isCopyOpen && (
+                        <fieldset className="bh_copy" id="bh_copy_schedule">
+                            <legend>Copiar horarios de {DAYS.find((day) => day.value === selectedDay)?.label}</legend>
+                            <p>Se reemplazarán todos los bloques de los días seleccionados, incluidos precios y estados.</p>
+                            <div className="bh_copy_days">
+                                {DAYS.filter((day) => day.value !== selectedDay).map((day) => (
+                                    <CheckboxField
+                                        key={day.value}
+                                        name={`copy_${day.value}`}
+                                        label={day.label}
+                                        checked={copyDays.includes(day.value)}
+                                        disabled={isSaving}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            setCopyDays((prev) => checked
+                                                ? [...prev, day.value]
+                                                : prev.filter((value) => value !== day.value));
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                            <div className="bh_copy_actions">
+                                <Button text="Cancelar copia" color="secondary" size="sm" onClick={() => setIsCopyOpen(false)} />
+                                <Button text="Copiar y reemplazar" icon={Copy} size="sm" disabled={copyDays.length === 0 || dayBlocks.length === 0 || isSaving} onClick={copySchedule} />
+                            </div>
+                        </fieldset>
+                    )}
 
                     <div className="bh_blocks">
                         {dayBlocks.length > 0 ? (
@@ -500,13 +551,12 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
                             </div>
                         )}
                     </div>
-
-                    <FormActions>
-                        <Button text="Cancelar" icon={X} color="secondary" type="button" onClick={onClose} />
-                        <Button text="Guardar horarios" icon={UploadCloud} type="submit" loading={isSaving} />
-                    </FormActions>
                 </form>
             </div>
+            <FormActions>
+                <Button text="Cancelar" icon={X} color="secondary" type="button" onClick={onClose} />
+                <Button text="Guardar horarios" icon={UploadCloud} type="submit" loading={isSaving} />
+            </FormActions>
         </Modal>
     );
 };

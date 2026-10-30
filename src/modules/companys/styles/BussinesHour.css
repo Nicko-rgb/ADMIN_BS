@@ -19,8 +19,7 @@
 
         .bh_day {
             display: flex;
-            flex-direction: column;
-            gap: .15rem;
+            justify-content: space-between;
             width: 100%;
             padding: .8rem 1rem;
             text-align: left;
@@ -56,12 +55,17 @@
 
             .bh_day_summary {
                 font-size: 1.15rem;
-                color: var(--text-muted);
+                color: var(--text);
+                width: 20px;
+                height: 20px;
+                padding-top: 2px;
+                background: var(--accent);
+                border-radius: 50%;
             }
 
             /* Un día con todos sus bloques cerrados se marca en rojo, igual que
                el estado "Cerrado" del toggle. */
-            &.is_closed .bh_day_summary {
+            &.is_closed .bh_day_name {
                 color: var(--danger-text);
             }
         }
@@ -81,6 +85,7 @@
 
         .bh_panel_head {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
@@ -88,24 +93,53 @@
             border-bottom: 1px solid var(--border);
 
             .bh_panel_title {
-                min-width: 0;
-
-                h3 {
-                    font-size: 1.7rem;
-                    font-weight: 700;
-                    color: var(--text);
-                }
-
-                p {
-                    font-size: 1.2rem;
-                    color: var(--text-muted);
-                }
+                font-size: 1.7rem;
+                font-weight: 700;
+                color: var(--text);
             }
 
             /* El switch del día no debe estirarse como un campo de formulario. */
-            & > .input_group {
+            &>.input_group {
                 width: auto;
                 flex-shrink: 0;
+            }
+        }
+
+        .bh_panel_actions,
+        .bh_copy_actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+
+            &>.input_group {
+                width: auto;
+            }
+        }
+
+        .bh_copy {
+            min-width: 0;
+            padding: 1.2rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--color-bg);
+
+            legend {
+                font-size: 1.3rem;
+                font-weight: 600;
+                color: var(--text);
+            }
+
+            p {
+                font-size: 1.2rem;
+                color: var(--text-muted);
+            }
+
+            .bh_copy_days {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+                gap: 1rem;
+                margin: 1.2rem 0;
             }
         }
 
@@ -140,12 +174,12 @@
 
                 /* Un bloque cerrado se ve atenuado, pero sigue editable. */
                 &.is_closed {
-                    & > .input_group {
+                    &>.input_group {
                         opacity: .75;
                     }
                 }
 
-                & > .input_group {
+                &>.input_group {
                     min-width: 0;
                 }
 
@@ -216,7 +250,7 @@
     }
 
     @media (max-width: 720px) {
-        grid-template-columns: minmax(0, 1fr);
+        flex-direction: column;
 
         /* En pantallas angostas los días pasan a una fila scrolleable en vez de
            apilarse en vertical y empujar el editor fuera de vista. */
