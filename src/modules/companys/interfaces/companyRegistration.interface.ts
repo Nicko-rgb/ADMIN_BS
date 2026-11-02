@@ -27,6 +27,7 @@ export interface PlanStepForm {
 // `owner` sale de toUserPayload (rol super_admin, modo alta).
 export interface RegisterCompanyPayload {
     company: CompanyStepForm;
-    owner: CreateManagedUserPayload;
-    plan: PlanStepForm;
+    owner?: CreateManagedUserPayload;
+    plan?: PlanStepForm;
+    source_company_public_id?: string;
 }

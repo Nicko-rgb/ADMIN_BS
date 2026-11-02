@@ -1,7 +1,7 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { Clock, Copy, Plus, Trash2, UploadCloud, X } from 'lucide-react';
-import { Modal, Button, InputField, FormActions, ToggleField, CheckboxField, EmptyScreen } from '../../../shared/components';
+import { Clock, Copy, Plus, Trash2, Check, X } from 'lucide-react';
+import { Modal, Button, InputField, FormActions, ToggleField, CheckboxField } from '../../../shared/components';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import toast from '../../../shared/utils/toast';
 import BusinessHourService from '../service/bussinesHourService';
@@ -204,12 +204,14 @@ const TimeField = ({ name, value, error, ariaLabel, maxHour, onChange, onCommit 
                     placeholder="HH:mm"
                     maxLength={5}
                     aria-label={ariaLabel}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? `${name}-error` : undefined}
                     className={`form_input bh_time ${error ? 'error' : ''}`}
                     onChange={handleChange}
                     onBlur={() => onCommit(normalizeTime(value))}
                 />
             </div>
-            {error && <span className="error_message">{error}</span>}
+            {error && <span className="error_message" id={`${name}-error`}>{error}</span>}
         </div>
     );
 };
@@ -226,12 +228,15 @@ const TimeField = ({ name, value, error, ariaLabel, maxHour, onChange, onCommit 
  * el mismo guardado.
  */
 export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, onSaved }: BussinesHourProps) => {
+    const formId = useId();
     const [blocks, setBlocks] = useState<HourDraft[]>([]);
     const [selectedDay, setSelectedDay] = useState<HourDay>('MONDAY');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);
     const [isCopyOpen, setIsCopyOpen] = useState(false);
     const [copyDays, setCopyDays] = useState<HourDay[]>([]);
+    const copyOriginals = useRef(new Map<HourDay, HourDraft[]>());
+    const copyAnchorRef = useRef<HTMLDivElement>(null);
 
     /* La data llega por props: al abrir se copia a un borrador local, así cerrar
        sin guardar no toca nada. Solo se re-siembra al abrir (no cuando la página
@@ -245,6 +250,7 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
         setErrors({});
         setIsCopyOpen(false);
         setCopyDays([]);
+        copyOriginals.current.clear();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
 
@@ -347,27 +353,36 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
         return true;
     };
 
-    const copySchedule = () => {
-        const targets = copyDays.filter((day) => day !== selectedDay);
-        if (isSaving || dayBlocks.length === 0 || targets.length === 0) return;
+    const copySchedule = (day: HourDay, checked: boolean) => {
+        if (isSaving || day === selectedDay) return;
+
+        if (!checked) {
+            const originals = copyOriginals.current.get(day);
+            if (!originals) return;
+            setBlocks((prev) => [...prev.filter((block) => block.day !== day), ...originals]);
+            setCopyDays((prev) => prev.filter((value) => value !== day));
+            copyOriginals.current.delete(day);
+            return;
+        }
+
+        if (dayBlocks.length === 0) return;
 
         const source = normalizeDraftTimes(dayBlocks);
         if (!validate(source)) return;
 
-        const copies = targets.flatMap((day) =>
-            source.map((block) => ({ ...block, key: newDraftKey(), day })));
+        copyOriginals.current.set(day, blocks.filter((block) => block.day === day));
+        const copies = source.map((block) => ({ ...block, key: newDraftKey(), day }));
         setBlocks((prev) => [
-            ...prev.filter((block) => block.day !== selectedDay && !targets.includes(block.day)),
+            ...prev.filter((block) => block.day !== selectedDay && block.day !== day),
             ...source,
             ...copies,
         ]);
-        setIsCopyOpen(false);
-        setCopyDays([]);
-        toast.success('Horarios copiados. Guardá los horarios para aplicar los cambios.');
+        setCopyDays((prev) => [...prev, day]);
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (isSaving) return;
 
         // Normaliza lo escrito ('8', '800', '00:00') antes de validar y enviar.
         const hours = normalizeDraftTimes(blocks);
@@ -396,10 +411,19 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Horarios y precios" icon={Clock} size="lg">
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Horarios y precios"
+            description='Organiza tu semana. Define los horarios y el precio de cada bloque.'
+            icon={Clock}
+            size="lg"
+            isLoading={isSaving}
+        >
             <div className="business_hour">
                 {/* ── Días (izquierda) ─────────────────────────────── */}
-                <aside className="bh_days">
+                <aside className="bh_days" aria-label="Días de la semana">
+                    <p className="bh_eyebrow">Tu semana</p>
                     {DAYS.map((day) => {
                         const list = blocks.filter((block) => block.day === day.value);
                         const isClosed = list.length > 0 && list.every((block) => block.isClosed);
@@ -408,6 +432,7 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
                             <button
                                 key={day.value}
                                 type="button"
+                                disabled={isSaving}
                                 className={`bh_day ${day.value === selectedDay ? 'is_active' : ''} ${isClosed ? 'is_closed' : ''}`}
                                 aria-pressed={day.value === selectedDay}
                                 aria-label={`${day.label}, ${list.length} bloque${list.length === 1 ? '' : 's'}${isClosed ? ', cerrado' : ''}`}
@@ -415,6 +440,7 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
                                     setSelectedDay(day.value);
                                     setIsCopyOpen(false);
                                     setCopyDays([]);
+                                    copyOriginals.current.clear();
                                 }}
                             >
                                 <span className="bh_day_name">{day.label}</span>
@@ -425,137 +451,167 @@ export const BussinesHour = ({ isOpen, onClose, spacePublicId, businessHours, on
                 </aside>
 
                 {/* ── Día elegido (derecha) ────────────────────────── */}
-                <form className="bh_panel" onSubmit={handleSubmit} noValidate>
-                    <header className="bh_panel_head">
-                        <h3 className="bh_panel_title">{DAYS.find((day) => day.value === selectedDay)?.label}</h3>
-                        <div className="bh_panel_actions">
-                            {/* Toggle del DÍA completo: abre o cierra todos sus bloques. */}
-                            <ToggleField
-                                name="day_status"
-                                label={dayBlocks.length === 0 ? 'Sin horarios' : dayClosed ? 'Cerrado' : 'Abierto'}
-                                checked={!dayClosed}
-                                disabled={dayBlocks.length === 0}
-                                onChange={(e) => toggleDay(e.target.checked)}
-                            />
-                            <Button text="Agregar bloque" icon={Plus} color="secondary" size="sm" type='button' onClick={addBlock} />
-                            <Button
-                                text="Copiar"
-                                icon={Copy}
-                                color="secondary"
-                                size="sm"
-                                disabled={dayBlocks.length === 0 || isSaving}
-                                onClick={() => {
-                                    setIsCopyOpen((prev) => !prev);
-                                    setCopyDays([]);
-                                }}
-                            />
-                        </div>
-                    </header>
-
-                    {isCopyOpen && (
-                        <fieldset className="bh_copy" id="bh_copy_schedule">
-                            <legend>Copiar horarios de {DAYS.find((day) => day.value === selectedDay)?.label}</legend>
-                            <p>Se reemplazarán todos los bloques de los días seleccionados, incluidos precios y estados.</p>
-                            <div className="bh_copy_days">
-                                {DAYS.filter((day) => day.value !== selectedDay).map((day) => (
-                                    <CheckboxField
-                                        key={day.value}
-                                        name={`copy_${day.value}`}
-                                        label={day.label}
-                                        checked={copyDays.includes(day.value)}
-                                        disabled={isSaving}
-                                        onChange={(e) => {
-                                            const checked = e.target.checked;
-                                            setCopyDays((prev) => checked
-                                                ? [...prev, day.value]
-                                                : prev.filter((value) => value !== day.value));
+                <form id={formId} className="bh_panel" onSubmit={handleSubmit} noValidate>
+                    <fieldset className="bh_editor" disabled={isSaving}>
+                        <legend className="bh_sr_only">Horarios del día seleccionado</legend>
+                        <header className="bh_panel_head">
+                            <div className="bh_panel_heading">
+                                <h3 className="bh_panel_title">{DAYS.find((day) => day.value === selectedDay)?.label}</h3>
+                                <p className="bh_panel_description">{dayBlocks.length === 0 ? 'Dale un horario a este día' : `${dayBlocks.length} bloque${dayBlocks.length === 1 ? '' : 's'} de atención`}</p>
+                            </div>
+                            <div className="bh_panel_actions">
+                                {/* Toggle del DÍA completo: abre o cierra todos sus bloques. */}
+                                <ToggleField
+                                    name="day_status"
+                                    label={dayBlocks.length === 0 ? 'Sin horarios' : dayClosed ? 'Cerrado' : 'Abierto'}
+                                    checked={dayBlocks.length > 0 && !dayClosed}
+                                    disabled={dayBlocks.length === 0}
+                                    onChange={(e) => toggleDay(e.target.checked)}
+                                />
+                                <Button text="Agregar bloque" icon={Plus} iconPosition="left" color="accent" size="sm" type="button" onClick={addBlock} />
+                                <div
+                                    ref={copyAnchorRef}
+                                    className="bh_copy_anchor"
+                                    onKeyDown={(event) => {
+                                        if (event.key !== 'Escape' || !isCopyOpen) return;
+                                        event.stopPropagation();
+                                        setIsCopyOpen(false);
+                                        copyAnchorRef.current?.querySelector('button')?.focus();
+                                    }}
+                                >
+                                    <Button
+                                        text="Copiar"
+                                        icon={Copy}
+                                        color="secondary"
+                                        size="sm"
+                                        type="button"
+                                        aria-expanded={isCopyOpen}
+                                        aria-controls={isCopyOpen ? 'bh_copy_schedule' : undefined}
+                                        disabled={dayBlocks.length === 0 || isSaving}
+                                        onClick={() => {
+                                            setIsCopyOpen((prev) => !prev);
+                                            if (!isCopyOpen) {
+                                                setCopyDays([]);
+                                                copyOriginals.current.clear();
+                                            }
                                         }}
                                     />
-                                ))}
-                            </div>
-                            <div className="bh_copy_actions">
-                                <Button text="Cancelar copia" color="secondary" size="sm" onClick={() => setIsCopyOpen(false)} />
-                                <Button text="Copiar y reemplazar" icon={Copy} size="sm" disabled={copyDays.length === 0 || dayBlocks.length === 0 || isSaving} onClick={copySchedule} />
-                            </div>
-                        </fieldset>
-                    )}
-
-                    <div className="bh_blocks">
-                        {dayBlocks.length > 0 ? (
-                            <>
-                                <div className="bh_blocks_head" aria-hidden>
-                                    <span>Apertura</span>
-                                    <span />
-                                    <span>Cierre</span>
-                                    <span>Precio</span>
-                                    <span>Estado</span>
-                                    <span />
+                                    {isCopyOpen && (
+                                        <div className="bh_copy" id="bh_copy_schedule" role="group" aria-label="Copiar horarios a otros días">
+                                            <button
+                                                type="button"
+                                                className="bh_copy_close"
+                                                aria-label="Cerrar copia de horarios"
+                                                onClick={() => {
+                                                    setIsCopyOpen(false);
+                                                    copyAnchorRef.current?.querySelector('button')?.focus();
+                                                }}
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                            <p className="bh_copy_title">Copiar a otros días</p>
+                                            <p className="bh_copy_description">Reemplaza sus bloques. Guarda para aplicar.</p>
+                                            <div className="bh_copy_days">
+                                                {DAYS.filter((day) => day.value !== selectedDay).map((day) => (
+                                                    <CheckboxField
+                                                        key={day.value}
+                                                        name={`copy_${day.value}`}
+                                                        label={day.label}
+                                                        checked={copyDays.includes(day.value)}
+                                                        disabled={isSaving || dayBlocks.length === 0}
+                                                        onChange={(e) => copySchedule(day.value, e.target.checked)}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-
-                                {dayBlocks.map((block) => (
-                                    <div className={`bh_block ${block.isClosed ? 'is_closed' : ''}`} key={block.key}>
-                                        <TimeField
-                                            name={`start_${block.key}`}
-                                            ariaLabel="Hora de apertura"
-                                            maxHour={23}
-                                            value={block.startTime}
-                                            error={errors[`${block.key}-start`]}
-                                            onChange={(value) => updateBlock(block.key, { startTime: value })}
-                                            onCommit={(value) => updateBlock(block.key, { startTime: value })}
-                                        />
-                                        <span className="bh_dash" aria-hidden>–</span>
-                                        <TimeField
-                                            name={`end_${block.key}`}
-                                            ariaLabel="Hora de cierre (24:00 = fin del día)"
-                                            maxHour={24}
-                                            value={block.endTime}
-                                            error={errors[`${block.key}-end`]}
-                                            onChange={(value) => updateBlock(block.key, { endTime: value })}
-                                            onCommit={(value) => updateBlock(block.key, { endTime: value === '00:00' ? END_OF_DAY : value })}
-                                        />
-                                        <InputField
-                                            name={`price_${block.key}`}
-                                            numberOnly
-                                            value={block.price}
-                                            placeholder="0.00"
-                                            onChange={(e) => updateBlock(block.key, { price: e.target.value })}
-                                            error={errors[`${block.key}-price`]}
-                                        />
-
-                                        {/* Toggle del bloque: afecta solo a este bloque. */}
-                                        <ToggleField
-                                            name={`closed_${block.key}`}
-                                            label={block.isClosed ? 'Cerrado' : 'Abierto'}
-                                            checked={!block.isClosed}
-                                            onChange={(e) => updateBlock(block.key, { isClosed: !e.target.checked })}
-                                        />
-
-                                        <button
-                                            type="button"
-                                            className="bh_block_remove"
-                                            aria-label="Quitar bloque"
-                                            onClick={() => removeBlock(block.key)}
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                ))}
-
-                                <p className="bh_hint">
-                                    En el cierre, <strong>24:00</strong> (o 00:00) marca el fin del día.
-                                </p>
-                            </>
-                        ) : (
-                            <div className="bh_emptyy center">
-                                <EmptyScreen message='No hay horarios configurados' onAction={addBlock} actionText='Agregar Bloque' iconBtn={Plus} />
                             </div>
-                        )}
-                    </div>
+                        </header>
+
+                        <div className="bh_blocks">
+                            {dayBlocks.length > 0 ? (
+                                <>
+                                    <div className="bh_blocks_head" aria-hidden>
+                                        <span>Apertura</span>
+                                        <span />
+                                        <span>Cierre</span>
+                                        <span>Precio</span>
+                                        <span>Estado</span>
+                                        <span />
+                                    </div>
+
+                                    {dayBlocks.map((block) => (
+                                        <div className={`bh_block ${block.isClosed ? 'is_closed' : ''}`} key={block.key}>
+                                            <TimeField
+                                                name={`start_${block.key}`}
+                                                ariaLabel="Hora de apertura"
+                                                maxHour={23}
+                                                value={block.startTime}
+                                                error={errors[`${block.key}-start`]}
+                                                onChange={(value) => updateBlock(block.key, { startTime: value })}
+                                                onCommit={(value) => updateBlock(block.key, { startTime: value })}
+                                            />
+                                            <span className="bh_dash" aria-hidden>–</span>
+                                            <TimeField
+                                                name={`end_${block.key}`}
+                                                ariaLabel="Hora de cierre (24:00 = fin del día)"
+                                                maxHour={24}
+                                                value={block.endTime}
+                                                error={errors[`${block.key}-end`]}
+                                                onChange={(value) => updateBlock(block.key, { endTime: value })}
+                                                onCommit={(value) => updateBlock(block.key, { endTime: value === '00:00' ? END_OF_DAY : value })}
+                                            />
+                                            <InputField
+                                                name={`price_${block.key}`}
+                                                aria-label="Precio del bloque"
+                                                label="Precio"
+                                                numberOnly
+                                                value={block.price}
+                                                placeholder="0.00"
+                                                onChange={(e) => updateBlock(block.key, { price: e.target.value })}
+                                                error={errors[`${block.key}-price`]}
+                                            />
+
+                                            {/* Toggle del bloque: afecta solo a este bloque. */}
+                                            <ToggleField
+                                                name={`closed_${block.key}`}
+                                                label={block.isClosed ? 'Cerrado' : 'Abierto'}
+                                                checked={!block.isClosed}
+                                                onChange={(e) => updateBlock(block.key, { isClosed: !e.target.checked })}
+                                            />
+
+                                            <button
+                                                type="button"
+                                                className="bh_block_remove"
+                                                aria-label="Quitar bloque"
+                                                onClick={() => removeBlock(block.key)}
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
+
+                                    <p className="bh_hint">
+                                        En el cierre, <strong>24:00</strong> (o 00:00) marca el fin del día.
+                                    </p>
+                                </>
+                            ) : (
+                                <div className="bh_empty">
+                                    <span className="bh_empty_icon" aria-hidden="true"><Clock size={26} /></span>
+                                    <h4>Un día por organizar</h4>
+                                    <p>Agrega tu primer bloque para definir el horario y su precio.</p>
+                                    <Button text="Crear primer bloque" icon={Plus} iconPosition="left" color="accent" size="sm" onClick={addBlock} />
+                                </div>
+                            )}
+                        </div>
+                    </fieldset>
                 </form>
             </div>
-            <FormActions>
-                <Button text="Cancelar" icon={X} color="secondary" type="button" onClick={onClose} />
-                <Button text="Guardar horarios" icon={UploadCloud} type="submit" loading={isSaving} />
+            <FormActions className="bh_footer">
+                <p className="bh_footer_note">Los cambios se aplican al guardar.</p>
+                <Button text="Cancelar" color="secondary" type="button" onClick={onClose} disabled={isSaving} />
+                <Button text="Guardar horarios" icon={Check} iconPosition="left" type="submit" form={formId} loading={isSaving} />
             </FormActions>
         </Modal>
     );

@@ -10,6 +10,7 @@ import { hasErrors } from '../../../shared/utils/formErrors';
 import { createEmptyUserForm, toUserPayload, validateUserForm } from '../../users/utils/userForm';
 import type { PlanStepForm } from '../interfaces/companyRegistration.interface';
 import type { UserFormValues } from '../../users/interfaces/user.interface';
+import { useCompanyContextStore, useSessionStore } from '../../../shared/store/sessionStore';
 
 const EMPTY_PLAN_FORM: PlanStepForm = {
     plan_public_id: '',
@@ -24,8 +25,13 @@ const EMPTY_PLAN_FORM: PlanStepForm = {
 export const useRegisterCompany = () => {
     const navigate = useNavigate();
     const { plans, loadPlans } = useCatalogActive();
+    const isPrimaryRegistration = useSessionStore((state) => state.scopeLevel === 1);
+    const contextCompanies = useCompanyContextStore((state) => state.companies);
+    const sourceCompanies = contextCompanies.filter((company) => company.access || company.sucursales.some((branch) => branch.access));
+    const [selectedSource, setSourceCompany] = useState('');
+    const sourceCompanyPublicId = selectedSource || (sourceCompanies.length === 1 ? sourceCompanies[0].publicId : '');
 
-    useEffect(() => { loadPlans(); }, [loadPlans]);
+    useEffect(() => { if (isPrimaryRegistration) loadPlans(); }, [loadPlans, isPrimaryRegistration]);
 
     const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -40,13 +46,13 @@ export const useRegisterCompany = () => {
         setOwnerValues((prev) => ({ ...prev, [field]: value }));
     };
     const ownerErrors = validateUserForm('super_admin', 'register', ownerValues);
-    const isOwnerStepValid = !hasErrors(ownerErrors);
+    const isOwnerStepValid = !isPrimaryRegistration || !hasErrors(ownerErrors);
 
     const [planForm, setPlanForm] = useState<PlanStepForm>(EMPTY_PLAN_FORM);
     const setPlanField = (name: keyof PlanStepForm) => (value: string | number) => {
         setPlanForm((prev) => ({ ...prev, [name]: value }));
     };
-    const isPlanStepValid = Boolean(planForm.plan_public_id);
+    const isPlanStepValid = isPrimaryRegistration ? Boolean(planForm.plan_public_id) : Boolean(sourceCompanyPublicId);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -54,7 +60,8 @@ export const useRegisterCompany = () => {
     // la derecha (avanzar) o desde la izquierda (retroceder), efecto de hoja de libro.
     const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
 
-    const isCurrentStepValid = step === 1 ? isCompanyStepValid : step === 2 ? isOwnerStepValid : isPlanStepValid;
+    const totalSteps = isPrimaryRegistration ? 3 : 2;
+    const isCurrentStepValid = step === 1 ? isCompanyStepValid : step === 2 && isPrimaryRegistration ? isOwnerStepValid : isPlanStepValid;
 
     // Los errores por campo recién se pintan cuando se intenta avanzar con el paso incompleto.
     const [showErrors, setShowErrors] = useState(false);
@@ -68,7 +75,7 @@ export const useRegisterCompany = () => {
         }
         setShowErrors(false);
         setDirection('forward');
-        setStep((prev) => (prev < 3 ? ((prev + 1) as 1 | 2 | 3) : prev));
+        setStep((prev) => (prev < totalSteps ? ((prev + 1) as 1 | 2 | 3) : prev));
     };
 
     const goBack = () => {
@@ -77,15 +84,18 @@ export const useRegisterCompany = () => {
         setStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3) : prev));
     };
 
-    // Alta de empresa — crea Company+User+Person+UserCompany+SaaSSubscription ya activa en el
-    // backend (una transacción, ver company.service.ts → register).
+    // System contrata un plan; el resto selecciona su grupo y hereda la suscripción.
     const handleRegister = async () => {
+        if (!isCompanyStepValid || !isOwnerStepValid || !isPlanStepValid) {
+            setShowErrors(true);
+            toast.error('Completa los datos de la empresa, el dueño y la suscripción');
+            return;
+        }
         setIsSubmitting(true);
         try {
             const result = await CompanyService.register({
                 company: companyForm,
-                owner: toUserPayload('super_admin', 'register', ownerValues),
-                plan: planForm,
+                ...(isPrimaryRegistration ? { owner: toUserPayload('super_admin', 'register', ownerValues), plan: planForm } : { source_company_public_id: sourceCompanyPublicId }),
             });
             toast.success(result.message);
             navigate('/companys');
@@ -97,7 +107,8 @@ export const useRegisterCompany = () => {
     };
 
     return {
-        step, direction, goNext, goBack,
+        step, totalSteps, direction, goNext, goBack,
+        isPrimaryRegistration, sourceCompanies, sourceCompanyPublicId, setSourceCompany,
         companyForm, setCompanyField, companyErrors: showErrors ? companyErrors : {},
         ownerValues, setOwnerField, ownerErrors: showErrors ? ownerErrors : {},
         planForm, setPlanField, isPlanStepValid,

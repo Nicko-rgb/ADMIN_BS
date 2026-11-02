@@ -1,5 +1,6 @@
 import { apiService } from '../../../shared/utils/apiService';
-import type { LoginAdminPayload, LoginAdminResponse, PasswordRequestPayload, PasswordRequestResponse, PasswordResetPayload } from '../interfaces/auth.interface';
+import type { LoginAdminPayload, PasswordRequestPayload, PasswordRequestResponse, PasswordResetPayload } from '../interfaces/auth.interface';
+import type { SessionInput } from '../../../shared/interfaces/session.interface';
 
 export class AuthService {
 
@@ -8,7 +9,7 @@ export class AuthService {
     }
 
     // Login del panel admin
-    static async loginAdmin(payload: LoginAdminPayload): Promise<{ data: LoginAdminResponse; message: string }> {
+    static async loginAdmin(payload: LoginAdminPayload): Promise<{ data: SessionInput; message: string }> {
         const res = await apiService.post('/auth/login', payload);
         return { data: res.data.data, message: res.data.message };
     }
