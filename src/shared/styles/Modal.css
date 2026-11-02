@@ -114,7 +114,7 @@
             padding: 2rem;
             min-height: 0;
             overflow-y: auto;
-            background: var(--color-bg);
+            /* background: var(--color-bg); */
         }
     }
 }
