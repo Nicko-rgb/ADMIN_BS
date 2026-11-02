@@ -307,6 +307,7 @@
                     color: var(--text-soft);
                     font-variant-numeric: tabular-nums;
                     white-space: nowrap;
+                    font-weight: 500;
                 }
 
                 .schedule_price {

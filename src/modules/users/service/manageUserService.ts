@@ -1,3 +1,4 @@
+import { refreshCompanyContext } from '../../../shared/utils/refreshCompanyContext';
 import { apiService } from '../../../shared/utils/apiService';
 import type { PaginatedResponse } from '../../../shared/interfaces/pagination.interface';
 import type {
@@ -27,6 +28,7 @@ class ManageUserService {
 
     static async update(role: ManagedRole, publicId: string, payload: UpdateManagedUserPayload): Promise<{ data: ManagedUserDetail; message: string }> {
         const res = await apiService.put(`/users/manage/${role}/${publicId}`, payload);
+        await refreshCompanyContext();
         return { data: res.data.data, message: res.data.message };
     }
 }

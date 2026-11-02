@@ -6,39 +6,35 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    padding: 1.5rem;
-    backdrop-filter: blur(2px);
-    animation: fade-in .25s ease-out both;
+    padding: 2rem;
+    backdrop-filter: blur(4px);
+    animation: fade-in .2s ease-out both;
 
     &.is_closing {
         pointer-events: none;
-        animation: fade-out .25s ease-in both;
+        animation: fade-out .2s ease-in both;
 
         .modal_container {
-            animation: slide-out-y .25s ease-in both;
+            animation: slide-out-y .2s ease-in both;
         }
     }
 
-    /* El cuerpo del modal usa el lienzo de la app y las .form_section de adentro
-       usan --surface: la misma relación fondo/card que en una página, así los
-       grupos del formulario se separan igual de claro en ambos modos. */
     .modal_container {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 10px;
+        border-radius: 12px;
         box-shadow: var(--shadow-lg);
         width: 100%;
         max-height: 90vh;
+        max-height: 90dvh;
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        animation: slide-in-y .3s cubic-bezier(.2, .8, .2, 1) both;
-
-        /* El modal sube desde abajo con un leve zoom. */
-        --anim-y-from: 16px;
-        --anim-y-to: 12px;
-        --anim-scale-from: .97;
-        --anim-scale-to: .97;
+        animation: slide-in-y .25s cubic-bezier(.2, .8, .2, 1) both;
+        --anim-y-from: 12px;
+        --anim-y-to: 8px;
+        --anim-scale-from: .99;
+        --anim-scale-to: .99;
 
         &.modal_sm {
             max-width: 450px;
@@ -49,56 +45,112 @@
         }
 
         &.modal_lg {
-            max-width: 900px;
+            max-width: 960px;
         }
 
         .modal_header {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            gap: 1rem;
-            padding: 1rem 2rem;
-            background-color: var(--surface);
+            gap: 1.6rem;
+            padding: 1.5rem 2rem;
+            padding-bottom: 1rem;
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
 
-            .modal_title {
+            .modal_heading {
                 display: flex;
-                align-items: center;
-                gap: .8rem;
-                font-size: 1.8rem;
-                font-weight: 700;
-                color: var(--primary);
+                flex-direction: column;
+                gap: .5rem;
 
-                svg {
-                    flex-shrink: 0;
-                    color: var(--primary);
+                .modal_icon {
+                    width: 3.5rem;
+                    height: 3.5rem;
+                    border-radius: var(--radius-sm);
+                    color: var(--primary-text);
+                    background: var(--primary-light);
+                }
+
+                .modal_title {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    margin: 0;
+                    font-size: 2rem;
+                    line-height: 1.1;
+                    font-weight: 700;
+                    letter-spacing: -.04rem;
+                    color: var(--primary-text);
+                }
+
+
+                .modal_description {
+                    font-size: 1.3rem;
+                    line-height: 1.6;
+                    color: var(--text-muted);
+                    font-weight: 400;
                 }
             }
 
             .modal_close_btn {
-                width: 32px;
-                height: 32px;
-                flex-shrink: 0;
-                border-radius: 8px;
-                background: transparent;
-                border: 1px solid var(--border);
-                color: var(--text-soft);
+                width: 36px;
+                height: 36px;
+                border-radius: var(--radius-sm);
+                background: var(--gray-medium);
+                color: var(--text-muted);
 
-                &:hover {
-                    background: var(--gray-medium);
+                &:hover:not(:disabled) {
                     color: var(--text);
+                }
+
+                &:disabled {
+                    opacity: .5;
+                    cursor: not-allowed;
                 }
             }
         }
 
         .modal_body {
-            padding: 1.5rem;
+            padding: 2rem;
+            min-height: 0;
             overflow-y: auto;
+            background: var(--color-bg);
+        }
+    }
+}
 
-            .form_section {
-                border: none !important;
-                box-shadow: none !important;
+@media (max-width: 600px) {
+    .modal_overlay {
+        padding: 1rem;
+
+        .modal_container {
+            max-height: calc(100dvh - 2rem);
+            border-radius: var(--radius-lg);
+
+            .modal_header {
+                padding: 1.6rem;
+                gap: 1rem;
+            }
+
+            .modal_header .modal_title {
+                font-size: 1.8rem;
+                gap: .8rem;
+            }
+
+            .modal_body {
+                padding: 1.2rem;
             }
         }
+    }
+}
+
+/* Conservar animationend para desmontar también al reducir movimiento. */
+@media (prefers-reduced-motion: reduce) {
+
+    .modal_overlay,
+    .modal_overlay.is_closing,
+    .modal_overlay .modal_container,
+    .modal_overlay.is_closing .modal_container {
+        animation-duration: .01ms;
     }
 }

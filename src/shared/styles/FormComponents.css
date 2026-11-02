@@ -320,8 +320,8 @@
         }
 
         .toggle_text {
-            font-size: 1.4rem;
-            color: var(--text);
+            font-size: 1.3rem;
+            color: var(--text-soft);
             font-weight: 500;
         }
     }

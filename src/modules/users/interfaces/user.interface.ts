@@ -39,7 +39,7 @@ export interface UserDetail {
 export interface ManagedUserAssignment {
     publicId: string;
     name: string;
-    role: string;
+    isOwner: boolean;
 }
 
 export interface ManagedUserDetail extends UserDetail {
