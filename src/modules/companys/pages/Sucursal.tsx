@@ -11,7 +11,8 @@ import {
 import { MedibleImage } from '../../../shared/components/MedibleImage';
 import SucursalService from '../service/sucursalService';
 import { resolveImageUrl } from '../../../shared/utils/formatText';
-import { LoadingScreen, NotFoundScreen, ForbiddenScreen, PlanUsageBar, Button, EmptyScreen } from '../../../shared/components';
+import { LoadingScreen, NotFoundScreen, ForbiddenScreen, Button, EmptyScreen } from '../../../shared/components';
+import { PlanUsageBar } from '../../saas/components/PlanUsageBar';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
@@ -19,7 +20,7 @@ import SucursalForm from '../components/SucursalForm';
 import SucursalConfigForm from '../components/SucursalConfigForm';
 import StatusSwitch from '../components/StatusSwitch';
 import SpaceForm from '../components/SpaceForm';
-import usePlanUsage from '../../../shared/hooks/usePlanUsage';
+import usePlanUsage from '../../saas/hooks/usePlanUsage';
 import useSucursal from '../hooks/useSucursal';
 import type { InfoChipProps } from '../interfaces/sucursal.interface';
 import '../styles/Sucursal.css';

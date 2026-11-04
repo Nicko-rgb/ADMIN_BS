@@ -4,7 +4,8 @@ import {
     Gift, ShieldCheck, UserCog, Phone, FileText, User, Mail, Calendar,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Header, Button, LoadingScreen, NotFoundScreen, PlanUsageBar, ForbiddenScreen } from '../../../shared/components';
+import { Header, Button, LoadingScreen, NotFoundScreen, ForbiddenScreen } from '../../../shared/components';
+import { PlanUsageBar } from '../../saas/components/PlanUsageBar';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';

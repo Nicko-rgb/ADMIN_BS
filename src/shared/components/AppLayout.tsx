@@ -112,7 +112,7 @@ export const AppLayout = () => {
                         <Bell size={16} />
                         <span className="menu_item_label">Notificaciones</span>
                     </button>
-                    <NavLink to="/home/profile" className="menu_item">
+                    <NavLink to="/profile" className="menu_item">
                         <UserCircle size={16} />
                         <span className="menu_item_label">Mi Perfil</span>
                     </NavLink>

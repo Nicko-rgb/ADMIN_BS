@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import PlanUsageService from '../service/planUsageService';
-import { handleApiError } from '../utils/errorHandler';
-import toast from '../utils/toast';
+import { handleApiError } from '../../../shared/utils/errorHandler';
+import toast from '../../../shared/utils/toast';
 import type { PlanUsage } from '../interfaces/planUsage.interface';
 
 /**

@@ -50,9 +50,9 @@ button {
         &:hover:not(:disabled) { background: var(--gray-light); color: var(--text); }
     }
     &.btn_app_accent {
-        background: var(--accent-soft);
+        background: var(--accent);
         color: var(--accent-text);
-        border-color: var(--accent-border);
+        border-color: var(--accent-hover);
         box-shadow: none;
         &:hover:not(:disabled) { background: var(--accent-hover); }
     }

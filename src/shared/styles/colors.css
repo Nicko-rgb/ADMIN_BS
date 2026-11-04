@@ -14,11 +14,9 @@
   --primary-light: #eaf5ef;
   --primary-border: #c6e2d4;
   --accent:        #f1edfb;
-  --accent-soft:   var(--accent);
   --accent-solid:  #7961bd;
   --accent-text:   #68509f;
   --accent-hover:  #e7dff7;
-  --accent-border: #dfd5f0;
 
   /* Superficies: blanco y escala de grises puros. */
   --color-bg:    #f7f7f7;
@@ -36,7 +34,7 @@
   --text-white: #ffffff;
 
   /* Pares semánticos: texto legible sobre su correspondiente fondo suave. */
-  --success-text: #267453;
+  --success:      #267453;
   --success-soft: #eaf5ed;
   --danger:       #bf4d51;
   --danger-text:  #a63e44;
@@ -47,8 +45,6 @@
   --info:         #426fba;
   --info-text:    #3c62a1;
   --info-soft:    #edf3fc;
-  --purple-text:  var(--accent-text);
-  --purple-soft:  var(--accent-soft);
 
   --brand-facebook:  #1877f2;
   --brand-instagram: #e4405f;
@@ -62,8 +58,8 @@
   --shadow-md:    0 3px 8px rgb(0 0 0 / .03), 0 12px 28px -12px rgb(0 0 0 / .12);
   --shadow-lg:    0 8px 24px -12px rgb(0 0 0 / .12), 0 28px 80px -24px rgb(0 0 0 / .24);
   --overlay:      rgb(0 0 0 / .30);
-  --radius-sm:    5px;
-  --radius-md:    9px;
+  --radius-sm:    4px;
+  --radius-md:    8px;
   --radius-lg:    13px;
 
   --font-primary:   'Poppins', sans-serif;
@@ -81,7 +77,6 @@
   --accent-solid:   #a18ad9;
   --accent-text:    #cfbdf4;
   --accent-hover:   #403655;
-  --accent-border:  #504263;
 
   --color-bg:    #1b1b1b;
   --surface:     #232323;
@@ -97,7 +92,7 @@
   --text-soft:  #c7c7c7;
   --text-muted: #a6a6a6;
 
-  --success-text: #94d3ac;
+  --success:      #94d3ac;
   --success-soft: #253c2e;
   --danger-text:  #f1a4ac;
   --danger-soft:  #43292e;

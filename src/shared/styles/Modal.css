@@ -36,6 +36,10 @@
         --anim-scale-from: .99;
         --anim-scale-to: .99;
 
+        [data-theme="dark"] & {
+            background-color: var(--color-bg);
+        }
+
         &.modal_sm {
             max-width: 450px;
         }
@@ -55,7 +59,6 @@
             gap: 1.6rem;
             padding: 1.5rem 2rem;
             padding-bottom: 1rem;
-            background: var(--surface);
             border-bottom: 1px solid var(--border);
 
             .modal_heading {
@@ -85,10 +88,9 @@
 
 
                 .modal_description {
-                    font-size: 1.3rem;
+                    font-size: 1.4rem;
                     line-height: 1.6;
                     color: var(--text-muted);
-                    font-weight: 400;
                 }
             }
 
@@ -114,6 +116,7 @@
             padding: 2rem;
             min-height: 0;
             overflow-y: auto;
+
             /* background: var(--color-bg); */
         }
     }

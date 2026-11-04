@@ -10,7 +10,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 export const usersRoutes = (
     <>
         <Route path='home' element={<Home />} />
-        <Route path="home/profile" element={<Profile />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="users" element={<UserPage />} />
     </>
 );

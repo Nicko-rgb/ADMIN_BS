@@ -81,7 +81,7 @@
         font-weight: 600;
         white-space: nowrap;
 
-        &.has_access { color: var(--success-text); }
+        &.has_access { color: var(--primary); background: var(--success-soft); padding: .2rem .5rem; border-radius: 4px; }
     }
 
     .profile_context_navigation {

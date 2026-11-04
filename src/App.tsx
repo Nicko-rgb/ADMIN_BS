@@ -10,6 +10,7 @@ import { Toaster } from 'react-hot-toast';
 import AuthRoutes from './modules/auth/index.routes';
 import { companyRoutes } from './modules/companys/index.routes';
 import { systemRoutes } from './modules/system/index.routes';
+import { saasRoutes } from './modules/saas/index.routes';
 import { usersRoutes } from './modules/users/index.routes';
 import { bookingsRoutes } from './modules/bookings/index.routes';
 import AppLayout from './shared/components/AppLayout';
@@ -31,9 +32,10 @@ function App() {
                     <Route path="auth/*" element={<AuthRoutes />} />
 
                     {/* Área autenticada: sin sesión, ProtectedRoute manda a login */}
-                    <Route path="" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{usersRoutes}</Route>
+                    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{usersRoutes}</Route>
                     <Route path="companys" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{companyRoutes}</Route>
-                    <Route path="system" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{systemRoutes}</Route>
+                    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{systemRoutes}</Route>
+                    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{saasRoutes}</Route>
                     <Route path="bookings" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{bookingsRoutes}</Route>
 
                     <Route path='prueba' element={<PagePrueba />} />
