@@ -1,6 +1,7 @@
 import { refreshCompanyContext } from '../../../shared/utils/refreshCompanyContext';
 import { apiService } from '../../../shared/utils/apiService';
 import type { SucursalDetail, SucursalPayload, EntityStatus } from '../interfaces/sucursal.interface';
+import type { CompanySubsidiary } from '../interfaces/company.interface';
 
 export interface BannerFile {
     publicId: string;
@@ -11,6 +12,11 @@ export interface BannerFile {
 
 // Alta y edición de sucursal — companyPublicId (alta) es el public_id de la empresa padre, publicId (detalle/edición) es el propio de la sucursal.
 class SucursalService {
+    static async listByCompany(companyPublicId: string): Promise<CompanySubsidiary[]> {
+        const res = await apiService.get(`/sucursals/company/${companyPublicId}/branches`);
+        return res.data.data;
+    }
+
     static async register(companyPublicId: string, payload: SucursalPayload): Promise<{ data: SucursalDetail; message: string }> {
         const res = await apiService.post(`/sucursals/${companyPublicId}`, payload);
         await refreshCompanyContext();

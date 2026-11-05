@@ -78,8 +78,6 @@ export interface CompanyDetail {
     isEnabled: CompanyEnabled | null;
     country: { id: number; name: string; flagUrl: string; phoneCode: string } | null;
     ubigeo: CompanyUbigeo | null;
-    subsidiaries: CompanySubsidiary[];
-    users: CompanyUser[];
     createdAt: string;
 }
 

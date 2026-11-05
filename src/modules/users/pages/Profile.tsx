@@ -41,6 +41,7 @@ const Profile = () => {
         openEditProfile, closeEditProfile, setEditField, submitEditProfile,
         navigateToSubscriptions,
     } = useProfile();
+    
     if (!canReadProfile) {
         return <ForbiddenScreen message="No tienes acceso a tu perfil." />;
     }
@@ -83,11 +84,11 @@ const Profile = () => {
                                     icon={BadgeCheck}
                                     subtitle='Plan y estado de tu empresa.'
                                     className='accent'
-                                    extra={<Button text='Ver Suscripciones' icon={Crown} size='sm' color='accent' onClick={navigateToSubscriptions} />}
+                                    extra={<Button text='Ver Suscripción' icon={Crown} size='sm' color='accent' onClick={navigateToSubscriptions} />}
                                 />
 
                                 {isLoadingSubscription ? (
-                                    <LoadingScreen message="Cargando suscripción..." />
+                                    <LoadingScreen message="Cargando suscripción..." size='sm' />
                                 ) : subscription && subscriptionState ? (
                                     <>
                                         <div className='subscription_header'>
@@ -95,7 +96,7 @@ const Profile = () => {
                                                 <span className='subscription_eyebrow'>Tu plan</span>
                                                 <div className='subscription_plan'>
                                                     <span className='subscription_plan_name'>{subscription.plan?.name ?? 'Sin plan'}</span>
-                                                    {subscription.plan && <span className='subscription_plan_code'>{subscription.plan.code}</span>}
+                                                    <span className='subscription_plan_code'>{subscription.plan?.code}</span>
                                                 </div>
                                             </div>
                                             <div className='subscription_chips'>

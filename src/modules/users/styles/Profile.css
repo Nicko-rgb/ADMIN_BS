@@ -203,7 +203,6 @@
 
             .subscription_eyebrow {
                 display: block;
-                margin-bottom: .25rem;
                 color: var(--text-muted);
                 font-size: 1.1rem;
                 font-weight: 600;
@@ -213,7 +212,7 @@
 
             .subscription_plan {
                 display: flex;
-                align-items: baseline;
+                align-items: center;
                 gap: .6rem;
                 min-width: 0;
             }

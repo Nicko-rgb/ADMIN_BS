@@ -3,16 +3,14 @@ import { lazy } from 'react';
 import { Route } from 'react-router-dom';
 
 const MyCompanys = lazy(() => import('./pages/MyCompanys'));
+const SucursalBookings = lazy(() => import('./pages/SucursalBookings'));
 
 /**
- * Rutas propias del módulo system — a diferencia de auth (standalone), estas
- * se insertan como hijas DIRECTAS del <Route path="system/*"> en App.tsx,
- * dentro del mismo <Routes> — así el <Outlet/> de AppLayout las encuentra.
- * Un <Routes> propio acá adentro no funciona: <Routes> solo reconoce
- * <Route>/<Fragment> como hijos, no un componente separado.
+ * Rutas hijas del módulo de reservas bajo el AppLayout de /bookings.
  */
 export const bookingsRoutes = (
     <>
         <Route index element={<MyCompanys />} />
+        <Route path="sucursals/:sucursalPublicId" element={<SucursalBookings />} />
     </>
 );

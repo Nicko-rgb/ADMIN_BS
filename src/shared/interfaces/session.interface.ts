@@ -40,7 +40,7 @@ export interface ContextCompany {
     isPrimary: boolean;
     publicId: string;
     name: string;
-    /** false cuando la empresa solo agrupa sucursales asignadas al usuario. */
+    /** Alcance de la empresa; las acciones también requieren sus permisos. */
     access: boolean;
     country: ContextCountry | null;
     sucursales: ContextSucursal[];

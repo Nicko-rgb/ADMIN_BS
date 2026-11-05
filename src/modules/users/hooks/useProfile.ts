@@ -158,7 +158,7 @@ export const useProfile = () => {
         closeEditProfile,
         setEditField,
         submitEditProfile,
-        navigateToSubscriptions: () => navigate('/saas/suscripciones'),
+        navigateToSubscriptions: () => navigate('/suscriptions'),
     };
 };
 

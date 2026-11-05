@@ -8,13 +8,15 @@ import toast from '../../../shared/utils/toast';
 import { usePlanUsage } from '../../saas/hooks/usePlanUsage';
 import { hasPlanRoom } from '../../saas/utils/planUsage';
 import CompanyService from '../service/companyService';
+import SucursalService from '../service/sucursalService';
+import UserService from '../../users/service/userService';
 import { COMPANY_REQUIRED_FIELDS, EMPTY_COMPANY_FORM } from '../utils/tenantForm';
 import useTenantForm from './useTenantForm';
-import type { CompanyDetail } from '../interfaces/company.interface';
+import type { CompanyDetail, CompanySubsidiary, CompanyUser } from '../interfaces/company.interface';
 
 export type CompanyErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 
-// Detalle de una empresa — carga país, ubigeo formateado, usuarios (incluyendo dueño) y sucursales.
+// El detalle, las sucursales y los usuarios se consultan de manera independiente.
 export const useCompany = () => {
     const { publicId } = useParams<{ publicId: string }>();
 
@@ -23,6 +25,10 @@ export const useCompany = () => {
     const [errorStatus, setErrorStatus] = useState<CompanyErrorStatus | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [reloadToken, setReloadToken] = useState(0);
+    const [subsidiaries, setSubsidiaries] = useState<CompanySubsidiary[]>([]);
+    const [users, setUsers] = useState<CompanyUser[]>([]);
+    const [branchesStatus, setBranchesStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+    const [usersStatus, setUsersStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
     useEffect(() => {
         if (!publicId) return;
@@ -45,6 +51,25 @@ export const useCompany = () => {
         };
 
         fetchCompany();
+
+        const fetchBranches = async () => {
+            setBranchesStatus('loading');
+            setSubsidiaries([]);
+            try {
+                const data = await SucursalService.listByCompany(publicId);
+                if (active) { setSubsidiaries(data); setBranchesStatus('ready'); }
+            } catch { if (active) setBranchesStatus('error'); }
+        };
+        const fetchUsers = async () => {
+            setUsersStatus('loading');
+            setUsers([]);
+            try {
+                const data = await UserService.listByCompany(publicId);
+                if (active) { setUsers(data); setUsersStatus('ready'); }
+            } catch { if (active) setUsersStatus('error'); }
+        };
+        void fetchBranches();
+        void fetchUsers();
 
         return () => { active = false; };
     }, [publicId, reloadToken]);
@@ -127,6 +152,10 @@ export const useCompany = () => {
 
     return {
         company,
+        subsidiaries,
+        users,
+        branchesStatus,
+        usersStatus,
         isLoading,
         errorStatus,
         errorMessage,
