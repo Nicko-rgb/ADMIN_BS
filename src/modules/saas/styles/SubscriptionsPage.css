@@ -3,6 +3,7 @@
     flex-direction: column;
     gap: 1.5rem;
     max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
     color: var(--text);
 }

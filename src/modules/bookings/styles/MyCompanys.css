@@ -1,0 +1,61 @@
+.booking_companies_page {
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+    min-width: 0;
+}
+
+.booking_companies_search, .booking_companies_card, .booking_companies_message {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.booking_companies_search { padding: 2rem; }
+.booking_companies_search label { display: block; margin-bottom: .8rem; color: var(--text); font-size: 1.3rem; font-weight: 600; }
+.booking_companies_search_row { display: flex; gap: 1rem; max-width: 64rem; }
+.booking_companies_input { display: flex; align-items: center; gap: 1rem; flex: 1; min-width: 0; padding: 0 1.3rem; background: var(--input-bg); border: 1px solid var(--border-strong); border-radius: var(--radius-md); color: var(--text-muted); }
+.booking_companies_input:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring); }
+.booking_companies_input input { width: 100%; min-width: 0; height: 4.2rem; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 1.4rem; }
+.booking_companies_search_row > button { padding: 0 2rem; border: 0; border-radius: var(--radius-md); background: var(--primary); color: var(--text-white); font-size: 1.3rem; font-weight: 600; cursor: pointer; }
+.booking_companies_search_row > button:hover { background: var(--primary-dark); }
+.booking_companies_section_heading h2 { color: var(--text); font-size: 1.8rem; font-weight: 600; }
+.booking_companies_section_heading p { margin-top: .4rem; color: var(--text-muted); font-size: 1.3rem; }
+.booking_companies_list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 40rem), 1fr)); gap: 1.6rem; align-items: start; }
+.booking_companies_card { overflow: hidden; }
+.booking_companies_card_header { display: flex; align-items: center; gap: 1.2rem; padding: 1.8rem; }
+.booking_companies_company_icon, .booking_companies_branch_icon { display: grid; flex-shrink: 0; place-items: center; border-radius: var(--radius-md); }
+.booking_companies_company_icon { width: 4.4rem; height: 4.4rem; background: var(--primary-light); color: var(--primary-text); }
+.booking_companies_card_title { flex: 1; min-width: 0; }
+.booking_companies_card_title h3 { overflow-wrap: anywhere; font-size: 1.5rem; font-weight: 600; }
+.booking_companies_card_title p { margin-top: .3rem; color: var(--text-muted); font-size: 1.2rem; }
+.booking_companies_expand { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .8rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--primary-text); font-size: 1.2rem; font-weight: 600; cursor: pointer; }
+.booking_companies_expand:hover { background: var(--primary-light); }
+.booking_companies_branches { padding: 0 1.8rem 1.8rem; list-style: none; }
+.booking_companies_branch { display: flex; align-items: center; gap: 1rem; padding: 1.2rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--gray-light); }
+.booking_companies_branch + .booking_companies_branch { margin-top: .8rem; }
+.booking_companies_branch_icon { width: 3.6rem; height: 3.6rem; background: var(--surface); color: var(--text-soft); }
+.booking_companies_branch strong, .booking_companies_branch span:not(.booking_companies_branch_icon) { display: block; }
+.booking_companies_branch strong { color: var(--text); font-size: 1.3rem; font-weight: 600; }
+.booking_companies_branch div span { margin-top: .2rem; color: var(--text-muted); font-size: 1.2rem; }
+.booking_companies_branch_info { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.booking_companies_branch_link { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; flex-shrink: 0; padding: .8rem 1rem; border: 1px solid var(--primary-border); border-radius: var(--radius-md); color: var(--primary-text); background: var(--surface); font-size: 1.2rem; font-weight: 600; text-decoration: none; }
+.booking_companies_branch_link:hover { background: var(--primary-light); }
+.booking_sucursal_back { display: inline-block; margin-top: 1.5rem; color: var(--primary-text); font-size: 1.3rem; font-weight: 600; }
+.booking_companies_empty_branch { padding: 0 1.8rem 1.8rem; color: var(--text-muted); font-size: 1.3rem; }
+.booking_companies_message { padding: 2.4rem; color: var(--text-muted); font-size: 1.4rem; }
+.booking_companies_message button { border: 0; background: none; color: var(--primary-text); font: inherit; text-decoration: underline; cursor: pointer; }
+.booking_companies_pagination { display: flex; align-items: center; justify-content: flex-end; gap: 1.2rem; color: var(--text-soft); font-size: 1.3rem; }
+.booking_companies_pagination button { padding: .8rem 1.2rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--text); font-size: 1.3rem; cursor: pointer; }
+.booking_companies_pagination button:disabled { opacity: .5; cursor: default; }
+.booking_companies_page button:focus-visible, .booking_companies_page a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+@media (max-width: 480px) {
+    .booking_companies_card_header { flex-wrap: wrap; }
+    .booking_companies_expand { margin-left: 5.6rem; }
+    .booking_companies_search_row > button { padding: 0 1.2rem; }
+    .booking_companies_branch { flex-wrap: wrap; }
+    .booking_companies_branch_info { flex-basis: calc(100% - 4.6rem); }
+    .booking_companies_branch_link { margin-left: 4.6rem; }
+}

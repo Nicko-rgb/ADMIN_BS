@@ -24,7 +24,7 @@ const SUCURSAL_STATUS_CLASSNAMES = { ACTIVE: 'active', INACTIVE: 'inactive', MAI
 
 const Company = () => {
     const {
-        company, isLoading, errorStatus, errorMessage, retry, planUsage,
+        company, subsidiaries, users, branchesStatus, usersStatus, isLoading, errorStatus, errorMessage, retry, planUsage,
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany,
         handleSubmitCompanyEdit, companyEditProps,
         openRegisterSucursal, isUserModalOpen, openUserModal, closeUserModal,
@@ -60,7 +60,7 @@ const Company = () => {
         return null;
     }
 
-    const owner = company.users.find((u) => u.role === 'super_admin') ?? null;
+    const owner = users.find((u) => u.role === 'super_admin') ?? null;
     const isPrimary = company.publicId === planUsage?.primaryCompany?.publicId;
 
     return (
@@ -146,7 +146,7 @@ const Company = () => {
                         <User size={15} />
                         <span>Dueño:</span>
                     </div>
-                    {owner ? (
+                    {usersStatus === 'loading' ? <span className="owner_empty">Cargando dueño...</span> : usersStatus === 'error' ? <span className="owner_empty">No se pudo cargar el dueño.</span> : owner ? (
                         <div className="owner_chips_list">
                             <span className="owner_chip name_chip">
                                 <strong>{`${owner.firstName ?? ''} ${owner.lastName ?? ''}`.trim() || '—'}</strong>
@@ -195,9 +195,11 @@ const Company = () => {
                         <Button text="Nueva Sucursal" size="sm" icon={Plus} onClick={openRegisterSucursal} />
                     )}
                 </div>
-                {company.subsidiaries.length > 0 ? (
+                {branchesStatus === 'loading' ? <div className="company_empty_state" role="status">Cargando sucursales...</div> : branchesStatus === 'error' ? (
+                    <div className="company_empty_state" role="alert"><span>No se pudieron cargar las sucursales.</span><Button text="Reintentar" size="sm" onClick={retry} /></div>
+                ) : subsidiaries.length > 0 ? (
                     <div className="company_subsidiaries_grid">
-                        {company.subsidiaries.map((subsidiary) => (
+                        {subsidiaries.map((subsidiary) => (
                             <div className="subsidiary_card" key={subsidiary.publicId}>
                                 {subsidiary.status ? (
                                     <span className={`subsidiary_status_dot ${SUCURSAL_STATUS_CLASSNAMES[subsidiary.status]}`} title={SUCURSAL_STATUS_LABELS[subsidiary.status]} />
@@ -238,12 +240,14 @@ const Company = () => {
                     <h3>Usuarios</h3>
                     <PlanUsageBar value={planUsage?.users} label="Usuarios" />
                     {canManageCompanyUsers && (
-                        <Button text="Nuevo Usuario" size="sm" icon={Plus} onClick={openUserModal} />
+                        <Button text="Nuevo Usuario" size="sm" icon={Plus} onClick={openUserModal} disabled={branchesStatus !== 'ready'} />
                     )}
                 </div>
-                {company.users.length > 0 ? (
+                {usersStatus === 'loading' ? <div className="company_empty_state" role="status">Cargando usuarios...</div> : usersStatus === 'error' ? (
+                    <div className="company_empty_state" role="alert"><span>No se pudieron cargar los usuarios.</span><Button text="Reintentar" size="sm" onClick={retry} /></div>
+                ) : users.length > 0 ? (
                     <div className="users_grid">
-                        {company.users.map((user) => (
+                        {users.map((user) => (
                             <div className="card" key={user.publicId}>
                                 <div className="header">
                                     <span className="name">{`${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || '—'}</span>
@@ -310,7 +314,7 @@ const Company = () => {
             {canManageCompanyUsers && isUserModalOpen && (
                 <UserAsingSucursal
                     onClose={closeUserModal}
-                    subsidiaries={company.subsidiaries}
+                    subsidiaries={subsidiaries}
                     onSaved={retry}
                 />
             )}
