@@ -1,9 +1,9 @@
-import { Pencil, Search, Trash2, Trophy } from 'lucide-react';
+import { Pencil, Plus, Search, Trash2, Trophy } from 'lucide-react';
 import { Table, TableActions } from '../../../shared/components/Table';
 import type { TableColumn } from '../../../shared/components/Table';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
-import { InputField, SelectField } from '../../../shared/components';
+import { Button, InputField, SelectField } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { useSportTypes } from '../hooks/useSportTypes';
 import { EditCatalogo } from '../components/EditCatalogo';
@@ -27,6 +27,14 @@ const SportTypesPage = () => {
         isCreateOpen, createForm, openCreate, closeCreate, setCreateField, handleCreateSubmit, isCreating,
     } = useSportTypes();
 
+    usePageHeader({
+        title: 'Deportes',
+        subtitle: 'Administra los tipos de deporte del sistema',
+        icon: Trophy,
+        extra: <Button text="Nuevo deporte" onClick={openCreate} icon={Plus} size="sm" iconPosition="left" />,
+        breadcrumbs: [{ label: 'Deportes' }],
+    });
+
     const columns: TableColumn<SportType>[] = [
         { key: 'code', header: 'Código' },
         { key: 'name', header: 'Nombre' },
@@ -45,7 +53,6 @@ const SportTypesPage = () => {
 
     return (
         <div className="catalog_page">
-            <Header title="Deportes" subtitle="Administra los tipos de deporte del sistema" icon={Trophy} action={{ label: 'Nuevo deporte', onClick: openCreate }} />
             <div className="catalog_toolbar">
                 <div className="catalog_toolbar_search">
                     <InputField

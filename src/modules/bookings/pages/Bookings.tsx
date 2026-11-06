@@ -4,7 +4,7 @@ import { Header } from '../../../shared/components/Header';
 import { useCompanyContextStore } from '../../../shared/store/sessionStore';
 import '../styles/MyCompanys.css';
 
-const SucursalBookings = () => {
+const Bookings = () => {
     const { sucursalPublicId } = useParams<{ sucursalPublicId: string }>();
     const location = useLocation();
     const companies = useCompanyContextStore((state) => state.companies);
@@ -17,7 +17,6 @@ const SucursalBookings = () => {
 
     return (
         <main className="booking_companies_page">
-            <Header title={branchName} subtitle="Reservas de la sucursal" icon={CalendarDays} breadcrumbs={[{ label: 'Reservas', path: returnTo }]} />
             <div className="booking_companies_message">
                 <p>El calendario y el selector de espacios de esta sucursal estarán disponibles próximamente.</p>
                 <Link className="booking_sucursal_back" to={returnTo}>Volver a reservas</Link>
@@ -26,4 +25,4 @@ const SucursalBookings = () => {
     );
 };
 
-export default SucursalBookings;
+export default Bookings;

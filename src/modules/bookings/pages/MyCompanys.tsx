@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Building2, CalendarDays, ChevronDown, ChevronUp, MapPin, Search } from 'lucide-react';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { useCompanyContextStore, useSessionStore } from '../../../shared/store/sessionStore';
+import toast from '../../../shared/utils/toast';
 import type { ContextCompany } from '../../../shared/interfaces/session.interface';
 import type { PaginationMeta } from '../../../shared/interfaces/pagination.interface';
 import type { CompanyAdmin, CompanySubsidiary } from '../../companys/interfaces/company.interface';
@@ -21,7 +22,7 @@ const Branches = ({ branches }: { branches: { publicId: string; name: string; de
                 <li className="booking_companies_branch" key={branch.publicId}>
                     <span className="booking_companies_branch_icon"><MapPin size={17} /></span>
                     <div className="booking_companies_branch_info"><strong>{branch.name}</strong><span>{branch.detail || 'Sucursal'}</span></div>
-                    <Link className="booking_companies_branch_link" to={`/bookings/sucursals/${encodeURIComponent(branch.publicId)}`} state={{ branchName: branch.name, returnTo: location.pathname + location.search }} aria-label={`Ir a reservas de ${branch.name}`}>
+                    <Link className="booking_companies_branch_link" to={`/bookings/branch/${encodeURIComponent(branch.publicId)}`} state={{ branchName: branch.name, returnTo: location.pathname + location.search }} aria-label={`Ir a reservas de ${branch.name}`}>
                         Ir a reservas <ArrowRight size={16} />
                     </Link>
                 </li>
@@ -147,9 +148,18 @@ const MyCompanys = () => {
     const companies = useCompanyContextStore((state) => state.companies);
     const isSystem = scopeLevel === 1;
 
+    usePageHeader({
+        title: 'Reservas',
+        subtitle: 'Empresas y sucursales disponibles para gestionar reservas',
+        icon: CalendarDays,
+        breadcrumbs: [
+            { label: 'Reservas' },
+        ],
+        onNotificationClick: () => toast.info('Notificaciones'),
+    });
+
     return (
         <main className="booking_companies_page">
-            <Header title="Reservas" subtitle="Empresas y sucursales disponibles para gestionar reservas" icon={CalendarDays} />
             {isSystem ? <SystemCompanies /> : (
                 <>
                     <div className="booking_companies_section_heading"><div><h2>Mis empresas y sucursales</h2><p>Estas son las empresas y sucursales disponibles en tu cuenta.</p></div></div>

@@ -5,7 +5,7 @@ import { useMenu } from '../hooks/useMenu';
 import { useCompanyContextStore, useSessionStore } from '../store/sessionStore';
 import { useAppLayout } from '../hooks/useAppLayout';
 import { resolveMenuIcon } from '../utils/menuTree';
-// import { Link } from 'react-router-dom';
+import { Header } from './Header';
 import '../styles/AppLayout.css';
 
 // Shell del panel admin: sidebar con el menú del usuario (agrupado, con submenús) + área de contenido con las rutas hijas.
@@ -136,10 +136,8 @@ export const AppLayout = () => {
                 </div>
             </section>
             <section className="app_section">
-                {/* ── Breadcrum e icono ──────────────────────────────────── */}
-                {/* <header className='app_header'>
-                    <Link>Home</Link> <ChevronRight /> <Link>Ruta 1</Link> <ChevronRight /> <Link>Ruta 2</Link>
-                </header> */}
+                {/* Header global: cada página lo configura con usePageHeader. */}
+                <Header />
                 <main className='app_main'>
                     <Outlet />
                 </main>

@@ -12,6 +12,7 @@ import SpaceService from '../service/spaceService';
 import useSpace from '../hooks/useSpace';
 import type { SpaceTab, SpaceMediaFile, InfoChipProps, GroupChipsProps } from '../interfaces/space.interface';
 import '../styles/Space.css';
+import { usePageHeader } from '../../../shared/store/headerStore';
 
 const InfoChip = ({ icon: Icon, value, className }: InfoChipProps) => {
     return (
@@ -43,6 +44,16 @@ const Space = () => {
     const [isEditOpen, setIsEditOpen] = useState(false);
     // Archivo de la galería abierto en el visor (modo lectura).
     const [mediaToView, setMediaToView] = useState<SpaceMediaFile | null>(null);
+
+    usePageHeader({
+        showCard: false,
+        breadcrumbs: [
+            { label: 'Empresas', path: '/companys' },
+            ...(space?.parent?.companyName && space.parent.companyPublicId ? [{ label: space.parent.companyName, path: `/companys/company/${space.parent.companyPublicId}` }] : []),
+            ...(space?.parent?.sucursalName && space.parent.sucursalPublicId ? [{ label: space.parent.sucursalName, path: `/companys/company/sucursal/${space.parent.sucursalPublicId}` }] : []),
+            { label: space?.name || 'Cargando...' },
+        ],
+    });
 
     if (isLoading) {
         return <LoadingScreen message="Cargando espacio..." />;

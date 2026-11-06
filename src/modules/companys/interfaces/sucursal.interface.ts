@@ -34,6 +34,7 @@ export interface SucursalUbigeo {
 export interface SucursalDetail {
     publicId: string;
     companyPublicId: string | null;
+    companyName: string | null;
     name: string;
     address: string;
     phoneCell: string;

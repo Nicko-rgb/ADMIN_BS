@@ -1,9 +1,9 @@
-import { Grid3x3, Pencil, Search, Trash2 } from 'lucide-react';
+import { Grid3x3, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { Table, TableActions } from '../../../shared/components/Table';
 import type { TableColumn } from '../../../shared/components/Table';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
-import { InputField } from '../../../shared/components';
+import { Button, InputField } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { useSurfaceTypes } from '../hooks/useSurfaceTypes';
 import { EditCatalogo } from '../components/EditCatalogo';
@@ -20,6 +20,14 @@ const SurfaceTypesPage = () => {
         deletingSurfaceType, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
         isCreateOpen, createForm, openCreate, closeCreate, setCreateField, handleCreateSubmit, isCreating,
     } = useSurfaceTypes();
+
+    usePageHeader({
+        title: 'Superficies',
+        subtitle: 'Administra los tipos de superficie del sistema',
+        icon: Grid3x3,
+        extra: <Button text="Nueva superficie" onClick={openCreate} icon={Plus} size="sm" iconPosition="left" />,
+        breadcrumbs: [{ label: 'Superficies' }],
+    });
 
     const columns: TableColumn<SurfaceType>[] = [
         { key: 'code', header: 'Código' },
@@ -38,7 +46,6 @@ const SurfaceTypesPage = () => {
 
     return (
         <div className="catalog_page">
-            <Header title="Superficies" subtitle="Administra los tipos de superficie del sistema" icon={Grid3x3} action={{ label: 'Nueva superficie', onClick: openCreate }} />
             <div className="catalog_toolbar">
                 <div className="catalog_toolbar_search">
                     <InputField

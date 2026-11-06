@@ -4,7 +4,8 @@ import {
     Gift, ShieldCheck, UserCog, Phone, FileText, User, Mail, Calendar,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Header, Button, LoadingScreen, NotFoundScreen, ForbiddenScreen } from '../../../shared/components';
+import { Button, LoadingScreen, NotFoundScreen, ForbiddenScreen } from '../../../shared/components';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { PlanUsageBar } from '../../saas/components/PlanUsageBar';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
@@ -40,7 +41,15 @@ const Company = () => {
 
     const [managingUser, setManagingUser] = useState<{ publicId: string; name: string } | null>(null);
 
-    if (isLoading) {
+    usePageHeader({
+        showCard: false,
+        breadcrumbs: [
+            { label: 'Empresas', path: '/companys' },
+            { label: company?.name || 'Cargando...' },
+        ],
+    });
+
+    if (isLoading || !company) {
         return <LoadingScreen message="Cargando empresa..." size="lg" />;
     }
 
@@ -56,17 +65,11 @@ const Company = () => {
         return <NotFoundScreen message={errorMessage} onRetry={retry} />;
     }
 
-    if (!company) {
-        return null;
-    }
-
     const owner = users.find((u) => u.role === 'super_admin') ?? null;
     const isPrimary = company.publicId === planUsage?.primaryCompany?.publicId;
 
     return (
         <div className="company_detail_page">
-            <Header title={company.name} breadcrumbs={[{ label: 'Empresas', path: '/companys' }]} showCard={false} />
-
             {/* ── Hero / Banner unificado ──────────────────────────── */}
             <div className="company_hero_banner card">
                 <div className="company_hero_main">

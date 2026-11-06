@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { Building2, Eye, Search } from 'lucide-react';
+import { Building2, Eye, Plus, Search } from 'lucide-react';
 import { Table, TableImage, TableActions } from '../../../shared/components/Table';
 import type { TableColumn } from '../../../shared/components/Table';
-import { Header } from '../../../shared/components/Header';
 import { Button } from '../../../shared/components/Button';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { InputField, SelectField } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { formatPhone } from '../../../shared/utils/formatText';
@@ -45,6 +45,16 @@ const CompanysPage = () => {
 
     const can = usePermission();
     const canCreate = can('company.create');
+
+    usePageHeader({
+        title: 'Empresas',
+        subtitle: 'Empresas registradas en el sistema',
+        icon: Building2,
+        breadcrumbs: [{ label: 'Empresas' }],
+        extra: canCreate ? (
+            <Button text="Crear empresa" size="sm" icon={Plus} iconPosition="left" onClick={() => navigate('/companys/register-company')} />
+        ) : undefined,
+    });
 
     const goToCompany = (company: CompanyAdmin) => navigate(`/companys/company/${company.publicId}`);
 
@@ -93,13 +103,6 @@ const CompanysPage = () => {
 
     return (
         <div className="companys_page">
-            <Header
-                title="Empresas"
-                subtitle="Empresas registradas en el sistema"
-                icon={Building2}
-                action={canCreate ? { label: 'Crear empresa', onClick: () => navigate('/companys/register-company') } : undefined}
-            />
-
             {isSuperAdmin ? (
                 <div className="companys_cards_grid">
                     {items.map((company) => (

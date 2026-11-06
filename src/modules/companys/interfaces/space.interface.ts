@@ -41,6 +41,12 @@ export interface SpaceListItem {
 // Detalle completo de un espacio deportivo — espeja toSpaceDto del backend.
 export interface SpaceDetail {
     publicId: string;
+    parent: {
+        sucursalName: string;
+        sucursalPublicId: string;
+        companyName: string | null;
+        companyPublicId: string | null;
+    } | null;
     name: string;
     sport: string | null;
     sportTypeId: number;

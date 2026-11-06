@@ -1,9 +1,7 @@
-import { LayoutGrid, Pencil, Search, Trash2 } from 'lucide-react';
-import { Table, TableActions } from '../../../shared/components/Table';
+import { LayoutGrid, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import type { TableColumn } from '../../../shared/components/Table';
-import { Header } from '../../../shared/components/Header';
-import { Dialog } from '../../../shared/components/Dialog';
-import { InputField } from '../../../shared/components';
+import { usePageHeader } from '../../../shared/store/headerStore';
+import { Dialog, Button, InputField, Table, TableActions } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { useMenuItems } from '../hooks/useMenuItems';
 import { CreateEditMenuItem } from '../components/CreateEditMenuItem';
@@ -26,6 +24,14 @@ const MenuManage = () => {
         openCreate, closeCreate, isCreateOpen, createForm, setCreateField, toggleCreateFormRole, handleCreateSubmit, isCreating,
         deletingItem, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
     } = useMenuItems();
+
+    usePageHeader({
+        title: 'Menú',
+        subtitle: 'Administra los ítems del menú de navegación',
+        icon: LayoutGrid,
+        extra: <Button text="Nuevo menú" size='sm' icon={Plus} onClick={openCreate} iconPosition='left' />,
+        breadcrumbs: [{ label: 'Menú' }],
+    });
 
     const roleLabelsById = new Map(roles.map((role) => [role.id, role.label]));
 
@@ -53,7 +59,6 @@ const MenuManage = () => {
 
     return (
         <div className="catalog_page">
-            <Header title="Menú" subtitle="Administra los ítems del menú de navegación" icon={LayoutGrid} action={{ label: 'Nuevo ítem', onClick: openCreate }} />
             <div className="catalog_toolbar">
                 <div className="catalog_toolbar_search">
                     <InputField

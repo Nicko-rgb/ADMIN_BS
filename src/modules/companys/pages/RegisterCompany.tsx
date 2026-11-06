@@ -1,9 +1,9 @@
 import { Fragment } from 'react';
 import { Building2, Check, ArrowLeft, ArrowRight, UploadCloud } from 'lucide-react';
-import { Header } from '../../../shared/components/Header';
 import { Button } from '../../../shared/components/Button';
 import { ForbiddenScreen, FormSection, SelectField } from '../../../shared/components';
 import { usePermission } from '../../../shared/hooks/usePermission';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import CompanyStepForm from '../components/CompanyStepForm';
 import PlanStepForm from '../components/PlanStepForm';
 import FormUserManage from '../../users/components/FormUserManage';
@@ -27,19 +27,22 @@ const RegisterCompany = () => {
     } = useRegisterCompany();
 
     const can = usePermission();
+    usePageHeader({
+        title: 'Registrar empresa',
+        subtitle: isPrimaryRegistration ? 'Alta de una empresa primaria, su dueño y su plan' : 'Alta de una empresa hermana dentro de tu grupo',
+        icon: Building2,
+        breadcrumbs: [
+            { label: 'Empresas', path: '/companys' },
+            { label: 'Registrar empresa' },
+        ],
+    });
+
     if (!can('company.create')) {
         return <ForbiddenScreen />;
     }
 
     return (
         <div className="register_company">
-            <Header
-                title="Registrar empresa"
-                subtitle={isPrimaryRegistration ? 'Alta de una empresa primaria, su dueño y su plan' : 'Alta de una empresa hermana dentro de tu grupo'}
-                icon={Building2}
-                breadcrumbs={[{ label: 'Empresas', path: '/companys' }]}
-            />
-
             <div className="register_steps_card">
                 {(isPrimaryRegistration ? ['Empresa', 'Dueño', 'Plan'] : ['Empresa', 'Suscripción compartida']).map((label, index) => {
                     const stepNumber = (index + 1) as 1 | 2 | 3;

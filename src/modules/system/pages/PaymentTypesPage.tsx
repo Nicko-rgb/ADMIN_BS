@@ -1,9 +1,9 @@
-import { CreditCard, Pencil, Search, Trash2 } from 'lucide-react';
+import { CreditCard, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { Table, TableImage, TableActions } from '../../../shared/components/Table';
 import type { TableColumn } from '../../../shared/components/Table';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
-import { InputField, SelectField } from '../../../shared/components';
+import { Button, InputField, SelectField } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { usePaymentTypes } from '../hooks/usePaymentTypes';
 import { EditCatalogo } from '../components/EditCatalogo';
@@ -26,6 +26,14 @@ const PaymentTypesPage = () => {
         deletingPaymentType, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
         isCreateOpen, createForm, openCreate, closeCreate, setCreateField, handleCreateSubmit, isCreating, countryOptions,
     } = usePaymentTypes();
+
+    usePageHeader({
+        title: 'Tipos de pago',
+        subtitle: 'Administra los tipos de pago disponibles en el sistema',
+        icon: CreditCard,
+        extra: <Button text="Nuevo tipo de pago" onClick={openCreate} icon={Plus} size="sm" iconPosition="left" />,
+        breadcrumbs: [{ label: 'Tipos de pago' }],
+    });
 
     const columns: TableColumn<PaymentType>[] = [
         {
@@ -56,7 +64,6 @@ const PaymentTypesPage = () => {
 
     return (
         <div className="catalog_page">
-            <Header title="Tipos de pago" subtitle="Administra los tipos de pago disponibles en el sistema" icon={CreditCard} action={{ label: 'Nuevo tipo de pago', onClick: openCreate }} />
             <div className="catalog_toolbar">
                 <div className="catalog_toolbar_search">
                     <InputField

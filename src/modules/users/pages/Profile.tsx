@@ -1,5 +1,6 @@
 import { BadgeCheck, Building2, CalendarDays, CheckCircle2, CreditCard, Crown, Edit, KeyRound, Mail, Phone, ShieldCheck, UserCircle, UploadCloud, X } from 'lucide-react';
-import { LoadingScreen, ForbiddenScreen, Button, Header, Modal, FormActions } from '../../../shared/components';
+import { LoadingScreen, ForbiddenScreen, Button, Modal, FormActions } from '../../../shared/components';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import ProfileCompanyContext from '../components/ProfileCompanyContext';
 import UserProfileFields from '../components/UserProfileFields';
 import useProfile from '../hooks/useProfile';
@@ -41,6 +42,14 @@ const Profile = () => {
         openEditProfile, closeEditProfile, setEditField, submitEditProfile,
         navigateToSubscriptions,
     } = useProfile();
+
+    usePageHeader({
+        visible: canReadProfile,
+        title: 'Mi perfil',
+        subtitle: 'Tu cuenta, acceso y seguridad',
+        icon: UserCircle,
+        breadcrumbs: [{ label: 'Mi perfil' }],
+    });
     
     if (!canReadProfile) {
         return <ForbiddenScreen message="No tienes acceso a tu perfil." />;
@@ -53,7 +62,6 @@ const Profile = () => {
     return (
         <div className="profile_page">
             <main>
-                <Header title="Mi perfil" subtitle="Tu cuenta, acceso y seguridad" icon={UserCircle} showCard={false} />
                 <section className="profile_hero card">
                     <div className="avatar center">{initials}</div>
                     <div className="hero_copy">

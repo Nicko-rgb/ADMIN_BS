@@ -1,10 +1,10 @@
 import '../styles/CatalogPage.css';
-import { Globe, Pencil, Search, Trash2 } from 'lucide-react';
+import { Globe, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { Table, TableImage, TableActions } from '../../../shared/components/Table';
 import type { TableColumn } from '../../../shared/components/Table';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
-import { InputField, SelectField } from '../../../shared/components';
+import { Button, InputField, SelectField } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { useCountries } from '../hooks/useCountries';
 import { EditCatalogo } from '../components/EditCatalogo';
@@ -26,6 +26,16 @@ const CountriesPage = () => {
         deletingCountry, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
         isCreateOpen, createForm, openCreate, closeCreate, setCreateField, handleCreateSubmit, isCreating,
     } = useCountries();
+
+    usePageHeader({
+        title: 'Países',
+        subtitle: 'Administra los países disponibles en el sistema',
+        icon: Globe,
+        extra: <Button text='Nuevo país' onClick={openCreate} icon={Plus} size='sm' iconPosition='left' />,
+        breadcrumbs: [
+            { label: 'Países' },
+        ],
+    });
 
     const columns: TableColumn<Country>[] = [
         {
@@ -56,7 +66,6 @@ const CountriesPage = () => {
 
     return (
         <div className="catalog_page">
-            <Header title="Países" subtitle="Administra los países disponibles en el sistema" icon={Globe} action={{ label: 'Nuevo país', onClick: openCreate }} />
             <div className="catalog_toolbar">
                 <div className="catalog_toolbar_search">
                     <InputField

@@ -24,6 +24,7 @@ import usePlanUsage from '../../saas/hooks/usePlanUsage';
 import useSucursal from '../hooks/useSucursal';
 import type { InfoChipProps } from '../interfaces/sucursal.interface';
 import '../styles/Sucursal.css';
+import { usePageHeader } from '../../../shared/store/headerStore';
 
 const STATUS_LABELS = { ACTIVE: 'Activa', INACTIVE: 'Inactiva', MAINTENANCE: 'Mantenimiento' } as const;
 const STATUS_CLASSNAMES = { ACTIVE: 'active', INACTIVE: 'inactive', MAINTENANCE: 'maintenance' } as const;
@@ -80,16 +81,25 @@ const Sucursal = () => {
     // Limpia el timer al desmontar la página.
     useEffect(() => () => { if (closeTimer.current) window.clearTimeout(closeTimer.current); }, []);
 
+    usePageHeader({
+        showCard: false,
+        breadcrumbs: [
+            { label: 'Empresas', path: '/companys' },
+            ...(sucursal?.companyName ? [{ label: sucursal.companyName, path: `/companys/company/${sucursal.companyPublicId}` }] : []),
+            { label: sucursal?.name || 'Cargando...' },
+        ],
+    });
+
     if (isLoading) {
-        return <LoadingScreen message="Cargando sucursal..."/>;
+        return <LoadingScreen message="Cargando sucursal..." />;
     }
 
     if (errorStatus === 'not_found') {
-        return <NotFoundScreen onRetry={retry} message={errorMessage || 'No se pudo encontrar información de esta sucursal' } />;
+        return <NotFoundScreen onRetry={retry} message={errorMessage || 'No se pudo encontrar información de esta sucursal'} />;
     }
 
     if (errorStatus === 'forbidden') {
-        return <ForbiddenScreen  message={errorMessage} />;
+        return <ForbiddenScreen message={errorMessage} />;
     }
 
     if (errorStatus === 'unknown') {
@@ -158,47 +168,47 @@ const Sucursal = () => {
                     </div>
                     <div className="cover_actions">
                         <div className="cover_socials">
-                        {socials.length > 0 && (
-                            <div
-                                ref={fanRef}
-                                className={`cover_socials_fan ${isSocialsOpen ? 'is_open' : ''}`}
-                                onMouseEnter={openSocialsFan}
-                                onMouseLeave={closeSocialsFan}
-                                onFocus={openSocialsFan}
-                                onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) closeSocialsFan(); }}
-                            >
-                                <button
-                                    type="button"
-                                    className="cover_socials_trigger"
-                                    aria-label="Ver redes sociales"
-                                    aria-expanded={isSocialsOpen}
-                                    onClick={openSocialsFan}
+                            {socials.length > 0 && (
+                                <div
+                                    ref={fanRef}
+                                    className={`cover_socials_fan ${isSocialsOpen ? 'is_open' : ''}`}
+                                    onMouseEnter={openSocialsFan}
+                                    onMouseLeave={closeSocialsFan}
+                                    onFocus={openSocialsFan}
+                                    onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) closeSocialsFan(); }}
                                 >
-                                    <Share2 size={18} aria-hidden />
-                                </button>
-                                {socials.map(({ href, label, key, Icon }, idx) => (
-                                    <a
-                                        key={label}
-                                        href={href}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        title={label}
-                                        aria-label={label}
-                                        className={`center cover_social_link ${key}`}
-                                        style={{ '--fan-angle': `${fanAngles[idx]}deg`, '--fan-delay': `${idx * 45}ms` } as CSSProperties}
+                                    <button
+                                        type="button"
+                                        className="cover_socials_trigger"
+                                        aria-label="Ver redes sociales"
+                                        aria-expanded={isSocialsOpen}
+                                        onClick={openSocialsFan}
                                     >
-                                        <Icon size={16} aria-hidden />
-                                    </a>
-                                ))}
-                            </div>
-                        )}
-                        {can('company.view') && (
-                            <Button text="Mi Empresa" size="sm" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
-                        )}
-                        {can('sucursal.edit') && (
-                            <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
-                        )}
-                    </div>
+                                        <Share2 size={18} aria-hidden />
+                                    </button>
+                                    {socials.map(({ href, label, key, Icon }, idx) => (
+                                        <a
+                                            key={label}
+                                            href={href}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            title={label}
+                                            aria-label={label}
+                                            className={`center cover_social_link ${key}`}
+                                            style={{ '--fan-angle': `${fanAngles[idx]}deg`, '--fan-delay': `${idx * 45}ms` } as CSSProperties}
+                                        >
+                                            <Icon size={16} aria-hidden />
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
+                            {can('company.view') && (
+                                <Button text="Mi Empresa" size="sm" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
+                            )}
+                            {can('sucursal.edit') && (
+                                <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
+                            )}
+                        </div>
                     </div>
                 </div>
 
