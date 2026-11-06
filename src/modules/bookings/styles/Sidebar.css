@@ -257,6 +257,60 @@
     line-height: 1.5;
 }
 
+.booking_calendar_side_feedback {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    padding: .6rem .9rem;
+    color: var(--bk-text-muted);
+    font-size: 1.15rem;
+    line-height: 1.5;
+}
+
+.booking_calendar_side_feedback_row {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+
+    svg {
+        flex-shrink: 0;
+        margin-top: .15rem;
+    }
+}
+
+.booking_calendar_side_retry {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .45rem .8rem;
+    border: 1px solid var(--bk-border);
+    border-radius: var(--bk-radius-sm);
+    background: var(--bk-surface);
+    color: var(--bk-text-soft);
+    font-size: 1.05rem;
+    font-weight: 600;
+
+    &:hover {
+        border-color: var(--bk-border-strong);
+        color: var(--bk-text);
+    }
+}
+
+.booking_calendar_side_feedback .is_spinning {
+    animation: booking_calendar_spin .8s linear infinite;
+}
+
+@keyframes booking_calendar_spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .booking_calendar_side_feedback .is_spinning {
+        animation: none;
+    }
+}
+
 .booking_calendar_back {
     display: inline-flex;
     align-items: center;

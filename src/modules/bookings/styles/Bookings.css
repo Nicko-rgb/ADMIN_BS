@@ -8,7 +8,6 @@
     min-height: 0;
     display: flex;
     background: var(--bk-bg);
-    /* border-radius: var(--bk-radius-xl); */
     color: var(--bk-text);
     font-family: var(--bk-font);
 
@@ -188,6 +187,35 @@
 
         svg {
             color: var(--bk-accent-text);
+        }
+    }
+}
+
+.booking_calendar_inline_error {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .45rem .8rem;
+    border-radius: var(--bk-radius-sm);
+    background: var(--bk-danger-soft);
+    color: var(--bk-danger-text);
+    font-size: 1.1rem;
+    font-weight: 500;
+
+    button {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .2rem .5rem;
+        border: 0;
+        border-radius: var(--bk-radius-sm);
+        background: transparent;
+        color: inherit;
+        font-size: 1.05rem;
+        font-weight: 700;
+
+        &:hover {
+            background: var(--bk-surface);
         }
     }
 }
@@ -415,101 +443,6 @@
     &.selected .booking_calendar_month_num {
         background: var(--bk-ink);
         color: var(--bk-on-ink);
-    }
-}
-
-/* ── Estados de carga / error ────────────────────────────────────────────── */
-
-.booking_calendar_state {
-    flex: 1;
-    display: grid;
-    place-items: center;
-    padding: 4rem 2rem;
-}
-
-.booking_calendar_state_card {
-    max-width: 46rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 3rem;
-    background: var(--bk-surface);
-    border: 1px solid var(--bk-border);
-    border-radius: var(--bk-radius-lg);
-    box-shadow: var(--bk-shadow-soft);
-    text-align: center;
-
-    h1 {
-        font-size: 1.8rem;
-        font-weight: 600;
-        letter-spacing: -.02em;
-    }
-
-    p {
-        color: var(--bk-text-muted);
-        font-size: 1.25rem;
-        line-height: 1.55;
-    }
-}
-
-.booking_calendar_state_icon {
-    width: 4.8rem;
-    height: 4.8rem;
-    display: grid;
-    place-items: center;
-    border-radius: var(--bk-radius-md);
-    background: var(--bk-accent-soft);
-    color: var(--bk-accent-text);
-}
-
-.booking_calendar_state_actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-top: .8rem;
-}
-
-.booking_calendar_retry_button {
-    padding: .8rem 1.3rem;
-    border: 1px solid var(--bk-border-strong);
-    border-radius: var(--bk-radius-md);
-    background: var(--bk-surface);
-    color: var(--bk-text);
-    font-size: 1.2rem;
-    font-weight: 600;
-
-    &:hover {
-        background: var(--bk-surface-muted);
-    }
-}
-
-.booking_calendar_link_button {
-    display: inline-flex;
-    align-items: center;
-    gap: .6rem;
-    padding: .8rem 1.3rem;
-    border-radius: var(--bk-radius-md);
-    background: var(--bk-ink);
-    color: var(--bk-on-ink);
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.booking_calendar_loader {
-    width: 3.4rem;
-    height: 3.4rem;
-    border: 3px solid var(--bk-accent-soft);
-    border-top-color: var(--bk-accent);
-    border-radius: 50%;
-    animation: booking_calendar_spin .8s linear infinite;
-}
-
-@keyframes booking_calendar_spin {
-    to {
-        transform: rotate(360deg);
     }
 }
 
