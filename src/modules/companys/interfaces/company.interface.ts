@@ -81,6 +81,26 @@ export interface CompanyDetail {
     createdAt: string;
 }
 
+// Árbol liviano empresa → sucursales → espacios (endpoint /companys/branches/:publicId/tree).
+export interface CompanyTreeSpace {
+    publicId: string;
+    name: string;
+}
+
+export interface CompanyTreeBranch {
+    publicId: string;
+    name: string;
+    spaces: CompanyTreeSpace[];
+}
+
+export interface CompanyBranchTree {
+    company: {
+        publicId: string;
+        name: string;
+    };
+    branches: CompanyTreeBranch[];
+}
+
 // Payload de autoedición de la propia empresa — todo opcional, incluye `document` (RUC) por si
 // se cargó mal al registrar; el backend revalida que no choque con el de otra empresa.
 export interface UpdateCompanyPayload {
