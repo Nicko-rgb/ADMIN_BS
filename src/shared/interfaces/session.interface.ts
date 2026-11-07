@@ -55,7 +55,6 @@ export interface CompanyContextState extends CompanyContextData {
     loadedAt: string | null;
     setContext: (userPublicId: string, context: CompanyContextData) => void;
     clearContext: () => void;
-    refreshContext: () => Promise<void>;
 }
 
 export interface SessionData {

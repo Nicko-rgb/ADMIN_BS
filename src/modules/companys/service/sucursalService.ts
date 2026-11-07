@@ -1,4 +1,3 @@
-import { refreshCompanyContext } from '../../../shared/utils/refreshCompanyContext';
 import { apiService } from '../../../shared/utils/apiService';
 import type { SucursalDetail, SucursalPayload, EntityStatus } from '../interfaces/sucursal.interface';
 import type { CompanySubsidiary } from '../interfaces/company.interface';
@@ -19,7 +18,6 @@ class SucursalService {
 
     static async register(companyPublicId: string, payload: SucursalPayload): Promise<{ data: SucursalDetail; message: string }> {
         const res = await apiService.post(`/sucursals/${companyPublicId}`, payload);
-        await refreshCompanyContext();
         return { data: res.data.data, message: res.data.message };
     }
 
@@ -30,7 +28,6 @@ class SucursalService {
 
     static async update(publicId: string, payload: SucursalPayload): Promise<{ data: SucursalDetail; message: string }> {
         const res = await apiService.put(`/sucursals/${publicId}`, payload);
-        await refreshCompanyContext();
         return { data: res.data.data, message: res.data.message };
     }
 

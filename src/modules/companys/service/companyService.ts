@@ -1,4 +1,3 @@
-import { refreshCompanyContext } from '../../../shared/utils/refreshCompanyContext';
 import { apiService } from '../../../shared/utils/apiService';
 import type { PaginatedResponse } from '../../../shared/interfaces/pagination.interface';
 import type { CompanyAdmin, CompanyDetail, CompanyEnabled, UpdateCompanyPayload, CompanyBranchTree } from '../interfaces/company.interface';
@@ -14,7 +13,6 @@ class CompanyService {
     // Alta de empresa (wizard de 3 pasos) — queda activa de una, sin comunicarse con MercadoPago.
     static async register(payload: RegisterCompanyPayload): Promise<{ data: CompanyAdmin; message: string }> {
         const res = await apiService.post('/companys/register', payload);
-        await refreshCompanyContext();
         return { data: res.data.data, message: res.data.message };
     }
 
@@ -34,7 +32,6 @@ class CompanyService {
     // Autoedición de la propia empresa — sin `document` (RUC).
     static async updateByPublicId(publicId: string, payload: UpdateCompanyPayload): Promise<{ data: CompanyDetail; message: string }> {
         const res = await apiService.put(`/companys/${publicId}`, payload);
-        await refreshCompanyContext();
         return { data: res.data.data, message: res.data.message };
     }
 }

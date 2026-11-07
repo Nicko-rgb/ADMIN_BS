@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Bell, ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, ShieldUser, UserCircle } from 'lucide-react';
 import { useMenu } from '../hooks/useMenu';
-import { useCompanyContextStore, useSessionStore } from '../store/sessionStore';
+import { useSessionStore } from '../store/sessionStore';
 import { useAppLayout } from '../hooks/useAppLayout';
 import { resolveMenuIcon } from '../utils/menuTree';
 import { Header } from './Header';
@@ -12,16 +11,7 @@ import '../styles/AppLayout.css';
 export const AppLayout = () => {
     const { groups, isLoading, expandedKeys, toggleExpanded } = useMenu();
     const user = useSessionStore((state) => state.user);
-    const userPublicId = user?.publicId;
     const { isCollapsed, toggleSidebar, isDark, toggleTheme, logout } = useAppLayout();
-
-    useEffect(() => {
-        if (!userPublicId) return;
-        const refresh = () => { void useCompanyContextStore.getState().refreshContext().catch(() => {}); };
-        refresh();
-        window.addEventListener('focus', refresh);
-        return () => window.removeEventListener('focus', refresh);
-    }, [userPublicId]);
 
     // Sin usuario (sesión recién limpiada, ej. token expirado) — no hay nada que mostrar, ProtectedRoute ya está redirigiendo.
     if (!user) return null;

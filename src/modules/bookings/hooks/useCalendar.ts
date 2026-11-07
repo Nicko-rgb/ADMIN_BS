@@ -17,6 +17,10 @@ import type { ContextCompany } from '../../../shared/interfaces/session.interfac
 const EMPTY_BRANCHES: CompanyTreeBranch[] = [];
 const EMPTY_SPACES: CompanyTreeSpace[] = [];
 
+// Horario temporal de la vista semanal; se reemplazará por el de la sucursal.
+const OPENING_HOUR = 10;
+const CLOSING_HOUR = 22;
+
 /**
  * Para usuarios con asignación a empresa/sucursal el árbol ya viene en el
  * contexto de sesión; solo se copian los nodos con `access === true`.
@@ -119,15 +123,13 @@ const useCalendar = () => {
     const company = currentTree?.company ?? null;
     const branches = currentTree?.branches ?? EMPTY_BRANCHES;
 
-    // La selección explícita manda; si el nodo ya no existe se cae a la
-    // sucursal de la URL y luego a la primera visible.
+    // Sin selección explícita válida se usa la primera sucursal disponible.
     const selectedBranch = useMemo(() => {
         if (!currentTree) return null;
         return currentTree.branches.find((branch) => branch.publicId === branchId)
-            ?? currentTree.branches.find((branch) => branch.publicId === sucursalPublicId)
             ?? currentTree.branches[0]
             ?? null;
-    }, [currentTree, branchId, sucursalPublicId]);
+    }, [currentTree, branchId]);
 
     const spaces = selectedBranch?.spaces ?? EMPTY_SPACES;
     const selectedSpace = useMemo(
@@ -148,6 +150,10 @@ const useCalendar = () => {
         [view, viewDate, weekDays],
     );
     const returnTo = useMemo(() => resolveReturnTo(location.state), [location.state]);
+    const timeSlots = useMemo(() => view === 'week'
+        ? Array.from({ length: CLOSING_HOUR - OPENING_HOUR }, (_, index) =>
+            `${String(OPENING_HOUR + index).padStart(2, '0')}:00`)
+        : TIME_SLOTS, [view]);
 
     return {
         company,
@@ -169,7 +175,7 @@ const useCalendar = () => {
         visibleDays,
         monthDays: WEEKDAYS_SHORT,
         monthCells,
-        timeSlots: TIME_SLOTS,
+        timeSlots,
         goPrev,
         goNext,
         goPrevMonth,

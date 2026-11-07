@@ -1,4 +1,3 @@
-import { refreshCompanyContext } from '../../../shared/utils/refreshCompanyContext';
 import { apiService } from '../../../shared/utils/apiService';
 import type { SpaceFormValues, SpaceListItem, SpaceDetail, SpaceMediaFile } from '../interfaces/space.interface';
 import type { EntityStatus } from '../interfaces/sucursal.interface';
@@ -8,7 +7,6 @@ import type { EntityStatus } from '../interfaces/sucursal.interface';
 class SpaceService {
     static async register(sucursalPublicId: string, payload: SpaceFormValues): Promise<{ data: unknown; message: string }> {
         const res = await apiService.post(`/spaces/${sucursalPublicId}`, payload);
-        await refreshCompanyContext();
         return { data: res.data.data, message: res.data.message };
     }
 
@@ -24,7 +22,6 @@ class SpaceService {
 
     static async updateSpace(spacePublicId: string, payload: Partial<SpaceFormValues>): Promise<{ data: SpaceDetail; message: string }> {
         const res = await apiService.put(`/spaces/space/${spacePublicId}`, payload);
-        await refreshCompanyContext();
         return { data: res.data.data, message: res.data.message };
     }
 

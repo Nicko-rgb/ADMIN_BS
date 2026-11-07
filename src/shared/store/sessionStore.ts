@@ -6,6 +6,7 @@ const EMPTY_CONTEXT = { companies: [], userPublicId: null, loadedAt: null };
 
 /**
  * Árbol empresa → sucursales → espacios recibido en el login.
+ * Se conserva en localStorage durante la sesión y se limpia al cerrarla.
  * Es una instantánea para la UI; `access` nunca autoriza operaciones en el backend.
  */
 export const useCompanyContextStore = create<CompanyContextState>()(
@@ -18,21 +19,6 @@ export const useCompanyContextStore = create<CompanyContextState>()(
                 loadedAt: new Date().toISOString(),
             }),
             clearContext: () => set(EMPTY_CONTEXT),
-            refreshContext: async () => {
-                const { token, user } = useSessionStore.getState();
-                if (!token || !user) return;
-                try {
-                    const { apiService } = await import('../utils/apiService');
-                    const response = await apiService.get('/auth/context');
-                    if (useSessionStore.getState().token !== token) return;
-                    const context = response.data.data;
-                    if (!Array.isArray(context?.companies)) throw new Error('Contexto inválido');
-                    set({ companies: context.companies, userPublicId: user.publicId, loadedAt: new Date().toISOString() });
-                } catch (error) {
-                    if (useSessionStore.getState().token === token) set(EMPTY_CONTEXT);
-                    throw error;
-                }
-            },
         }),
         {
             name: 'admin-context',

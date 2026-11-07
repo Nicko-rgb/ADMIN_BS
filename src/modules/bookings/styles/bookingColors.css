@@ -1,10 +1,10 @@
 /**
  * Sistema de color exclusivo del módulo de reservas (calendario).
- * Se aplica solo dentro de `.booking_calendar_page` para no contaminar el
+ * Se aplica solo dentro de `.booking_calendar` para no contaminar el
  * resto del panel. Ningún componente de este módulo debe usar hex directos:
  * siempre `var(--bk-*)`.
  */
-.booking_calendar_page {
+.booking_calendar {
     color-scheme: light;
 
     --bk-bg: #e9edf3;
@@ -49,7 +49,7 @@
     --bk-font: 'Outfit', 'Poppins', sans-serif;
 }
 
-[data-theme="dark"] .booking_calendar_page {
+[data-theme="dark"] .booking_calendar {
     color-scheme: dark;
 
     --bk-bg: #101219;

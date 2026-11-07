@@ -30,8 +30,11 @@ const Header = () => {
                         </nav>
                     )}
 
-                    {config.showNotification && (
-                        <div className='btn_icons'>
+                    <div className='btn_icons'>
+                        {!config.showCard && config.extra && (
+                            config.extra
+                        )}
+                        {config.showNotification && (
                             <button
                                 type="button"
                                 className="btn_notification"
@@ -41,8 +44,8 @@ const Header = () => {
                             >
                                 <Bell size={16} strokeWidth={2.2} />
                             </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             )}
 

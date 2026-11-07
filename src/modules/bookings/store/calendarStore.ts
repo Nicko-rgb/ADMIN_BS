@@ -15,7 +15,7 @@ interface CalendarStoreState {
     /** Última sucursal solicitada, para descartar respuestas viejas. */
     requestedSucursal: string | null;
 
-    /** Selección explícita del usuario; null = usar la sucursal de la URL. */
+    /** Selección explícita del usuario; null = usar la primera sucursal disponible. */
     branchId: string | null;
     spaceId: string | null;
 

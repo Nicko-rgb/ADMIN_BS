@@ -58,6 +58,7 @@
         .btn_icons {
             display: flex;
             justify-content: flex-end;
+            gap: 1rem;
             flex: 1;
 
             .btn_notification {

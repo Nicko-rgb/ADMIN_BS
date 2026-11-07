@@ -97,7 +97,7 @@ const CompanyNode = ({ company }: CompanyNodeProps) => {
     );
 };
 
-/** Árbol informativo de /auth/context; nunca autoriza acciones por sí mismo. */
+/** Árbol informativo recibido al iniciar sesión; nunca autoriza acciones por sí mismo. */
 const ProfileCompanyContext = ({ companies, scopeLevel }: ProfileCompanyContextProps) => {
     const [companyIndex, setCompanyIndex] = useState(0);
     const copy = scopeLevel === null ? undefined : SCOPE_COPY[scopeLevel];

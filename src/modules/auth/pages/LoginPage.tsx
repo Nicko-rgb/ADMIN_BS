@@ -65,7 +65,6 @@ const LoginPage = () => {
                         <Button
                             text="Iniciar sesión"
                             type="submit"
-                            size="lg"
                             className="login_submit"
                             disabled={isSubmitting}
                             loading={isSubmitting}
