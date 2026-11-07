@@ -21,6 +21,8 @@ export const EMPTY_SUCURSAL_CONFIG_FORM: SucursalConfigFormValues = {
 };
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/;
+// El cierre admite además '24:00'; '00:00' también se usa como fin del día.
+const END_TIME_PATTERN = /^(([01]\d|2[0-3]):[0-5]\d|24:00)$/;
 
 // 'HH:mm[:ss]' → minutos para comparar apertura vs cierre.
 const toMinutes = (value: string): number | null => {
@@ -28,6 +30,20 @@ const toMinutes = (value: string): number | null => {
     if (!match) return null;
     const [hours, minutes] = value.split(':').map(Number);
     return hours * 60 + minutes;
+};
+
+// Cierre: '00:00' y '24:00' son el mismo instante (fin del día) = 1440.
+const toEndMinutes = (value: string): number | null => (
+    value === '00:00' || value === '24:00' ? 24 * 60 : toMinutes(value)
+);
+
+// La columna TIME del backend devuelve 'HH:mm:ss'; el input usa 'HH:mm'.
+const toShortTime = (value: string | null): string => (value ? value.slice(0, 5) : '');
+
+// El input type="time" no acepta '24:00': se muestra como '00:00' (fin del día).
+const toFormClosingTime = (value: string | null): string => {
+    const short = toShortTime(value);
+    return short === '24:00' ? '00:00' : short;
 };
 
 const urlError = (value: string, label: string): string | undefined => {
@@ -45,11 +61,11 @@ const validateConfigForm = (form: SucursalConfigFormValues): FormErrors<Sucursal
     else if (!TIME_PATTERN.test(form.opening_time.trim())) errors.opening_time = 'Hora no válida (HH:mm)';
 
     if (!form.closing_time.trim()) errors.closing_time = 'El horario de cierre es requerido';
-    else if (!TIME_PATTERN.test(form.closing_time.trim())) errors.closing_time = 'Hora no válida (HH:mm)';
+    else if (!END_TIME_PATTERN.test(form.closing_time.trim())) errors.closing_time = 'Hora no válida (HH:mm; 00:00 = fin del día)';
 
     if (!errors.opening_time && !errors.closing_time) {
         const opening = toMinutes(form.opening_time.trim())!;
-        const closing = toMinutes(form.closing_time.trim())!;
+        const closing = toEndMinutes(form.closing_time.trim())!;
         if (closing <= opening) errors.closing_time = 'El cierre debe ser posterior a la apertura';
     }
 
@@ -112,8 +128,8 @@ export const useSucursalConfig = ({ sucursalPublicId, onClose, onSaved }: UseSuc
                     social_youtube: detail.socialYoutube ?? '',
                     social_whatsapp: detail.socialWhatsapp ?? '',
                     whatsapp_message: detail.whatsappMessage ?? '',
-                    opening_time: detail.openingTime ?? '',
-                    closing_time: detail.closingTime ?? '',
+                    opening_time: toShortTime(detail.openingTime),
+                    closing_time: toFormClosingTime(detail.closingTime),
                     min_price: detail.minPrice ?? '',
                     features: detail.features ?? '',
                 });

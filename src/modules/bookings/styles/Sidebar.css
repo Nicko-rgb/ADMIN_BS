@@ -170,3 +170,84 @@
         transform: rotate(360deg);
     }
 }
+
+/* Leyendas del calendario */
+.booking_legend {
+    flex-shrink: 0;
+    margin: 0 .8rem;
+    border: 1px solid var(--bk-border);
+    border-radius: var(--bk-radius-md);
+    background: var(--bk-surface);
+
+    summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .8rem;
+        padding: 1rem;
+        list-style: none;
+        color: var(--bk-text-soft);
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &:hover {
+            color: var(--bk-text);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--bk-accent);
+            outline-offset: 2px;
+            border-radius: var(--bk-radius-md);
+        }
+
+        svg {
+            flex-shrink: 0;
+            transition: transform .18s ease;
+        }
+    }
+
+    &[open] summary svg {
+        transform: rotate(180deg);
+    }
+
+    .booking_legend_items {
+        display: flex;
+        flex-direction: column;
+        gap: .9rem;
+        margin: 0;
+        padding: .2rem 1rem 1rem;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+            color: var(--bk-text-soft);
+            font-size: 1.15rem;
+        }
+    }
+
+    .booking_legend_swatch {
+        flex-shrink: 0;
+        width: 1.8rem;
+        height: 1.4rem;
+        border: 1px solid var(--bk-border-strong);
+        border-radius: .3rem;
+
+        &.is_closed {
+            background-color: var(--bk-surface-muted);
+            background-image: var(--bk-closed-pattern);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        summary svg {
+            transition: none;
+        }
+    }
+}

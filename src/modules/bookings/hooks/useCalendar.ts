@@ -1,49 +1,21 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCompanyContextStore, useSessionStore } from '../../../shared/store/sessionStore';
 import { dateKey, formatMonthYear } from '../../../shared/utils/formatDate';
 import { useCalendarStore } from '../store/calendarStore';
+import { useCalendarHoursStore } from '../store/calendarHoursStore';
+import { buildCalendarSchedule, CALENDAR_WEEKDAYS } from '../utils/businessHours';
 import {
-    TIME_SLOTS,
     WEEKDAYS_SHORT,
     buildMonthCells,
     buildPeriodLabel,
     buildVisibleDays,
     buildWeekDays,
 } from '../utils/calendar';
-import type { CompanyBranchTree, CompanyTreeBranch, CompanyTreeSpace } from '../../companys/interfaces/company.interface';
-import type { ContextCompany } from '../../../shared/interfaces/session.interface';
+import type { CompanyTreeBranch, CompanyTreeSpace } from '../../companys/interfaces/company.interface';
 
 const EMPTY_BRANCHES: CompanyTreeBranch[] = [];
 const EMPTY_SPACES: CompanyTreeSpace[] = [];
-
-// Horario temporal de la vista semanal; se reemplazará por el de la sucursal.
-const OPENING_HOUR = 10;
-const CLOSING_HOUR = 22;
-
-/**
- * Para usuarios con asignación a empresa/sucursal el árbol ya viene en el
- * contexto de sesión; solo se copian los nodos con `access === true`.
- */
-const treeFromContext = (companies: ContextCompany[], sucursalPublicId: string): CompanyBranchTree | null => {
-    const company = companies.find((item) =>
-        item.access && item.sucursales.some((branch) => branch.publicId === sucursalPublicId && branch.access));
-
-    if (!company) return null;
-
-    return {
-        company: { publicId: company.publicId, name: company.name },
-        branches: company.sucursales
-            .filter((branch) => branch.access)
-            .map((branch) => ({
-                publicId: branch.publicId,
-                name: branch.name,
-                spaces: branch.spaces
-                    .filter((space) => space.access)
-                    .map((space) => ({ publicId: space.publicId, name: space.name })),
-            })),
-    };
-};
 
 const resolveReturnTo = (state: unknown): string => {
     const returnTo = (state as { returnTo?: unknown } | null)?.returnTo;
@@ -53,20 +25,22 @@ const resolveReturnTo = (state: unknown): string => {
 };
 
 /**
- * Calendario de reservas: sincroniza el árbol de sucursales/espacios con el
- * origen que corresponda (endpoint para system, contexto de sesión para el
- * resto) y deriva la grilla de días desde el estado global de la store.
+ * Calendario de reservas: el árbol público (empresa → sucursales → espacios
+ * con apertura/cierre) es la única fuente de datos; el contexto de sesión solo
+ * limita qué sucursales y espacios puede elegir cada usuario. La grilla se
+ * deriva del estado global de la store.
  */
 const useCalendar = () => {
     const { sucursalPublicId } = useParams<{ sucursalPublicId: string }>();
     const location = useLocation();
+    const navigate = useNavigate();
     const scopeLevel = useSessionStore((state) => state.scopeLevel);
     const companies = useCompanyContextStore((state) => state.companies);
     const isSystem = scopeLevel === 1;
 
     const tree = useCalendarStore((state) => state.tree);
     const treeStatus = useCalendarStore((state) => state.treeStatus);
-    const treeError = useCalendarStore((state) => state.treeError);
+    const storeTreeError = useCalendarStore((state) => state.treeError);
     const requestedSucursal = useCalendarStore((state) => state.requestedSucursal);
     const branchId = useCalendarStore((state) => state.branchId);
     const spaceId = useCalendarStore((state) => state.spaceId);
@@ -74,7 +48,7 @@ const useCalendar = () => {
     const viewDate = useCalendarStore((state) => state.viewDate);
     const loadTree = useCalendarStore((state) => state.loadTree);
     const setTree = useCalendarStore((state) => state.setTree);
-    const selectBranch = useCalendarStore((state) => state.selectBranch);
+    const storeSelectBranch = useCalendarStore((state) => state.selectBranch);
     const selectSpace = useCalendarStore((state) => state.selectSpace);
     const setView = useCalendarStore((state) => state.setView);
     const selectDay = useCalendarStore((state) => state.selectDay);
@@ -90,58 +64,135 @@ const useCalendar = () => {
             return;
         }
 
-        if (isSystem) {
-            void loadTree(sucursalPublicId);
-            return;
-        }
-
-        const contextTree = treeFromContext(companies, sucursalPublicId);
-        setTree(contextTree, contextTree ? null : 'No tenés acceso a esta sucursal.');
-    }, [sucursalPublicId, isSystem, companies, loadTree, setTree]);
+        void loadTree(sucursalPublicId);
+    }, [sucursalPublicId, loadTree, setTree]);
 
     useEffect(() => {
         syncTree();
     }, [syncTree]);
 
+    // La URL es la fuente de verdad de la sucursal: al entrar por un enlace,
+    // volver con atrás/adelante o cambiar de sucursal, el store se alinea.
+    // Se lee el estado con `getState` para no reaccionar al `branchId` que el
+    // propio selector actualiza antes de que el router refleje la nueva URL.
+    useEffect(() => {
+        if (!sucursalPublicId) return;
+        if (useCalendarStore.getState().branchId === sucursalPublicId) return;
+        storeSelectBranch(sucursalPublicId);
+    }, [sucursalPublicId, storeSelectBranch]);
+
     const retry = useCallback(() => {
         if (!sucursalPublicId) return;
+        void loadTree(sucursalPublicId, { force: true });
+    }, [sucursalPublicId, loadTree]);
 
-        if (isSystem) {
-            void loadTree(sucursalPublicId, { force: true });
-            return;
-        }
-
-        const contextTree = treeFromContext(companies, sucursalPublicId);
-        setTree(contextTree, contextTree ? null : 'No tenés acceso a esta sucursal.');
-    }, [sucursalPublicId, isSystem, companies, loadTree, setTree]);
+    // Si la sucursal pedida ya está en el árbol cargado (misma empresa), el
+    // árbol no está viejo aunque `requestedSucursal` todavía no se actualice.
+    const treeHasRequestedBranch = !!sucursalPublicId
+        && (tree?.branches.some((branch) => branch.publicId === sucursalPublicId) ?? false);
 
     // Mientras la respuesta de otra sucursal está en vuelo no se muestra el árbol viejo.
-    const isStaleTree = isSystem && !!sucursalPublicId && requestedSucursal !== sucursalPublicId;
+    const isStaleTree = !!sucursalPublicId
+        && requestedSucursal !== sucursalPublicId
+        && !treeHasRequestedBranch;
     const currentTree = isStaleTree ? null : tree;
     const isTreeLoading = treeStatus === 'idle' || treeStatus === 'loading' || isStaleTree;
 
     const company = currentTree?.company ?? null;
-    const branches = currentTree?.branches ?? EMPTY_BRANCHES;
+    const allBranches = currentTree?.branches ?? EMPTY_BRANCHES;
 
-    // Sin selección explícita válida se usa la primera sucursal disponible.
+    // El contexto de sesión solo decide qué puede elegir cada usuario; el árbol
+    // público aporta nombres, espacios y la ventana horaria de cada sucursal.
+    // `system` (scopeLevel 1) no tiene membresías y puede elegir todo.
+    const access = useMemo(() => {
+        if (isSystem) return null;
+
+        const branches = new Set<string>();
+        const spacesByBranch = new Map<string, Set<string>>();
+
+        for (const companyContext of companies) {
+            if (!companyContext.access) continue;
+            for (const branch of companyContext.sucursales) {
+                if (!branch.access) continue;
+                branches.add(branch.publicId);
+                spacesByBranch.set(
+                    branch.publicId,
+                    new Set(branch.spaces.filter((space) => space.access).map((space) => space.publicId)),
+                );
+            }
+        }
+
+        return { branches, spacesByBranch };
+    }, [companies, isSystem]);
+
+    const branches = useMemo(
+        () => (access ? allBranches.filter((branch) => access.branches.has(branch.publicId)) : allBranches),
+        [access, allBranches],
+    );
+
+    // Una sucursal de la URL que no está en el contexto del usuario no se
+    // reemplaza por otra: se muestra el error de acceso.
+    const hasUrlBranchAccess = !access || !sucursalPublicId || access.branches.has(sucursalPublicId);
+    const accessError = !hasUrlBranchAccess && !isTreeLoading
+        ? 'No tenés acceso a esta sucursal.'
+        : null;
+    const treeError = accessError ?? storeTreeError;
+
+    // La sucursal de la URL manda; si no existe en el árbol se cae a la
+    // selección guardada y, por último, a la primera disponible.
     const selectedBranch = useMemo(() => {
-        if (!currentTree) return null;
-        return currentTree.branches.find((branch) => branch.publicId === branchId)
-            ?? currentTree.branches[0]
+        if (!currentTree || !hasUrlBranchAccess) return null;
+        const wanted = sucursalPublicId ?? branchId;
+        return branches.find((branch) => branch.publicId === wanted)
+            ?? branches.find((branch) => branch.publicId === branchId)
+            ?? branches[0]
             ?? null;
-    }, [currentTree, branchId]);
+    }, [currentTree, hasUrlBranchAccess, branches, sucursalPublicId, branchId]);
 
-    const spaces = selectedBranch?.spaces ?? EMPTY_SPACES;
+    const branchSpaces = selectedBranch?.spaces ?? EMPTY_SPACES;
+    const spaces = useMemo(() => {
+        if (!access || !selectedBranch) return branchSpaces;
+        const allowed = access.spacesByBranch.get(selectedBranch.publicId);
+        return branchSpaces.filter((space) => allowed?.has(space.publicId));
+    }, [access, branchSpaces, selectedBranch]);
+
     const selectedSpace = useMemo(
         () => spaces.find((space) => space.publicId === spaceId) ?? spaces[0] ?? null,
         [spaces, spaceId],
     );
 
+    const hours = useCalendarHoursStore((state) => state.hours);
+    const hoursSpaceId = useCalendarHoursStore((state) => state.spacePublicId);
+    const hoursStatus = useCalendarHoursStore((state) => state.status);
+    const hoursError = useCalendarHoursStore((state) => state.error);
+    const loadHours = useCalendarHoursStore((state) => state.loadHours);
+    const selectedSpaceId = !isTreeLoading && !treeError ? selectedSpace?.publicId ?? null : null;
+
+    useEffect(() => {
+        void loadHours(selectedSpaceId);
+    }, [loadHours, selectedSpaceId]);
+
+    const hoursMatchSpace = selectedSpaceId !== null && hoursSpaceId === selectedSpaceId;
+    const isHoursLoading = selectedSpaceId !== null && (!hoursMatchSpace || hoursStatus === 'idle' || hoursStatus === 'loading');
+    // La grilla va de apertura a cierre de la sucursal; sin ventana configurada
+    // se mantiene el rango que cubren los horarios del espacio.
+    const schedule = useMemo(() => hoursMatchSpace && hoursStatus === 'ready'
+        ? buildCalendarSchedule(hours, {
+            openingTime: selectedBranch?.openingTime ?? null,
+            closingTime: selectedBranch?.closingTime ?? null,
+        })
+        : null, [hours, hoursMatchSpace, hoursStatus, selectedBranch]);
+    const hasConfiguredHours = hoursMatchSpace && hoursStatus === 'ready' && hours.length > 0;
+    const retryHours = useCallback(() => { void loadHours(selectedSpaceId, true); }, [loadHours, selectedSpaceId]);
+
     const todayKey = dateKey(new Date());
     const weekDays = useMemo(() => buildWeekDays(viewDate, todayKey), [viewDate, todayKey]);
     const visibleDays = useMemo(
-        () => buildVisibleDays(view, viewDate, weekDays, todayKey),
-        [view, viewDate, weekDays, todayKey],
+        () => buildVisibleDays(view, viewDate, weekDays, todayKey).map((day) => ({
+            ...day,
+            closedRanges: schedule?.closedByDay[CALENDAR_WEEKDAYS[day.date.getDay()]] ?? [],
+        })),
+        [view, viewDate, weekDays, todayKey, schedule],
     );
     const monthCells = useMemo(() => buildMonthCells(viewDate, todayKey), [viewDate, todayKey]);
     const monthLabel = useMemo(() => formatMonthYear(viewDate), [viewDate]);
@@ -150,10 +201,14 @@ const useCalendar = () => {
         [view, viewDate, weekDays],
     );
     const returnTo = useMemo(() => resolveReturnTo(location.state), [location.state]);
-    const timeSlots = useMemo(() => view === 'week'
-        ? Array.from({ length: CLOSING_HOUR - OPENING_HOUR }, (_, index) =>
-            `${String(OPENING_HOUR + index).padStart(2, '0')}:00`)
-        : TIME_SLOTS, [view]);
+
+    // Cambiar de sucursal navega a la URL de esa sucursal: el enlace queda
+    // compartible y atrás/adelante funcionan. El store se sincroniza con la URL.
+    const selectBranch = useCallback((publicId: string) => {
+        if (publicId !== sucursalPublicId) {
+            navigate(`/bookings/branch/${encodeURIComponent(publicId)}`);
+        }
+    }, [navigate, sucursalPublicId]);
 
     return {
         company,
@@ -175,7 +230,12 @@ const useCalendar = () => {
         visibleDays,
         monthDays: WEEKDAYS_SHORT,
         monthCells,
-        timeSlots,
+        timeSlots: schedule?.slots ?? [],
+        scheduleDurationHours: schedule ? (schedule.end - schedule.start) / 60 : 0,
+        hasConfiguredHours,
+        isHoursLoading,
+        hoursError: hoursMatchSpace ? hoursError : null,
+        retryHours,
         goPrev,
         goNext,
         goPrevMonth,

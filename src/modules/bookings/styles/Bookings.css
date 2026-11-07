@@ -217,12 +217,49 @@
         min-height: 0;
         border-top: 1px solid var(--bk-border);
 
+        .calendar_schedule_feedback {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            color: var(--bk-text-soft);
+            font-size: 1.3rem;
+            text-align: center;
+
+            button {
+                display: inline-flex;
+                align-items: center;
+                gap: .5rem;
+                padding: .7rem 1rem;
+                border: 1px solid var(--bk-border-strong);
+                border-radius: var(--bk-radius-sm);
+                background: var(--bk-surface);
+                color: var(--bk-text);
+            }
+
+            .schedule_spinner {
+                animation: booking_context_spin .8s linear infinite;
+
+                @media (prefers-reduced-motion: reduce) {
+                    animation: none;
+                }
+            }
+        }
+
         /* ── Vista de semana / día ───────────────────────────────────────────────── */
         .calendar_timegrid {
             display: flex;
             flex-direction: column;
             height: var(--booking-grid-height, auto);
             min-height: 0;
+
+            .closed_period {
+                background-color: var(--bk-surface-muted);
+                background-image: var(--bk-closed-pattern);
+            }
 
             /* Cabeza de fechas */
             .timegrid_head {
@@ -293,7 +330,7 @@
                     .time_labels,
                     .day_column {
                         display: grid;
-                        grid-template-rows: repeat(var(--booking-hour-count), minmax(0, 1fr));
+                        grid-template-rows: var(--booking-time-rows);
                         min-height: 0;
                     }
 
@@ -317,12 +354,24 @@
                     }
 
                     .day_column {
+                        position: relative;
+                        isolation: isolate;
                         height: var(--booking-day-height, calc(5.6rem * var(--booking-hour-count)));
                         border-left: 1px solid var(--bk-border);
 
                         .hour_slot {
+                            position: relative;
+                            z-index: 1;
+                            pointer-events: none;
                             min-height: 0;
                             border-bottom: 1px solid var(--bk-border);
+                        }
+
+                        .closed_period {
+                            position: absolute;
+                            left: 0;
+                            right: 0;
+                            cursor: not-allowed;
                         }
                     }
                 }

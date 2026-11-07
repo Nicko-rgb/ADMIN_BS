@@ -2,43 +2,12 @@ import { create } from 'zustand';
 import CompanyService from '../../companys/service/companyService';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import { addDays, addMonths } from '../../../shared/utils/formatDate';
-import type { CompanyBranchTree } from '../../companys/interfaces/company.interface';
-import type { BookingCalendarView } from '../interfaces/booking.interface';
-
-export type CalendarTreeStatus = 'idle' | 'loading' | 'ready' | 'error';
-
-interface CalendarStoreState {
-    /** Árbol empresa → sucursales → espacios de la sucursal activa. */
-    tree: CompanyBranchTree | null;
-    treeStatus: CalendarTreeStatus;
-    treeError: string | null;
-    /** Última sucursal solicitada, para descartar respuestas viejas. */
-    requestedSucursal: string | null;
-
-    /** Selección explícita del usuario; null = usar la primera sucursal disponible. */
-    branchId: string | null;
-    spaceId: string | null;
-
-    view: BookingCalendarView;
-    viewDate: Date;
-
-    loadTree: (sucursalPublicId: string, options?: { force?: boolean }) => Promise<void>;
-    setTree: (tree: CompanyBranchTree | null, error?: string | null) => void;
-    selectBranch: (publicId: string) => void;
-    selectSpace: (publicId: string) => void;
-    setView: (view: BookingCalendarView) => void;
-    selectDay: (date: Date) => void;
-    goPrev: () => void;
-    goNext: () => void;
-    goPrevMonth: () => void;
-    goNextMonth: () => void;
-    goToday: () => void;
-}
+import type { CalendarStoreState } from '../interfaces/booking.interface';
 
 /**
- * Estado global del calendario de reservas. Vive fuera de React para que la
- * página y el sidebar compartan árbol, selección y navegación sin props.
- * Los datos derivados (días, celdas, etiquetas) se calculan en `useCalendar`.
+ * Estado global del calendario de reservas. Vive fuera de React para compartir
+ * árbol, selección y navegación entre la página y sus componentes sin depender
+ * de la jerarquía. Los datos derivados se calculan en `useCalendar`.
  */
 export const useCalendarStore = create<CalendarStoreState>((set, get) => ({
     tree: null,
@@ -55,9 +24,18 @@ export const useCalendarStore = create<CalendarStoreState>((set, get) => ({
     loadTree: async (sucursalPublicId, options) => {
         const state = get();
         const isSameRequest = state.requestedSucursal === sucursalPublicId;
+        // La sucursal pedida ya está en el árbol cargado (misma empresa):
+        // cambiar de sucursal no debe volver a pedir el árbol completo.
+        const treeHasBranch = state.tree?.branches.some((branch) => branch.publicId === sucursalPublicId) ?? false;
 
-        // Deduplica montajes simultáneos (página + sidebar) y visitas repetidas.
-        if (!options?.force && isSameRequest && (state.treeStatus === 'loading' || state.treeStatus === 'ready')) return;
+        // Deduplica montajes simultáneos y visitas repetidas.
+        if (!options?.force) {
+            if (isSameRequest && (state.treeStatus === 'loading' || state.treeStatus === 'ready')) return;
+            if (treeHasBranch) {
+                set({ requestedSucursal: sucursalPublicId });
+                return;
+            }
+        }
 
         set({
             requestedSucursal: sucursalPublicId,
@@ -76,7 +54,7 @@ export const useCalendarStore = create<CalendarStoreState>((set, get) => ({
         }
     },
 
-    // Camino sin endpoint: el árbol sale del contexto de sesión.
+    // Árbol inyectado sin endpoint — sólo se usa para estados locales (sin URL).
     setTree: (tree, error = null) => set({
         tree,
         treeStatus: error ? 'error' : 'ready',

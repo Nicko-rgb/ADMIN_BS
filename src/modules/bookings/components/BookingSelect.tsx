@@ -1,17 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import type { BookingSelectProps } from '../interfaces/booking.interface';
 import '../styles/BookingSelect.css';
-
-interface BookingSelectProps {
-    label: string;
-    icon: LucideIcon;
-    options: { publicId: string; name: string }[];
-    value?: string;
-    emptyMessage: string;
-    onChange: (publicId: string) => void;
-}
 
 /** Selector del calendario con opciones superpuestas, sin desplazar el contenido. */
 export const BookingSelect = ({ label, icon: Icon, options, value, emptyMessage, onChange }: BookingSelectProps) => {

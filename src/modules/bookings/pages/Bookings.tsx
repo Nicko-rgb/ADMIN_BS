@@ -1,6 +1,8 @@
 import { AlertCircle, Building2, CalendarPlus, ChevronLeft, ChevronRight, Dumbbell, LoaderCircle, Plus, RefreshCw, Store } from 'lucide-react';
 import type { CSSProperties } from 'react';
+import { useState } from 'react';
 import { usePageHeader } from '../../../shared/store/headerStore';
+import { CreateBooking } from '../components/CreateBooking';
 import { Sidebar } from '../components/Sidebar';
 import useCalendar from '../hooks/useCalendar';
 import type { BookingCalendarViewOption } from '../interfaces/booking.interface';
@@ -16,11 +18,13 @@ const VIEW_OPTIONS: BookingCalendarViewOption[] = [
 /* ── Página ───────────────────────────────────────────────────────────────── */
 
 const Bookings = () => {
+    const [isCreateBookingOpen, setIsCreateBookingOpen] = useState(false);
     const {
-        company, selectedBranch, selectedSpace,
-        isTreeLoading, treeError, retry,
+        company, branches, spaces, selectedBranch, selectedSpace,
+        isTreeLoading, treeError, retry, selectBranch, selectSpace,
         view, setView, periodLabel, visibleDays, monthDays, monthCells, timeSlots,
-        goPrev, goNext, goToday, selectDay,
+        scheduleDurationHours, hasConfiguredHours, isHoursLoading, hoursError, retryHours,
+        goPrev, goNext, goToday, monthLabel, goPrevMonth, goNextMonth, selectDay,
     } = useCalendar();
 
     usePageHeader({
@@ -42,7 +46,23 @@ const Bookings = () => {
         <div className={`booking_calendar${view === 'week' ? ' is_week' : ''}`}>
 
             {/* Sidebar */}
-            <Sidebar />
+            <Sidebar
+                companyName={company?.name ?? null}
+                branches={branches}
+                spaces={spaces}
+                selectedBranchId={selectedBranch?.publicId ?? null}
+                selectedSpaceId={selectedSpace?.publicId ?? null}
+                isTreeLoading={isTreeLoading}
+                treeError={treeError}
+                onSelectBranch={selectBranch}
+                onSelectSpace={selectSpace}
+                monthLabel={monthLabel}
+                monthDays={monthDays}
+                monthCells={monthCells}
+                onPrevMonth={goPrevMonth}
+                onNextMonth={goNextMonth}
+                onSelectDay={selectDay}
+            />
 
             <div className="calendar_main">
                 <header className="toolbar">
@@ -75,7 +95,7 @@ const Bookings = () => {
                             <button
                                 type="button"
                                 className="new_booking"
-                                title="Disponible cuando esté listo el endpoint de creación de reservas"
+                                onClick={() => setIsCreateBookingOpen(true)}
                             >
                                 <CalendarPlus size={16} /> Nueva reserva
                             </button>
@@ -130,8 +150,30 @@ const Bookings = () => {
                                 ))}
                             </div>
                         </div>
+                    ) : isTreeLoading || isHoursLoading ? (
+                        <div className="calendar_schedule_feedback" role="status">
+                            <LoaderCircle size={22} className="schedule_spinner" aria-hidden="true" />
+                            <span>Cargando horarios…</span>
+                        </div>
+                    ) : hoursError ? (
+                        <div className="calendar_schedule_feedback" role="alert">
+                            <AlertCircle size={22} aria-hidden="true" />
+                            <span>{hoursError}</span>
+                            <button type="button" onClick={retryHours}><RefreshCw size={14} /> Reintentar</button>
+                        </div>
+                    ) : !timeSlots.length ? (
+                        <div className="calendar_schedule_feedback" role="status">
+                            <span>{treeError ?? (!selectedSpace
+                                ? 'Selecciona un espacio deportivo para ver sus horarios.'
+                                : hasConfiguredHours
+                                    ? 'Este espacio no tiene horarios activos.'
+                                    : 'Sin horarios configurados.')}</span>
+                        </div>
                     ) : (
-                        <div className="calendar_timegrid" style={{ '--booking-hour-count': timeSlots.length } as CSSProperties}>
+                        <div className="calendar_timegrid" style={{
+                            '--booking-hour-count': scheduleDurationHours,
+                            '--booking-time-rows': timeSlots.map((slot) => `${slot.end - slot.start}fr`).join(' '),
+                        } as CSSProperties}>
                             <div className={`timegrid_head ${view === 'day' ? 'is_day' : 'is_week'}`}>
                                 <span />
                                 {visibleDays.map((day) => (
@@ -145,14 +187,24 @@ const Bookings = () => {
                                 <div className={`timegrid_content ${view === 'day' ? 'is_day' : 'is_week'}`}>
                                     <div className="time_labels">
                                         {timeSlots.map((slot, index) => (
-                                            <div className="time_box" key={slot}>
-                                                {(view !== 'week' || index > 0) && <span>{slot}</span>}
+                                            <div className="time_box" key={slot.start}>
+                                                {index > 0 && <span>{slot.label}</span>}
                                             </div>
                                         ))}
                                     </div>
                                     {visibleDays.map((day) => (
-                                        <div key={day.key} className="day_column" aria-hidden="true">
-                                            {timeSlots.map((slot) => <div key={slot} className="hour_slot" data-start-time={slot} />)}
+                                        <div key={day.key} className="day_column">
+                                            {timeSlots.map((slot) => <div key={slot.start} className="hour_slot" data-start-time={slot.label} aria-hidden="true" />)}
+                                            {day.closedRanges.map((range) => (
+                                                <div
+                                                    key={range.start}
+                                                    className="closed_period"
+                                                    style={{ top: `${range.top}%`, height: `${range.height}%` }}
+                                                    role="img"
+                                                    aria-label={`${day.weekday}: ${range.label}`}
+                                                    title={range.label}
+                                                />
+                                            ))}
                                         </div>
                                     ))}
                                 </div>
@@ -161,6 +213,8 @@ const Bookings = () => {
                     )}
                 </main>
             </div>
+
+            <CreateBooking isOpen={isCreateBookingOpen} onClose={() => setIsCreateBookingOpen(false)} />
         </div>
     );
 };

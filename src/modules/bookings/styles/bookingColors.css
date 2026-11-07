@@ -13,6 +13,9 @@
     --bk-surface-muted: #eef0f5;
     --bk-border: #e6e9f0;
     --bk-border-strong: #d7dce6;
+    --bk-closed-pattern: repeating-linear-gradient(135deg,
+        transparent 0, transparent 5px,
+        var(--bk-border) 5px, var(--bk-border) 6px);
 
     --bk-text: #232735;
     --bk-text-soft: #5f6474;

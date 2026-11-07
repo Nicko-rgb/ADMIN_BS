@@ -63,7 +63,7 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, onSaved }: Sucur
                             <FormSection title="Horarios" icon={Clock}>
                                 <FormRow>
                                     <InputField name="opening_time" label="Apertura" type="time" value={form.opening_time} onChange={(e) => setField('opening_time')(e.target.value)} required error={errors.opening_time} />
-                                    <InputField name="closing_time" label="Cierre" type="time" value={form.closing_time} onChange={(e) => setField('closing_time')(e.target.value)} required error={errors.closing_time} />
+                                    <InputField name="closing_time" label="Cierre (00:00 = fin del día)" type="time" value={form.closing_time} onChange={(e) => setField('closing_time')(e.target.value)} required error={errors.closing_time} />
                                 </FormRow>
                             </FormSection>
 

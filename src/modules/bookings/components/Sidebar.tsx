@@ -1,26 +1,37 @@
-import { AlertCircle, CalendarDays, ChevronLeft, ChevronRight, Dumbbell, LoaderCircle, Store } from 'lucide-react';
-import useCalendar from '../hooks/useCalendar';
+import { AlertCircle, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Dumbbell, LoaderCircle, Store } from 'lucide-react';
 import { BookingSelect } from './BookingSelect';
+import type { BookingSidebarProps } from '../interfaces/booking.interface';
 import '../styles/Sidebar.css';
 
 /**
  * Sidebar del calendario de reservas: marca, mini calendario y selectores de
- * sucursal y espacio. Lee el estado global con `useCalendar`, sin props.
+ * sucursal y espacio. Recibe datos y callbacks desde la página para mantenerse
+ * como componente presentacional y no duplicar el estado del calendario.
  */
-export const Sidebar = () => {
-    const {
-        company, branches, spaces, selectedBranch, selectedSpace,
-        isTreeLoading, treeError, selectBranch, selectSpace,
-        monthLabel, monthDays, monthCells, goPrevMonth, goNextMonth, selectDay,
-    } = useCalendar();
-
+export const Sidebar = ({
+    companyName,
+    branches,
+    spaces,
+    selectedBranchId,
+    selectedSpaceId,
+    isTreeLoading,
+    treeError,
+    onSelectBranch,
+    onSelectSpace,
+    monthLabel,
+    monthDays,
+    monthCells,
+    onPrevMonth,
+    onNextMonth,
+    onSelectDay,
+}: BookingSidebarProps) => {
     return (
         <aside className="calendar_sidebar">
             <div className="brand">
                 <span className="brand_icon"><CalendarDays size={19} /></span>
                 <div>
                     <strong>Reservas</strong>
-                    <span>{company?.name ?? (isTreeLoading ? 'Cargando sucursales…' : 'Sin sucursal')}</span>
+                    <span>{companyName ?? (isTreeLoading ? 'Cargando sucursales…' : 'Sin sucursal')}</span>
                 </div>
             </div>
 
@@ -28,8 +39,8 @@ export const Sidebar = () => {
                 <div className="mini_head">
                     <h2>{monthLabel}</h2>
                     <div className="mini_nav">
-                        <button type="button" onClick={goPrevMonth} aria-label="Mes anterior"><ChevronLeft size={15} /></button>
-                        <button type="button" onClick={goNextMonth} aria-label="Mes siguiente"><ChevronRight size={15} /></button>
+                        <button type="button" onClick={onPrevMonth} aria-label="Mes anterior"><ChevronLeft size={15} /></button>
+                        <button type="button" onClick={onNextMonth} aria-label="Mes siguiente"><ChevronRight size={15} /></button>
                     </div>
                 </div>
                 <div className="mini_week" aria-hidden="true">
@@ -41,7 +52,7 @@ export const Sidebar = () => {
                             key={cell.key}
                             type="button"
                             className={`booking_calendar_mini_day${cell.inMonth ? '' : ' out'}${cell.isToday ? ' today' : ''}${cell.isSelected ? ' selected' : ''}`}
-                            onClick={() => selectDay(cell.date)}
+                            onClick={() => onSelectDay(cell.date)}
                             aria-label={cell.date.toLocaleDateString('es-ES', { dateStyle: 'full' })}
                             aria-current={cell.isToday ? 'date' : undefined}
                         >
@@ -67,22 +78,36 @@ export const Sidebar = () => {
                             label="Sucursal"
                             icon={Store}
                             options={branches}
-                            value={selectedBranch?.publicId}
+                            value={selectedBranchId ?? undefined}
                             emptyMessage="Sin sucursales disponibles"
-                            onChange={selectBranch}
+                            onChange={onSelectBranch}
                         />
                         <BookingSelect
-                            key={selectedBranch?.publicId ?? 'no-branch'}
+                            key={selectedBranchId ?? 'no-branch'}
                             label="Espacio deportivo"
                             icon={Dumbbell}
                             options={spaces}
-                            value={selectedSpace?.publicId}
+                            value={selectedSpaceId ?? undefined}
                             emptyMessage="Sin espacios disponibles"
-                            onChange={selectSpace}
+                            onChange={onSelectSpace}
                         />
                     </>
                 )}
             </section>
+
+            {/* Legends */}
+            <details className="booking_legend">
+                <summary>
+                    <span>Leyendas</span>
+                    <ChevronDown size={16} aria-hidden="true" />
+                </summary>
+                <ul className="booking_legend_items">
+                    <li>
+                        <span className="booking_legend_swatch is_closed" aria-hidden="true" />
+                        <span>Fuera de horario</span>
+                    </li>
+                </ul>
+            </details>
         </aside>
     );
 };

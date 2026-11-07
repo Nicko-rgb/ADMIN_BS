@@ -22,10 +22,10 @@ class CompanyService {
         return res.data.data;
     }
 
-    // Árbol liviano empresa → sucursales → espacios para el calendario de reservas.
-    // Solo lo consume un usuario system; los demás arman su árbol desde el contexto de sesión.
+    // Árbol público empresa → sucursales → espacios para el calendario de reservas,
+    // con apertura/cierre de cada sucursal. El acceso de cada usuario se filtra en el front.
     static async getBranchTree(sucursalPublicId: string): Promise<CompanyBranchTree> {
-        const res = await apiService.get(`/companys/branches/${encodeURIComponent(sucursalPublicId)}/tree`);
+        const res = await apiService.get(`/companys/public/branches/${encodeURIComponent(sucursalPublicId)}/tree`);
         return res.data.data;
     }
 

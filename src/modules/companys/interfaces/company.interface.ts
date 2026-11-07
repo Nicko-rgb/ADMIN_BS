@@ -81,7 +81,7 @@ export interface CompanyDetail {
     createdAt: string;
 }
 
-// Árbol liviano empresa → sucursales → espacios (endpoint /companys/branches/:publicId/tree).
+// Árbol público empresa → sucursales → espacios (endpoint /companys/public/branches/:publicId/tree).
 export interface CompanyTreeSpace {
     publicId: string;
     name: string;
@@ -90,6 +90,10 @@ export interface CompanyTreeSpace {
 export interface CompanyTreeBranch {
     publicId: string;
     name: string;
+    /** 'HH:mm' — null si la sucursal todavía no tiene configuración. */
+    openingTime: string | null;
+    /** 'HH:mm' — '24:00' representa fin del día. */
+    closingTime: string | null;
     spaces: CompanyTreeSpace[];
 }
 

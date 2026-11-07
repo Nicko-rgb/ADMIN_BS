@@ -15,8 +15,6 @@ import type {
 
 export const WEEKDAYS_SHORT = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-export const TIME_SLOTS = Array.from({ length: 16 }, (_, index) => `${String(index + 7).padStart(2, '0')}:00`);
-
 export const buildCalendarDay = (date: Date, todayKey: string): BookingCalendarDay => ({
     date,
     key: dateKey(date),

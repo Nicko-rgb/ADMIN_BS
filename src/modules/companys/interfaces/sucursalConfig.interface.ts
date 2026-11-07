@@ -13,6 +13,7 @@ export interface SucursalConfig {
     socialWhatsapp: string | null;
     whatsappMessage: string | null;
     openingTime: string | null;
+    /** 'HH:mm[:ss]' — el cierre puede ser '24:00' (fin del día). */
     closingTime: string | null;
     minPrice: string | null;
     features: string | null;
