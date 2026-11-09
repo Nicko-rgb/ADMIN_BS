@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useCompanyContextStore, useSessionStore } from '../../../shared/store/sessionStore';
 import { dateKey, formatMonthYear } from '../../../shared/utils/formatDate';
 import { useCalendarStore } from '../store/calendarStore';
 import { useCalendarHoursStore } from '../store/calendarHoursStore';
 import { buildCalendarSchedule, CALENDAR_WEEKDAYS } from '../utils/businessHours';
+import { useBooking } from './useBooking';
+import { positionDayBookings, visibleBookingRange } from '../utils/calendarBookings';
 import {
     WEEKDAYS_SHORT,
     buildMonthCells,
@@ -17,13 +19,6 @@ import type { CompanyTreeBranch, CompanyTreeSpace } from '../../companys/interfa
 const EMPTY_BRANCHES: CompanyTreeBranch[] = [];
 const EMPTY_SPACES: CompanyTreeSpace[] = [];
 
-const resolveReturnTo = (state: unknown): string => {
-    const returnTo = (state as { returnTo?: unknown } | null)?.returnTo;
-    return typeof returnTo === 'string' && (returnTo === '/bookings' || returnTo.startsWith('/bookings?'))
-        ? returnTo
-        : '/bookings';
-};
-
 /**
  * Calendario de reservas: el árbol público (empresa → sucursales → espacios
  * con apertura/cierre) es la única fuente de datos; el contexto de sesión solo
@@ -32,7 +27,6 @@ const resolveReturnTo = (state: unknown): string => {
  */
 const useCalendar = () => {
     const { sucursalPublicId } = useParams<{ sucursalPublicId: string }>();
-    const location = useLocation();
     const navigate = useNavigate();
     const scopeLevel = useSessionStore((state) => state.scopeLevel);
     const companies = useCompanyContextStore((state) => state.companies);
@@ -168,39 +162,54 @@ const useCalendar = () => {
     const loadHours = useCalendarHoursStore((state) => state.loadHours);
     const selectedSpaceId = !isTreeLoading && !treeError ? selectedSpace?.publicId ?? null : null;
 
+    const todayKey = dateKey(new Date());
+    const weekDays = useMemo(() => buildWeekDays(viewDate, todayKey), [viewDate, todayKey]);
+    const baseDays = useMemo(() => buildVisibleDays(view, viewDate, weekDays, todayKey), [view, viewDate, weekDays, todayKey]);
+    const monthCells = useMemo(() => buildMonthCells(viewDate, todayKey), [viewDate, todayKey]);
+    const bookingRange = useMemo(
+        () => visibleBookingRange(view, baseDays, monthCells),
+        [view, baseDays, monthCells],
+    );
+    const {
+        bookingsByDate,
+        ranges: bookingRanges,
+        count: bookingsCount,
+        isBookingsLoading,
+        error: bookingsError,
+        reloadBookings,
+    } = useBooking(selectedSpaceId, bookingRange);
+
     useEffect(() => {
         void loadHours(selectedSpaceId);
     }, [loadHours, selectedSpaceId]);
 
     const hoursMatchSpace = selectedSpaceId !== null && hoursSpaceId === selectedSpaceId;
     const isHoursLoading = selectedSpaceId !== null && (!hoursMatchSpace || hoursStatus === 'idle' || hoursStatus === 'loading');
-    // La grilla va de apertura a cierre de la sucursal; sin ventana configurada
-    // se mantiene el rango que cubren los horarios del espacio.
-    const schedule = useMemo(() => hoursMatchSpace && hoursStatus === 'ready'
-        ? buildCalendarSchedule(hours, {
+    // La grilla va de apertura a cierre de la sucursal; sin ventana ni horarios
+    // se usa un rango fallback para que el calendario siempre se muestre.
+    const schedule = useMemo(() => buildCalendarSchedule(
+        hoursMatchSpace && hoursStatus === 'ready' ? hours : [],
+        {
             openingTime: selectedBranch?.openingTime ?? null,
             closingTime: selectedBranch?.closingTime ?? null,
-        })
-        : null, [hours, hoursMatchSpace, hoursStatus, selectedBranch]);
-    const hasConfiguredHours = hoursMatchSpace && hoursStatus === 'ready' && hours.length > 0;
+        },
+        bookingRanges,
+    ), [hours, hoursMatchSpace, hoursStatus, selectedBranch, bookingRanges]);
     const retryHours = useCallback(() => { void loadHours(selectedSpaceId, true); }, [loadHours, selectedSpaceId]);
 
-    const todayKey = dateKey(new Date());
-    const weekDays = useMemo(() => buildWeekDays(viewDate, todayKey), [viewDate, todayKey]);
     const visibleDays = useMemo(
-        () => buildVisibleDays(view, viewDate, weekDays, todayKey).map((day) => ({
+        () => baseDays.map((day) => ({
             ...day,
-            closedRanges: schedule?.closedByDay[CALENDAR_WEEKDAYS[day.date.getDay()]] ?? [],
+            closedRanges: schedule.closedByDay[CALENDAR_WEEKDAYS[day.date.getDay()]] ?? [],
+            bookings: positionDayBookings(bookingsByDate[day.key] ?? [], schedule),
         })),
-        [view, viewDate, weekDays, todayKey, schedule],
+        [baseDays, schedule, bookingsByDate],
     );
-    const monthCells = useMemo(() => buildMonthCells(viewDate, todayKey), [viewDate, todayKey]);
     const monthLabel = useMemo(() => formatMonthYear(viewDate), [viewDate]);
     const periodLabel = useMemo(
         () => buildPeriodLabel(view, viewDate, weekDays),
         [view, viewDate, weekDays],
     );
-    const returnTo = useMemo(() => resolveReturnTo(location.state), [location.state]);
 
     // Cambiar de sucursal navega a la URL de esa sucursal: el enlace queda
     // compartible y atrás/adelante funcionan. El store se sincroniza con la URL.
@@ -226,23 +235,27 @@ const useCalendar = () => {
         viewDate,
         monthLabel,
         periodLabel,
-        weekDays,
         visibleDays,
         monthDays: WEEKDAYS_SHORT,
         monthCells,
-        timeSlots: schedule?.slots ?? [],
-        scheduleDurationHours: schedule ? (schedule.end - schedule.start) / 60 : 0,
-        hasConfiguredHours,
+        timeSlots: schedule.slots,
+        scheduleStart: schedule.start,
+        scheduleEnd: schedule.end,
+        scheduleDurationHours: (schedule.end - schedule.start) / 60,
         isHoursLoading,
         hoursError: hoursMatchSpace ? hoursError : null,
         retryHours,
+        bookingsByDate,
+        bookingsCount,
+        isBookingsLoading,
+        bookingsError,
+        reloadBookings,
         goPrev,
         goNext,
         goPrevMonth,
         goNextMonth,
         goToday,
         selectDay,
-        returnTo,
     };
 };
 

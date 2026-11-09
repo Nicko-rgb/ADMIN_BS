@@ -60,3 +60,20 @@ export const dateKey = (date: Date): string => {
     const day = String(date.getDate()).padStart(2, '0');
     return `${date.getFullYear()}-${month}-${day}`;
 };
+
+
+/* ── Hora ─────────────────────────────────────────────────────────────────── */
+
+/** 'HH:mm' → minutos desde medianoche. */
+export const toMinutes = (time: string): number => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+};
+
+/** Cierre a medianoche: '00:00' y '24:00' son el mismo instante (fin del día). */
+export const toClosingMinutes = (time: string): number =>
+    (time.slice(0, 5) === '00:00' ? 1440 : toMinutes(time));
+
+/** Minutos desde medianoche → etiqueta 'HH:mm'. */
+export const formatMinutes = (minutes: number): string =>
+    `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;

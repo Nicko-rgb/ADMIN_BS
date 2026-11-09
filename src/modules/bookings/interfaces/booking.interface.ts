@@ -1,10 +1,17 @@
 import type { LucideIcon } from 'lucide-react';
 import type { CompanyBranchTree, CompanyTreeBranch, CompanyTreeSpace } from '../../companys/interfaces/company.interface';
 import type { BusinessHourData, HourDay } from '../../companys/interfaces/bussinesHour.interfece';
+import type { BookingData } from './createBooking.interface';
 
 /* ── Calendario ───────────────────────────────────────────────────────────── */
 
 export type BookingCalendarView = 'day' | 'week' | 'month';
+
+/** Rango de fechas locales (YYYY-MM-DD) que cubre la vista actual. */
+export interface BookingDateRange {
+    start_date: string;
+    end_date: string;
+}
 
 export interface BookingCalendarViewOption {
     value: BookingCalendarView;
@@ -63,6 +70,37 @@ export interface CalendarHoursState {
     status: CalendarLoadStatus;
     error: string | null;
     loadHours: (spacePublicId: string | null, force?: boolean) => Promise<void>;
+}
+
+export interface BookingStoreState {
+    /** Espacio y rango de la última petición de reservas iniciada. */
+    spacePublicId: string | null;
+    rangeKey: string | null;
+    bookings: BookingData[];
+    status: CalendarLoadStatus;
+    error: string | null;
+
+    loadBookings: (
+        spacePublicId: string | null,
+        range: BookingDateRange,
+        options?: { force?: boolean },
+    ) => Promise<void>;
+    reloadBookings: () => Promise<void>;
+    /** Actualización puntual preparada para un futuro canal en tiempo real. */
+    upsertBooking: (booking: BookingData) => void;
+    removeBooking: (bookingId: number) => void;
+}
+
+/** Un aviso del calendario: carga o error de árbol, horarios o reservas. */
+export type CalendarNoticeKey = 'tree' | 'hours' | 'bookings';
+
+export interface CalendarNotice {
+    key: CalendarNoticeKey;
+    label: string;
+    loading: boolean;
+    loadingText: string;
+    error: string | null;
+    retry: () => void;
 }
 
 /* ── Grilla de horarios ───────────────────────────────────────────────────── */

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Building2, CalendarDays, ChevronDown, ChevronUp, MapPin, Search } from 'lucide-react';
 import { usePageHeader } from '../../../shared/store/headerStore';
 import { useCompanyContextStore, useSessionStore } from '../../../shared/store/sessionStore';
@@ -14,22 +14,21 @@ import '../styles/MyCompanys.css';
 
 const PAGE_SIZE = 20;
 
-const Branches = ({ branches }: { branches: { publicId: string; name: string; detail?: string | null }[] }) => {
-    const location = useLocation();
-    return branches.length ? (
+const Branches = ({ branches }: { branches: { publicId: string; name: string; detail?: string | null }[] }) => (
+    branches.length ? (
         <ul className="booking_companies_branches">
             {branches.map((branch) => (
                 <li className="booking_companies_branch" key={branch.publicId}>
                     <span className="booking_companies_branch_icon"><MapPin size={17} /></span>
                     <div className="booking_companies_branch_info"><strong>{branch.name}</strong><span>{branch.detail || 'Sucursal'}</span></div>
-                    <Link className="booking_companies_branch_link" to={`/bookings/branch/${encodeURIComponent(branch.publicId)}`} state={{ branchName: branch.name, returnTo: location.pathname + location.search }} aria-label={`Ir a reservas de ${branch.name}`}>
+                    <Link className="booking_companies_branch_link" to={`/bookings/branch/${encodeURIComponent(branch.publicId)}`} aria-label={`Ir a reservas de ${branch.name}`}>
                         Ir a reservas <ArrowRight size={16} />
                     </Link>
                 </li>
             ))}
         </ul>
-    ) : <p className="booking_companies_empty_branch">No hay sucursales disponibles.</p>;
-};
+    ) : <p className="booking_companies_empty_branch">No hay sucursales disponibles.</p>
+);
 
 const ContextCompanyCard = ({ company }: { company: ContextCompany }) => (
     <article className="booking_companies_card">

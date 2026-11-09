@@ -1,0 +1,47 @@
+.create_booking_form {
+    fieldset {
+        min-width: 0;
+        padding: 0;
+        margin: 0;
+        border: 0;
+    }
+
+    .error_message {
+        position: static;
+    }
+
+    .booking_form_hint,
+    .booking_form_feedback {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        line-height: 1.5;
+    }
+
+    .booking_form_feedback {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .booking_form_error {
+        margin-top: 1.5rem;
+        color: var(--danger-text);
+        font-size: 1.3rem;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+        .form_row {
+            flex-direction: column;
+
+            > .input_group {
+                width: 100%;
+            }
+        }
+
+        .form_actions {
+            flex-wrap: wrap;
+        }
+    }
+}
