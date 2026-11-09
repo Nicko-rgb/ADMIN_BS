@@ -60,9 +60,10 @@
     width: 100%;
 
     .label {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
         font-weight: 500;
         color: var(--text-muted);
+        font-family: var(--font-secondary);
         padding-left: 4px;
         text-wrap: nowrap;
     }

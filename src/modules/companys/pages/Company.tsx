@@ -13,6 +13,7 @@ import { formatDate } from '../../../shared/utils/formatDate';
 import { DOCUMENT_TYPE_LABELS, ROLE_LABELS, ROLE_MANAGE_PERMISSIONS } from '../../users/utils/userConstants';
 import { ManageUserPermissions } from '../../users/components/ManageUserPermissions';
 import CompanyEdit from '../components/CompanyEdit';
+import SucursalForm from '../components/SucursalForm';
 import UserAsingSucursal from '../components/UserAsingSucursal';
 import useCompany from '../hooks/useCompany';
 import '../styles/Company.css';
@@ -29,6 +30,7 @@ const Company = () => {
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany,
         handleSubmitCompanyEdit, companyEditProps,
         openRegisterSucursal, isUserModalOpen, openUserModal, closeUserModal,
+        isRegisterSucursalOpen, closeRegisterSucursal,
     } = useCompany();
 
     const navigate = useNavigate();
@@ -327,6 +329,15 @@ const Company = () => {
                     publicId={managingUser?.publicId ?? null}
                     userName={managingUser?.name ?? ''}
                     onClose={() => setManagingUser(null)}
+                />
+            )}
+
+            {canManageSucursales && isRegisterSucursalOpen && (
+                <SucursalForm
+                    companyPublicId={company.publicId}
+                    sucursalPublicId={null}
+                    onClose={closeRegisterSucursal}
+                    onSaved={retry}
                 />
             )}
         </div>

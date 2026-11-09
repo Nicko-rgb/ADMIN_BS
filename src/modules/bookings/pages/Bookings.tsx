@@ -28,7 +28,7 @@ const VIEW_OPTIONS: BookingCalendarViewOption[] = [
 const Bookings = () => {
     const [createBookingContext, setCreateBookingContext] = useState<CreateBookingContext | null>(null);
     const can = usePermission();
-    const hasBookingPermissions = ['booking.create', 'booking.confirm', 'payment.create', 'user.client_manage']
+    const hasBookingPermissions = ['booking.create', 'booking.view', 'booking.confirm', 'payment.create', 'user.client_manage']
         .every((permission) => can(permission));
     const {
         company, branches, spaces, selectedBranch, selectedSpace,
@@ -69,6 +69,8 @@ const Bookings = () => {
         });
     };
 
+    
+
     usePageHeader({
         visible: true,
         title: 'Hola',
@@ -85,7 +87,7 @@ const Bookings = () => {
     });
 
     return (
-        <div className={`booking_calendar${view === 'week' ? ' is_week' : ''}`}>
+        <div className='booking_calendar'>
             <Sidebar
                 companyName={companyName}
                 branches={branches}
@@ -166,11 +168,11 @@ const Bookings = () => {
                                 </div>
                             ) : (
                                 <>
-                                    <span className="chips"><Building2 size={15} /> {companyName ?? 'Sin empresa'}</span>
-                                    <span className="chips"><Store size={15} /> {branchName ?? 'Sin sucursal'}</span>
-                                    <span className="chips accent"><Dumbbell size={15} /> {spaceName ?? 'Sin espacio'}</span>
-                                    <span className="chips count_bookings" role="status">
-                                        <Calendar size={15} /> {bookingsCount === 0 ? 'Sin reservas en este rango' : `${bookingsCount} ${bookingsCount === 1 ? 'reserva' : 'reservas'}`}
+                                    <span className={`chips ${companyName ?? 'not_fount'}`}><Building2 size={15} /> {companyName ?? 'Sin empresa'}</span>
+                                    <span className={`chips ${branchName ?? 'not_fount'}`}><Store size={15} /> {branchName ?? 'Sin sucursal'}</span>
+                                    <span className={`chips ${spaceName ?? 'not_fount'}`}><Dumbbell size={15} /> {spaceName ?? 'Sin espacio'}</span>
+                                    <span className={`chips count_bookings`} role="status">
+                                        <Calendar size={15} /> {bookingsCount === 0 ? '0 reservas' : `${bookingsCount} ${bookingsCount === 1 ? 'reserva' : 'reservas'}`}
                                     </span>
                                 </>
                             )}

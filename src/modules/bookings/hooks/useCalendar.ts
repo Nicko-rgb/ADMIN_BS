@@ -128,7 +128,7 @@ const useCalendar = () => {
     // reemplaza por otra: se muestra el error de acceso.
     const hasUrlBranchAccess = !access || !sucursalPublicId || access.branches.has(sucursalPublicId);
     const accessError = !hasUrlBranchAccess && !isTreeLoading
-        ? 'No tenés acceso a esta sucursal.'
+        ? 'No tienes acceso a esta sucursal.'
         : null;
     const treeError = accessError ?? storeTreeError;
 

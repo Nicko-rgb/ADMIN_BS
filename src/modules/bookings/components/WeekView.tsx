@@ -86,7 +86,7 @@ const WeekDayColumn = ({
 
     return (
         <div
-            className={`day_column${cursor ? ' is_cursor_active' : ''}`}
+            className={`day_column ${cursor ? ' is_cursor_active' : ''}`}
             onPointerMove={handlePointerMove}
             onPointerLeave={() => setCursor(null)}
             onClick={handleClick}
@@ -164,7 +164,7 @@ export const WeekView = ({
         <div className={`timegrid_head ${view === 'day' ? 'is_day' : 'is_week'}`}>
             <span />
             {days.map((day) => (
-                <div key={day.key} className={`day_head${day.isToday ? ' today' : ''}`}>
+                <div key={day.key} className={`day_head ${day.isToday ? ' today' : ''}`}>
                     <span>{day.weekday}</span>
                     <strong className='center'>{day.dayNumber}</strong>
                 </div>

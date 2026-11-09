@@ -247,10 +247,6 @@
             &:has(> .booking_calendar) {
                 padding: 0;
             }
-
-            &:has(> .booking_calendar.is_week) {
-                min-height: 0;
-            }
         }
     }
 

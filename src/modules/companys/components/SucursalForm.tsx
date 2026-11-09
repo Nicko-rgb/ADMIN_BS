@@ -27,7 +27,7 @@ export const SucursalForm = ({ onClose, companyPublicId, sucursalPublicId, onSav
     } = useSucursalForm({ companyPublicId, sucursalPublicId, onClose, onSaved });
 
     return (
-        <Modal isOpen onClose={onClose} title={isEditMode ? 'Editar sucursal' : 'Nueva sucursal'} icon={Store} size="lg">
+        <Modal isOpen onClose={onClose} title={isEditMode ? 'Editar sucursal' : 'Nueva sucursal'} icon={Store}>
             {isLoadingDetail ? (
                 <LoadingScreen message="Cargando sucursal..." size="sm" />
             ) : (

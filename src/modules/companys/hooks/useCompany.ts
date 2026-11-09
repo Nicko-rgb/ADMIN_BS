@@ -84,6 +84,7 @@ export const useCompany = () => {
     // Edición de empresa ────────────────────────────────────────────────────────────────────
     const { preload, isValid: isCompanyEditValid, errors: companyEditErrors, ...companyEditFields } = useTenantForm(EMPTY_COMPANY_FORM, COMPANY_REQUIRED_FIELDS);
     const [isEditCompanyOpen, setIsEditCompanyOpen] = useState(false);
+    const [isRegisterSucursalOpen, setIsRegisterSucursalOpen] = useState(false);
     const [isSavingCompany, setIsSavingCompany] = useState(false);
 
     // Los errores por campo recién se pintan cuando se intenta guardar con el form incompleto.
@@ -137,7 +138,10 @@ export const useCompany = () => {
         if (!hasPlanRoom(planUsage?.subsidiaries)) {
             return toast.warning('Alcanzaste el límite de tu plan para registrar sucursales, actualiza de plan.', { duration: 5000 });
         }
+        setIsRegisterSucursalOpen(true);
     };
+
+    const closeRegisterSucursal = () => setIsRegisterSucursalOpen(false);
 
     // Modal de alta de usuario de sucursal
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -178,6 +182,8 @@ export const useCompany = () => {
         isUserModalOpen,
         openUserModal,
         closeUserModal,
+        isRegisterSucursalOpen,
+        closeRegisterSucursal,
     };
 };
 
