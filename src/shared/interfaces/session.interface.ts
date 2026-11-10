@@ -8,12 +8,6 @@ export interface SessionUser {
     role: string;
 }
 
-export interface ContextCountry {
-    id: number;
-    name: string;
-    isoCode: string;
-}
-
 export interface ContextCurrency {
     code: string;
     name: string;
@@ -31,7 +25,11 @@ export interface ContextSucursal {
     publicId: string;
     name: string;
     access: boolean;
-    country: ContextCountry | null;
+    /** 'HH:mm' — null si la sucursal todavía no tiene horario configurado. */
+    openTime: string | null;
+    /** 'HH:mm' — '24:00' representa fin del día. */
+    closeTime: string | null;
+    /** Moneda del país de la sucursal; el backend no envía el objeto país. */
     currency: ContextCurrency | null;
     spaces: ContextSpace[];
 }
@@ -42,17 +40,26 @@ export interface ContextCompany {
     name: string;
     /** Alcance de la empresa; las acciones también requieren sus permisos. */
     access: boolean;
-    country: ContextCountry | null;
     sucursales: ContextSucursal[];
+}
+
+export interface CurrentPlan {
+    name: string;
+    code: string;
+    status: string;
+    isEffective: boolean;
+    currentPeriodStart: string | null;
+    currentPeriodEnd: string | null;
 }
 
 export interface CompanyContextData {
     companies: ContextCompany[];
+    currentPlan: CurrentPlan | null;
+    loadedAt: string;
+    userPublicId: string;
 }
 
 export interface CompanyContextState extends CompanyContextData {
-    userPublicId: string | null;
-    loadedAt: string | null;
     setContext: (userPublicId: string, context: CompanyContextData) => void;
     clearContext: () => void;
 }

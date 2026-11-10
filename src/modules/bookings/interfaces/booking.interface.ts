@@ -1,5 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
-import type { CompanyBranchTree, CompanyTreeBranch, CompanyTreeSpace } from '../../companys/interfaces/company.interface';
+import type { CompanyBranchTree, CompanyTreeCompany } from '../../companys/interfaces/company.interface';
 import type { BusinessHourData, HourDay } from '../../companys/interfaces/bussinesHour.interfece';
 import type { BookingData } from './createBooking.interface';
 
@@ -37,7 +36,7 @@ export type CalendarLoadStatus = 'idle' | 'loading' | 'ready' | 'error';
 export type CalendarTreeStatus = CalendarLoadStatus;
 
 export interface CalendarStoreState {
-    /** Árbol empresa → sucursales → espacios de la sucursal activa. */
+    /** Árbol del tenant (todas las empresas, hermanas incluidas) que contiene la sucursal activa. */
     tree: CompanyBranchTree | null;
     treeStatus: CalendarTreeStatus;
     treeError: string | null;
@@ -91,18 +90,6 @@ export interface BookingStoreState {
     removeBooking: (bookingId: number) => void;
 }
 
-/** Un aviso del calendario: carga o error de árbol, horarios o reservas. */
-export type CalendarNoticeKey = 'tree' | 'hours' | 'bookings';
-
-export interface CalendarNotice {
-    key: CalendarNoticeKey;
-    label: string;
-    loading: boolean;
-    loadingText: string;
-    error: string | null;
-    retry: () => void;
-}
-
 /* ── Grilla de horarios ───────────────────────────────────────────────────── */
 
 export interface TimeRange {
@@ -131,19 +118,8 @@ export interface CalendarBranchWindow {
 
 /* ── Props de componentes ─────────────────────────────────────────────────── */
 
-export interface BookingSelectProps {
-    label: string;
-    icon: LucideIcon;
-    options: { publicId: string; name: string }[];
-    value?: string;
-    emptyMessage: string;
-    onChange: (publicId: string) => void;
-}
-
 export interface BookingSidebarProps {
-    companyName: string | null;
-    branches: CompanyTreeBranch[];
-    spaces: CompanyTreeSpace[];
+    company: CompanyTreeCompany | null;
     selectedBranchId: string | null;
     selectedSpaceId: string | null;
     isTreeLoading: boolean;

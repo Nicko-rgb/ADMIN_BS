@@ -1,17 +1,18 @@
-import { AlertCircle, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Dumbbell, LoaderCircle, Store } from 'lucide-react';
-import { BookingSelect } from './BookingSelect';
+import { useState } from 'react';
+import {
+    AlertCircle, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight,
+    Dumbbell, LoaderCircle, Store,
+} from 'lucide-react';
 import type { BookingSidebarProps } from '../interfaces/booking.interface';
 import '../styles/Sidebar.css';
 
 /**
- * Sidebar del calendario de reservas: marca, mini calendario y selectores de
- * sucursal y espacio. Recibe datos y callbacks desde la página para mantenerse
- * como componente presentacional y no duplicar el estado del calendario.
+ * Sidebar del calendario: marca, mini calendario y selectores. Recibe la
+ * empresa ya capturada del árbol y deriva sus sucursales accesibles y los
+ * espacios de la sucursal seleccionada.
  */
 export const Sidebar = ({
-    companyName,
-    branches,
-    spaces,
+    company,
     selectedBranchId,
     selectedSpaceId,
     isTreeLoading,
@@ -25,13 +26,21 @@ export const Sidebar = ({
     onNextMonth,
     onSelectDay,
 }: BookingSidebarProps) => {
+    const [branchOpen, setBranchOpen] = useState(false);
+    const [spaceOpen, setSpaceOpen] = useState(false);
+
+    const branches = (company?.sucursales ?? []).filter((branch) => branch.access);
+    const selectedBranch = branches.find((branch) => branch.publicId === selectedBranchId) ?? null;
+    const spaces = (selectedBranch?.spaces ?? []).filter((space) => space.access);
+    const selectedSpace = spaces.find((space) => space.publicId === selectedSpaceId) ?? null;
+
     return (
         <aside className="calendar_sidebar">
             <div className="brand">
                 <span className="brand_icon"><CalendarDays size={19} /></span>
                 <div>
                     <strong>Reservas</strong>
-                    <span>{companyName ?? (isTreeLoading ? 'Cargando sucursales…' : 'Sin sucursal')}</span>
+                    <span>{company?.name ?? (isTreeLoading ? 'Cargando sucursales…' : 'Sin sucursal')}</span>
                 </div>
             </div>
 
@@ -74,40 +83,105 @@ export const Sidebar = ({
                     </div>
                 ) : (
                     <>
-                        <BookingSelect
-                            label="Sucursal"
-                            icon={Store}
-                            options={branches}
-                            value={selectedBranchId ?? undefined}
-                            emptyMessage="Sin sucursales disponibles"
-                            onChange={onSelectBranch}
-                        />
-                        <BookingSelect
-                            key={selectedBranchId ?? 'no-branch'}
-                            label="Espacio deportivo"
-                            icon={Dumbbell}
-                            options={spaces}
-                            value={selectedSpaceId ?? undefined}
-                            emptyMessage="Sin espacios disponibles"
-                            onChange={onSelectSpace}
-                        />
+                        <div className="booking_select">
+                            <div className="booking_select_label">
+                                <span className="booking_select_label_text">
+                                    <Store size={14} aria-hidden="true" /> Sucursal
+                                </span>
+                                <span aria-hidden="true">{branches.length}</span>
+                            </div>
+                            <button
+                                type="button"
+                                className="booking_select_trigger"
+                                aria-label={`Sucursal: ${selectedBranch?.name ?? 'Sin sucursales disponibles'}`}
+                                aria-haspopup="listbox"
+                                aria-expanded={branchOpen}
+                                disabled={!branches.length}
+                                onClick={() => { setBranchOpen(!branchOpen); setSpaceOpen(false); }}
+                            >
+                                <span className="booking_select_value" title={selectedBranch?.name}>
+                                    {selectedBranch?.name ?? 'Sin sucursales disponibles'}
+                                </span>
+                                <ChevronDown size={15} className="booking_select_arrow" aria-hidden="true" />
+                            </button>
+                            {branchOpen && branches.length > 0 && (
+                                <>
+                                    <button type="button" className="booking_select_backdrop" aria-label="Cerrar" onClick={() => setBranchOpen(false)} />
+                                    <div className="booking_select_menu" role="listbox">
+                                        {branches.map((branch) => (
+                                            <button
+                                                key={branch.publicId}
+                                                type="button"
+                                                role="option"
+                                                aria-selected={branch.publicId === selectedBranchId}
+                                                className="booking_select_option"
+                                                onClick={() => { onSelectBranch(branch.publicId); setBranchOpen(false); }}
+                                            >
+                                                <span>{branch.name}</span>
+                                                {branch.publicId === selectedBranchId && <Check size={14} aria-hidden="true" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="booking_select">
+                            <div className="booking_select_label">
+                                <span className="booking_select_label_text">
+                                    <Dumbbell size={14} aria-hidden="true" /> Espacio deportivo
+                                </span>
+                                <span aria-hidden="true">{spaces.length}</span>
+                            </div>
+                            <button
+                                type="button"
+                                className="booking_select_trigger"
+                                aria-label={`Espacio deportivo: ${selectedSpace?.name ?? 'Sin espacios disponibles'}`}
+                                aria-haspopup="listbox"
+                                aria-expanded={spaceOpen}
+                                disabled={!spaces.length}
+                                onClick={() => { setSpaceOpen(!spaceOpen); setBranchOpen(false); }}
+                            >
+                                <span className="booking_select_value" title={selectedSpace?.name}>
+                                    {selectedSpace?.name ?? 'Sin espacios disponibles'}
+                                </span>
+                                <ChevronDown size={15} className="booking_select_arrow" aria-hidden="true" />
+                            </button>
+                            {spaceOpen && spaces.length > 0 && (
+                                <>
+                                    <button type="button" className="booking_select_backdrop" aria-label="Cerrar" onClick={() => setSpaceOpen(false)} />
+                                    <div className="booking_select_menu" role="listbox">
+                                        {spaces.map((space) => (
+                                            <button
+                                                key={space.publicId}
+                                                type="button"
+                                                role="option"
+                                                aria-selected={space.publicId === selectedSpaceId}
+                                                className="booking_select_option"
+                                                onClick={() => { onSelectSpace(space.publicId); setSpaceOpen(false); }}
+                                            >
+                                                <span>{space.name}</span>
+                                                {space.publicId === selectedSpaceId && <Check size={14} aria-hidden="true" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </>
                 )}
             </section>
 
             {/* Legends */}
-            <details className="booking_legend">
-                <summary>
-                    <span>Leyendas</span>
-                    <ChevronDown size={16} aria-hidden="true" />
-                </summary>
+            <section className="booking_legend" aria-label="Leyendas">
+                <h3>Leyendas</h3>
                 <ul className="booking_legend_items">
                     <li>
                         <span className="booking_legend_swatch is_closed" aria-hidden="true" />
                         <span>Fuera de horario</span>
                     </li>
                 </ul>
-            </details>
+            </section>
         </aside>
     );
 };
