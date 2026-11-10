@@ -134,15 +134,6 @@
                 min-height: 3rem;
             }
 
-            .context_notices {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: .5rem;
-                min-width: 0;
-                max-width: 100%;
-            }
-
             .chips,
             .context_placeholder,
             .count_bookings {
@@ -172,12 +163,7 @@
                         color: var(--bk-accent-text);
                     }
                 }
-
-                &.not_fount {
-                    color: var(--bk-text-muted);
-                    font-style: italic;
-                }
-
+                
                 &.count_bookings {
                     color: var(--bk-mint-text);
                     background-color: var(--bk-mint-soft);
@@ -185,6 +171,16 @@
 
                     svg {
                         color: var(--bk-mint-text);
+                    }
+                }
+
+                &.is_warning {
+                    background: var(--bk-warning-soft);
+                    color: var(--bk-warning-text);
+                    font-weight: 600;
+
+                    svg {
+                        color: var(--bk-warning-text);
                     }
                 }
             }
@@ -207,10 +203,6 @@
 
                     svg {
                         color: var(--bk-danger-text);
-                    }
-
-                    strong {
-                        font-weight: 600;
                     }
 
                     span {

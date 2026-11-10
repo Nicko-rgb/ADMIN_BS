@@ -24,9 +24,10 @@ export const useCalendarStore = create<CalendarStoreState>((set, get) => ({
     loadTree: async (sucursalPublicId, options) => {
         const state = get();
         const isSameRequest = state.requestedSucursal === sucursalPublicId;
-        // La sucursal pedida ya está en el árbol cargado (misma empresa):
+        // La sucursal pedida ya está en el árbol cargado (mismo tenant):
         // cambiar de sucursal no debe volver a pedir el árbol completo.
-        const treeHasBranch = state.tree?.branches.some((branch) => branch.publicId === sucursalPublicId) ?? false;
+        const treeHasBranch = state.tree?.companies?.some((company) =>
+            company.sucursales?.some((branch) => branch.publicId === sucursalPublicId)) ?? false;
 
         // Deduplica montajes simultáneos y visitas repetidas.
         if (!options?.force) {

@@ -30,21 +30,28 @@ const Branches = ({ branches }: { branches: { publicId: string; name: string; de
     ) : <p className="booking_companies_empty_branch">No hay sucursales disponibles.</p>
 );
 
-const ContextCompanyCard = ({ company }: { company: ContextCompany }) => (
-    <article className="booking_companies_card">
-        <div className="booking_companies_card_header">
-            <span className="booking_companies_company_icon"><Building2 size={21} /></span>
-            <div className="booking_companies_card_title">
-                <h3>{company.name}</h3>
-                <p>{company.country?.name || 'Empresa'} · {company.sucursales.filter((branch) => branch.access).length} {company.sucursales.filter((branch) => branch.access).length === 1 ? 'sucursal' : 'sucursales'}</p>
+const ContextCompanyCard = ({ company }: { company: ContextCompany }) => {
+    const branches = company.sucursales.filter((branch) => branch.access);
+
+    return (
+        <article className="booking_companies_card">
+            <div className="booking_companies_card_header">
+                <span className="booking_companies_company_icon"><Building2 size={21} /></span>
+                <div className="booking_companies_card_title">
+                    <h3>{company.name}</h3>
+                    <p>{company.isPrimary ? 'Empresa principal' : 'Empresa'} · {branches.length} {branches.length === 1 ? 'sucursal' : 'sucursales'}</p>
+                </div>
             </div>
-        </div>
-        <Branches branches={company.sucursales.filter((branch) => branch.access).map((branch) => ({
-            publicId: branch.publicId, name: branch.name,
-            detail: `${branch.spaces.filter((space) => space.access).length} ${branch.spaces.filter((space) => space.access).length === 1 ? 'espacio deportivo' : 'espacios deportivos'}`,
-        }))} />
-    </article>
-);
+            <Branches branches={branches.map((branch) => {
+                const spaces = branch.spaces.filter((space) => space.access).length;
+                return {
+                    publicId: branch.publicId, name: branch.name,
+                    detail: `${spaces} ${spaces === 1 ? 'espacio deportivo' : 'espacios deportivos'}`,
+                };
+            })} />
+        </article>
+    );
+};
 
 const SystemCompanyCard = ({ company }: { company: CompanyAdmin }) => {
     const [open, setOpen] = useState(false);
@@ -144,8 +151,11 @@ const SystemCompanies = () => {
 
 const MyCompanys = () => {
     const scopeLevel = useSessionStore((state) => state.scopeLevel);
-    const companies = useCompanyContextStore((state) => state.companies);
+    const contextCompanies = useCompanyContextStore((state) => state.companies);
     const isSystem = scopeLevel === 1;
+    // El backend entrega las empresas del tenant con `access` dinámico;
+    // acá solo se listan las que están dentro del alcance del usuario.
+    const companies = contextCompanies.filter((company) => company.access);
 
     usePageHeader({
         title: 'Reservas',
@@ -166,6 +176,9 @@ const MyCompanys = () => {
                         : <p className="booking_companies_message">No tienes empresas ni sucursales asignadas.</p>}
                 </>
             )}
+            <pre>
+                {JSON.stringify(contextCompanies, null, 6)}
+            </pre>
         </main>
     );
 };

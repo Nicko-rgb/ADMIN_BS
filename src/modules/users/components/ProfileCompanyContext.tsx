@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-    Building2, ChevronLeft, ChevronRight, CircleCheck, Crown, Globe2, ShieldX,
+    Building2, ChevronLeft, ChevronRight, CircleCheck, Clock, Crown, ShieldX,
     LayoutGrid, MapPin, Network, Plus, WalletCards,
 } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
@@ -27,9 +27,10 @@ const AccessPill = ({ access }: { access: boolean }) => (
     </span>
 );
 
-const CountryPill = ({ country }: { country: ContextCompany['country'] }) => (
+/** Ventana operativa de la sucursal tal como la manda el árbol del backend. */
+const SchedulePill = ({ openTime, closeTime }: { openTime: string | null; closeTime: string | null }) => (
     <span className="profile_context_meta">
-        <Globe2 size={14} />{country ? country.name + ' · ' + country.isoCode : 'País no registrado'}
+        <Clock size={14} />{openTime && closeTime ? openTime + ' – ' + closeTime : 'Sin horario configurado'}
     </span>
 );
 
@@ -52,7 +53,7 @@ const SucursalNode = ({ sucursal }: { sucursal: ContextSucursal }) => (
             <div>
                 <h4>{sucursal.name}</h4>
                 <div className="profile_context_sucursal_meta">
-                    <CountryPill country={sucursal.country} />
+                    <SchedulePill openTime={sucursal.openTime} closeTime={sucursal.closeTime} />
                     <span className="profile_context_meta"><WalletCards size={14} />{sucursal.currency ? sucursal.currency.symbol + ' · ' + sucursal.currency.code + ' · ' + sucursal.currency.name : 'Moneda no registrada'}</span>
                     <span className="profile_context_meta"><LayoutGrid size={14} />{countLabel(sucursal.spaces.length, 'espacio', 'espacios')}</span>
                 </div>
@@ -80,7 +81,6 @@ const CompanyNode = ({ company }: CompanyNodeProps) => {
                         {company.isPrimary && <span className="profile_context_primary"><Crown size={13} />Principal</span>}
                     </div>
                     <div className="profile_context_company_meta">
-                        <CountryPill country={company.country} />
                         <span className="profile_context_meta"><Building2 size={14} />{countLabel(company.sucursales.length, 'sucursal', 'sucursales')}</span>
                         <span className="profile_context_meta"><LayoutGrid size={14} />{countLabel(spaceCount, 'espacio', 'espacios')}</span>
                     </div>

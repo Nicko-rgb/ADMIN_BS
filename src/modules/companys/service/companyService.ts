@@ -22,8 +22,10 @@ class CompanyService {
         return res.data.data;
     }
 
-    // Árbol público empresa → sucursales → espacios para el calendario de reservas,
-    // con apertura/cierre de cada sucursal. El acceso de cada usuario se filtra en el front.
+    // Árbol del tenant de la sucursal, tal como lo devuelve el backend
+    // (`companies[].sucursales[]` con `openTime`/`closeTime` y `access`). No se
+    // mapea nada: el contrato del front es el mismo y cada consumidor decide con
+    // qué empresa trabajar.
     static async getBranchTree(sucursalPublicId: string): Promise<CompanyBranchTree> {
         const res = await apiService.get(`/companys/public/branches/${encodeURIComponent(sucursalPublicId)}/tree`);
         return res.data.data;
