@@ -46,7 +46,7 @@ export const SucursalConfigForm = ({ onClose, sucursalPublicId, onSaved }: Sucur
     };
 
     return (
-        <Modal isOpen onClose={onClose} title={isEditMode ? 'Editar Configuración' : 'Configurar Sucursal'} icon={Settings} size="lg">
+        <Modal isOpen onClose={onClose} title={isEditMode ? 'Editar Configuración' : 'Configurar Sucursal'} icon={Settings}>
             
                 <form onSubmit={handleTabSubmit} noValidate>
                     <Tabs
