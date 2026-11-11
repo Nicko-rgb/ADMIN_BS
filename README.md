@@ -1,4 +1,10 @@
-# React + TypeScript + Vite
+# Booking Sport — Panel administrativo
+
+Para publicar el panel, consultar la [guía de despliegue en Vercel](./DEPLOY_VERCEL.md).
+La configuración de compilación y rutas está en `vercel.json` y las variables de
+producción de referencia en `.env.production.example`.
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
