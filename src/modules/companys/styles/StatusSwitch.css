@@ -11,8 +11,12 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 2px;
     padding: 5px;
-    background: var(--gray-light);
+    background: var(--surface);
     border-radius: 15px;
+
+    [data-theme="dark"] & {
+        background: rgb(49, 49, 49);
+    }
 
     /* Control deslizante — la posición la fija el índice del estado. */
     .status_switch_thumb {
@@ -28,7 +32,7 @@
             background-color .25s ease;
 
         &.is_active {
-            background: var(--success-soft);
+            background: var(--primary-light);
         }
 
         &.is_maintenance {
@@ -54,7 +58,7 @@
         background: transparent;
         font-size: 1.2rem;
         font-weight: 600;
-        color: var(--text-soft);
+        color: var(--text);
         margin: auto;
 
         &:disabled {
@@ -72,7 +76,7 @@
         }
 
         &.is_selected.is_active {
-            color: var(--success-text);
+            color: var(--success);
         }
 
         &.is_selected.is_maintenance {

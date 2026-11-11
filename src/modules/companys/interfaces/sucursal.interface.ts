@@ -13,14 +13,6 @@ export type EntityStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
 /** Estado de la sucursal — alias de EntityStatus (mismo ENUM en backend). */
 export type SucursalStatus = EntityStatus;
 
-// Espacio de la sede (toSucursalDto → spaces) — nombre, deporte y estado.
-export interface SucursalSpace {
-    publicId: string;
-    name: string;
-    sport: string | null;
-    status: SucursalStatus;
-}
-
 // País de la sucursal (toSucursalDto) — con `id` de catálogo para precargar el form.
 // A diferencia de la empresa, la sucursal SÍ trae ids (ver BACKEND dto/sucursal.dto.ts).
 export interface SucursalCountry extends CountryDisplay {
@@ -42,6 +34,7 @@ export interface SucursalUbigeo {
 export interface SucursalDetail {
     publicId: string;
     companyPublicId: string | null;
+    companyName: string | null;
     name: string;
     address: string;
     phoneCell: string;
@@ -50,10 +43,9 @@ export interface SucursalDetail {
     longitude: string | null;
     description: string | null;
     website: string | null;
-    status: SucursalStatus | null;
+    status: EntityStatus;
     country: SucursalCountry | null;
     ubigeo: SucursalUbigeo | null;
-    spaces: SucursalSpace[];
     createdAt: string;
 }
 

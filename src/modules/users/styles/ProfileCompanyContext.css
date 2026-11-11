@@ -1,0 +1,185 @@
+.profile_content .profile_context_card {
+    grid-column: 1 / -1;
+    padding: 1.8rem;
+    font-size: 1.2rem;
+
+    .profile_context_heading {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding-bottom: 1.4rem;
+        border-bottom: 1px solid var(--border);
+
+        > div:nth-child(2) { min-width: 0; flex: 1; }
+        h2 { color: var(--text); font-size: 1.8rem; line-height: 1.3; }
+        p { margin-top: .3rem; color: var(--text-muted); font-size: 1.3rem; line-height: 1.5; }
+    }
+
+    .profile_context_actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .profile_context_icon,
+    .profile_context_node_icon {
+        display: grid;
+        place-items: center;
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: var(--primary);
+        background: var(--primary-light);
+    }
+
+    .profile_context_current { padding-top: 1.6rem; }
+    .profile_context_company { min-width: 0; }
+    .profile_context_company_header,
+    .profile_context_sucursal_heading {
+        display: flex;
+        align-items: flex-start;
+        gap: .9rem;
+        min-width: 0;
+    }
+
+    .profile_context_node_icon.company {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+    }
+
+    .profile_context_company_main,
+    .profile_context_sucursal_heading > div:nth-child(2) { flex: 1; min-width: 0; }
+
+    .profile_context_title_row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .7rem;
+
+        h3 { color: var(--text); font-size: 1.65rem; line-height: 1.3; }
+    }
+
+    .profile_context_sucursal h4 { color: var(--text); font-size: 1.4rem; line-height: 1.35; }
+    .profile_context_primary { display: inline-flex; align-items: center; gap: .35rem; color: var(--purple-text); font-size: 1.2rem; font-weight: 600; }
+    .profile_context_company_meta,
+    .profile_context_sucursal_meta { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; margin-top: .45rem; }
+    .profile_context_meta { display: inline-flex; align-items: center; gap: .4rem; color: var(--text-muted); font-size: 1.2rem; line-height: 1.45; }
+    .profile_context_meta svg { flex: 0 0 auto; }
+
+    .profile_context_access {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        flex: 0 0 auto;
+        margin-left: auto;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        font-weight: 600;
+        white-space: nowrap;
+
+        &.has_access { color: var(--primary); background: var(--success-soft); padding: .2rem .5rem; border-radius: 4px; }
+    }
+
+    .profile_context_navigation {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .45rem;
+        flex: 0 0 auto;
+        color: var(--text-soft);
+        font-size: 1.2rem;
+        font-weight: 600;
+        white-space: nowrap;
+
+        button {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            color: var(--primary-text);
+            background: var(--primary-light);
+            cursor: pointer;
+            transition: var(--transition);
+
+            &:hover:not(:disabled) { color: var(--text-white); background: var(--primary); }
+            &:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+            &:disabled { opacity: .45; cursor: not-allowed; }
+        }
+    }
+
+    .profile_context_sucursales,
+    .profile_context_spaces { margin: 0; padding: 0; list-style: none; }
+
+    .profile_context_sucursales {
+        position: relative;
+        margin: .3rem 0 0 2.1rem;
+        padding: .4rem 0 .1rem 3rem;
+
+        &::before { content: ''; position: absolute; top: 0; bottom: 2.2rem; left: 0; border-left: 1px solid var(--border-strong); }
+    }
+
+    .profile_context_sucursal,
+    .profile_context_space,
+    .profile_context_space_empty { position: relative; }
+
+    .profile_context_sucursal { padding: 1.1rem 0; }
+    .profile_context_sucursal::before,
+    .profile_context_space::before,
+    .profile_context_space_empty::before {
+        content: '';
+        position: absolute;
+        top: 2.7rem;
+        left: -3rem;
+        width: 3rem;
+        border-top: 1px solid var(--border-strong);
+    }
+
+    .profile_context_spaces {
+        position: relative;
+        margin: .4rem 0 0 1.7rem;
+        padding-left: 3rem;
+
+        &::before { content: ''; position: absolute; top: 0; bottom: 2.1rem; left: 0; border-left: 1px solid var(--border-strong); }
+    }
+
+    .profile_context_space {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        min-height: 4.4rem;
+        padding: .35rem 0;
+        color: var(--text-soft);
+        font-size: 1.2rem;
+
+        &::before { top: 2.2rem; }
+        .profile_context_node_icon { flex-basis: 30px; width: 30px; height: 30px; }
+    }
+
+    .profile_context_space_name { flex: 1; min-width: 0; }
+
+    .profile_context_space_empty { padding: 1rem 0; color: var(--text-muted); font-size: 1.2rem; }
+    .profile_context_space_empty::before { top: 1.8rem; }
+    .profile_context_empty_branch { margin: 1.4rem 0 0 5.1rem; color: var(--text-muted); font-size: 1.2rem; }
+    .profile_context_empty_state { display: flex; align-items: center; flex-wrap: wrap; gap: 1.4rem; min-height: 90px; }
+    .profile_context_empty { flex: 1; color: var(--text-muted); font-size: 1.2rem; }
+}
+
+@media (max-width: 720px) {
+    .profile_content .profile_context_card {
+        .profile_context_heading { flex-wrap: wrap; }
+        .profile_context_actions { width: 100%; justify-content: space-between; }
+        .profile_context_company_header,
+        .profile_context_sucursal_heading { flex-wrap: wrap; }
+        .profile_context_company_header .profile_context_access,
+        .profile_context_sucursal_heading .profile_context_access { margin-left: auto; }
+        .profile_context_space { flex-wrap: wrap; }
+        .profile_context_space .profile_context_access { margin-left: auto; }
+    }
+}

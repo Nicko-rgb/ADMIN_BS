@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Pencil, Search, ShieldCheck, UploadCloud, UserCog, Users as UsersIcon, X } from 'lucide-react';
+import { Pencil, Plus, Search, ShieldCheck, UploadCloud, UserCog, Users as UsersIcon, X } from 'lucide-react';
 import { Table, TableActions, TableImage } from '../../../shared/components/Table';
 import type { TableAction, TableColumn } from '../../../shared/components/Table';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { Modal } from '../../../shared/components/Modal';
 import { Button } from '../../../shared/components/Button';
 import { InputField, SelectField, FormActions, ForbiddenScreen, LoadingScreen } from '../../../shared/components';
@@ -26,6 +26,14 @@ const UserCatalog = () => {
         countryFilter, setCountryFilter, countryOptions,
         editing, editValues, isLoadingDetail, isSaving, isEditValid, openEdit, closeEdit, setEditField, handleSubmitEdit,
     } = useUsers();
+
+    usePageHeader({
+        title: 'Usuarios',
+        subtitle: 'Usuarios registrados en el sistema',
+        icon: UsersIcon,
+        breadcrumbs: [{ label: 'Usuarios' }],
+        extra: <Button text="Nuevo usuario" size='sm' icon={Plus} onClick={() => {}} iconPosition='left' />,
+    });
 
     // Objetivo del modal de permisos — con solo el publicId el modal carga y guarda solo.
     const [managingUser, setManagingUser] = useState<{ publicId: string; name: string } | null>(null);
@@ -71,7 +79,6 @@ const UserCatalog = () => {
 
     return (
         <div className="users_page">
-            <Header title="Usuarios" subtitle="Usuarios registrados en el sistema" icon={UsersIcon} />
             <div className="users_toolbar">
                 <div className="users_toolbar_search">
                     <InputField
@@ -113,7 +120,7 @@ const UserCatalog = () => {
                 pagination={pagination}
                 onPageChange={setPage}
             />
-            <Modal isOpen={editing !== null} onClose={closeEdit} title="Editar usuario" icon={UserCog} size="lg">
+            <Modal isOpen={editing !== null} onClose={closeEdit} title="Editar usuario" icon={UserCog} size="md">
                 {isLoadingDetail || !editing || !editValues ? (
                     <LoadingScreen message="Cargando datos del usuario..." size="sm" />
                 ) : (

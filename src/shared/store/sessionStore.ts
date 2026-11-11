@@ -1,27 +1,48 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { SessionUser } from '../interfaces/session.interface';
+import type { CompanyContextState, SessionData, SessionState } from '../interfaces/session.interface';
 
-interface SessionData {
-    token: string | null;
-    user: SessionUser | null;
-    permissions: string[];
-    companyIds: number[];
-    /** Alcance del rol (1=system … 4=empleado, null=cliente) — pista de UI, la seguridad la decide el backend. */
-    scopeLevel: number | null;
-}
+const EMPTY_CONTEXT = { companies: [], currentPlan: null, loadedAt: '', userPublicId: '' };
 
-interface SessionState extends SessionData {
-    setSession: (session: { token: string; user: SessionUser; permissions: string[]; companyIds: number[]; scopeLevel: number | null }) => void;
-    updateUser: (fields: Partial<SessionUser>) => void;
-    clearSession: () => void;
-}
+/**
+ * Árbol empresa → sucursales → espacios recibido en el login.
+ * Se conserva en localStorage durante la sesión y se limpia al cerrarla.
+ * Es una instantánea para la UI; `access` nunca autoriza operaciones en el backend.
+ */
+export const useCompanyContextStore = create<CompanyContextState>()(
+    persist(
+        (set) => ({
+            ...EMPTY_CONTEXT,
+            setContext: (userPublicId, context) => set({
+                companies: context.companies,
+                currentPlan: context.currentPlan,
+                loadedAt: context.loadedAt,
+                userPublicId,
+            }),
+            clearContext: () => set(EMPTY_CONTEXT),
+        }),
+        {
+            name: 'admin-context',
+            version: 3,
+            migrate: () => EMPTY_CONTEXT,
+            partialize: ({ companies, currentPlan, loadedAt, userPublicId }) => ({ companies, currentPlan, loadedAt, userPublicId }),
+        }
+    )
+);
 
-const EMPTY_SESSION: SessionData = { token: null, user: null, permissions: [], companyIds: [], scopeLevel: null };
+const EMPTY_SESSION: SessionData = { token: null, user: null, permissions: [], scopeLevel: null };
+
+// Lista explícita de campos persistidos: descarta datos del contrato anterior.
+const pickSessionData = (session: Partial<SessionData> | null | undefined): SessionData => ({
+    token: session?.token ?? null,
+    user: session?.user ?? null,
+    permissions: session?.permissions ?? [],
+    scopeLevel: session?.scopeLevel ?? null,
+});
 
 /**
  * Sesión del usuario autenticado — única fuente de verdad del token, del
- * usuario, sus permisos y sus company_ids en el front. Persiste en
+ * usuario, sus permisos y su nivel de alcance en el front. Persiste en
  * localStorage para sobrevivir un refresh. `apiService` lee `token` de acá
  * para el header Authorization; `usePermission` lee `permissions`.
  */
@@ -29,12 +50,42 @@ export const useSessionStore = create<SessionState>()(
     persist(
         (set) => ({
             ...EMPTY_SESSION,
-            setSession: (session) => set(session),
+            setSession: ({ token, user, permissions, scopeLevel, context }) => {
+                // No mezclar el árbol con admin-session ni conservar datos del login anterior.
+                useCompanyContextStore.getState().clearContext();
+                if (!context || !Array.isArray(context.companies)) {
+                    set(EMPTY_SESSION);
+                    throw new Error('No se pudo cargar el contexto de la sesión. Vuelve a iniciar sesión.');
+                }
+                useCompanyContextStore.getState().setContext(user.publicId, context);
+                set({ token, user, permissions, scopeLevel });
+            },
             // Autoedición de perfil (Profile.tsx) — refresca los datos cacheados de la sesión sin
             // pedir un login nuevo (ej. el nombre que muestra el saludo de Home).
             updateUser: (fields) => set((state) => (state.user ? { user: { ...state.user, ...fields } } : state)),
-            clearSession: () => set(EMPTY_SESSION),
+            clearSession: () => {
+                useCompanyContextStore.getState().clearContext();
+                set(EMPTY_SESSION);
+            },
         }),
-        { name: 'admin-session' }
+        {
+            name: 'admin-session',
+            version: 1,
+            migrate: (persisted) => pickSessionData(persisted as Partial<SessionData> | null),
+            partialize: (state) => pickSessionData(state),
+        }
     )
 );
+
+// localStorage se hidrata de forma síncrona. Una sesión sin su contexto requiere login.
+const restoredSession = useSessionStore.getState();
+const restoredContext = useCompanyContextStore.getState();
+if (
+    !restoredSession.token
+    || !restoredSession.user
+    || restoredContext.userPublicId !== restoredSession.user.publicId
+    || !restoredContext.loadedAt
+    || !Array.isArray(restoredContext.companies)
+) {
+    useSessionStore.getState().clearSession();
+}

@@ -1,6 +1,6 @@
 import { apiService } from '../../../shared/utils/apiService';
 import type { PaginatedResponse } from '../../../shared/interfaces/pagination.interface';
-import type { CompanyAdmin, CompanyDetail, CompanyEnabled, UpdateCompanyPayload } from '../interfaces/company.interface';
+import type { CompanyAdmin, CompanyDetail, CompanyEnabled, UpdateCompanyPayload, CompanyBranchTree } from '../interfaces/company.interface';
 import type { RegisterCompanyPayload } from '../interfaces/companyRegistration.interface';
 
 // Catálogo de empresas principales del sistema — listado paginado, con búsqueda por nombre o documento y filtros por país y estado.
@@ -19,6 +19,15 @@ class CompanyService {
     // Detalle de una empresa — se busca por publicId, nunca ids internos.
     static async getByPublicId(publicId: string): Promise<CompanyDetail> {
         const res = await apiService.get(`/companys/${publicId}`);
+        return res.data.data;
+    }
+
+    // Árbol del tenant de la sucursal, tal como lo devuelve el backend
+    // (`companies[].sucursales[]` con `openTime`/`closeTime` y `access`). No se
+    // mapea nada: el contrato del front es el mismo y cada consumidor decide con
+    // qué empresa trabajar.
+    static async getBranchTree(sucursalPublicId: string): Promise<CompanyBranchTree> {
+        const res = await apiService.get(`/companys/public/branches/${encodeURIComponent(sucursalPublicId)}/tree`);
         return res.data.data;
     }
 

@@ -1,5 +1,5 @@
 import { ChevronRight, Folder, FolderOpen, MapPin, Pencil, Plus, Trash2 } from 'lucide-react';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
 import { useUbigeo } from '../hooks/useUbigeo';
 import { CreateEditUbigeo } from '../components/CreateEditUbigeo';
@@ -103,6 +103,13 @@ const UbigeoPage = () => {
         deletingNode, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
     } = useUbigeo();
 
+    usePageHeader({
+        title: 'Ubigeo',
+        subtitle: 'Administra la información geográfica del sistema',
+        icon: MapPin,
+        breadcrumbs: [{ label: 'Ubigeo' }],
+    });
+
     const modalTitle = !modalContext
         ? ''
         : modalContext.mode === 'edit'
@@ -111,7 +118,6 @@ const UbigeoPage = () => {
 
     return (
         <div className="catalog_page ubigeo_page">
-            <Header title="Ubigeo" subtitle="Administra la información geográfica del sistema" icon={MapPin} />
 
             <nav className="ubigeo_breadcrumb" aria-label="breadcrumb">
                 <button type="button" onClick={collapseToCountries} className={!expandedCountry ? 'active' : ''}>Países</button>

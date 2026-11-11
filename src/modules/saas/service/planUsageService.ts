@@ -1,4 +1,4 @@
-import { apiService } from '../utils/apiService';
+import { apiService } from '../../../shared/utils/apiService';
 import type { PlanUsage } from '../interfaces/planUsage.interface';
 
 // Plan de una empresa, su empresa primaria y el uso de cada uno de sus límites.

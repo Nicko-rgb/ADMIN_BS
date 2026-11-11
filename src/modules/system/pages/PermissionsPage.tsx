@@ -1,11 +1,8 @@
 import { useState } from 'react';
-import { Pencil, Search, ShieldCheck, ShieldUser, Trash2 } from 'lucide-react';
-import { Table, TableActions } from '../../../shared/components/Table';
+import { Pencil, Plus, Search, ShieldCheck, ShieldUser, Trash2 } from 'lucide-react';
 import type { TableColumn } from '../../../shared/components/Table';
-import { Button } from '../../../shared/components/Button';
-import { Header } from '../../../shared/components/Header';
-import { Dialog } from '../../../shared/components/Dialog';
-import { InputField, SelectField, Tabs, LoadingScreen, EmptyScreen } from '../../../shared/components';
+import { usePageHeader } from '../../../shared/store/headerStore';
+import { InputField, SelectField, Tabs, LoadingScreen, EmptyScreen, Table, TableActions, Button, Dialog } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { usePermissions } from '../hooks/usePermissions';
 import { EditRegisterPermission } from '../components/EditRegisterPermission';
@@ -86,15 +83,20 @@ const PermissionsPage = () => {
 
     const isPermissionsTab = tab === 'permissions';
 
+    usePageHeader({
+        title: 'Permisos y Roles',
+        breadcrumbs: [
+            { label: 'Permisos y Roles' },
+        ],
+        subtitle: isPermissionsTab
+            ? 'Catálogo de permisos disponibles en el sistema'
+            : 'Roles del sistema — permisos base y alcance de datos',
+        icon: isPermissionsTab ? ShieldCheck : ShieldUser,
+        extra: <Button text={isPermissionsTab ? 'Nuevo permiso' : 'Nuevo rol'} size='sm' icon={Plus} onClick={isPermissionsTab ? openPermissionCreate : openRoleCreate} />,
+    });
+
     return (
         <div className="catalog_page">
-            <Header
-                title="Permisos y Roles"
-                subtitle={isPermissionsTab ? 'Catálogo de permisos disponibles en el sistema' : 'Roles del sistema — permisos base y alcance de datos'}
-                icon={isPermissionsTab ? ShieldCheck : ShieldUser}
-                action={isPermissionsTab ? { label: 'Nuevo permiso', onClick: openPermissionCreate } : { label: 'Nuevo rol', onClick: openRoleCreate }}
-            />
-
             <Tabs
                 tabs={[
                     { key: 'permissions', label: 'Permisos', icon: ShieldCheck },
@@ -152,7 +154,6 @@ const PermissionsPage = () => {
                 <LoadingScreen message="Cargando roles..." />
             ) : roleItems.length === 0 ? (
                 <EmptyScreen
-                    title="No hay roles registrados"
                     message="Creá el primer rol para organizar permisos y alcances."
                     actionText="Nuevo rol"
                     onAction={openRoleCreate}

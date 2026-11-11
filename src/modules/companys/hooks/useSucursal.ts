@@ -1,20 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { handleApiError, getApiErrorStatus } from '../../../shared/utils/errorHandler';
+import toast from '../../../shared/utils/toast';
 import SucursalService from '../service/sucursalService';
 import SucursalConfigService from '../service/sucursalConfigService';
 import SpaceService from '../service/spaceService';
 import type { BannerFile } from '../service/sucursalService';
 import type { SpaceListItem } from '../interfaces/space.interface';
-import type { SucursalDetail } from '../interfaces/sucursal.interface';
+import type { SucursalDetail, EntityStatus } from '../interfaces/sucursal.interface';
 import type { SucursalConfig } from '../interfaces/sucursalConfig.interface';
 
 export type SucursalErrorStatus = 'not_found' | 'forbidden' | 'unknown';
 
-// Detalle de una sucursal — trae el publicId de la URL (/companys/company/sucursal/:publicId).
-// El 404 (publicId inexistente o no es sucursal) y el 403 (fuera del scope del usuario, ver
-// sucursal.service.ts en el backend) se distinguen por status para que la página elija entre
-// NotFoundScreen y ForbiddenScreen — cualquier otro error queda como 'unknown'.
 export const useSucursal = () => {
     const { publicId } = useParams<{ publicId: string }>();
 
@@ -23,14 +20,13 @@ export const useSucursal = () => {
     // null = sin config o no se pudo cargar — la página igual se muestra; el modal
     // hace su propio fetch con manejo de errores al abrirse.
     const [config, setConfig] = useState<SucursalConfig | null>(null);
-    // Portada actual — null si no hay o no se pudo cargar (no bloquea la página).
     const [banner, setBanner] = useState<BannerFile | null>(null);
-    // Espacios de la sucursal — endpoint propio con space.view.
     const [spaces, setSpaces] = useState<SpaceListItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorStatus, setErrorStatus] = useState<SucursalErrorStatus | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [reloadToken, setReloadToken] = useState(0);
+    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
     useEffect(() => {
         if (!publicId) return;
@@ -83,7 +79,28 @@ export const useSucursal = () => {
         setSpaces(data);
     };
 
-    return { publicId, sucursal, config, banner, spaces, isLoading, errorStatus, errorMessage, retry: reload, reloadBanner, reloadSpaces };
+    // Cambia el estado de la sucursal (switch de estado) — el backend devuelve la
+    // sucursal actualizada, se aplica directo al estado sin recargar la página.
+    const handleToggleStatus = async (status: EntityStatus) => {
+        if (!publicId) return;
+        setIsTogglingStatus(true);
+        toast.loading('Actualizando...')
+        try {
+            const { data, message } = await SucursalService.toggleStatus(publicId)(status);
+            toast.success(message);
+            setSucursal(data);
+        } catch (err) {
+            toast.error(handleApiError(err));
+        } finally {
+            setIsTogglingStatus(false);
+        }
+    };
+
+    return {
+        publicId, sucursal, config, banner, spaces, isLoading, errorStatus, errorMessage,
+        retry: reload, reloadBanner, reloadSpaces,
+        isTogglingStatus, handleToggleStatus,
+    };
 };
 
 export default useSucursal;

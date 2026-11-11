@@ -11,7 +11,8 @@ import {
 import { MedibleImage } from '../../../shared/components/MedibleImage';
 import SucursalService from '../service/sucursalService';
 import { resolveImageUrl } from '../../../shared/utils/formatText';
-import { LoadingScreen, NotFoundScreen, ForbiddenScreen, PlanUsageBar, Button, EmptyScreen } from '../../../shared/components';
+import { LoadingScreen, NotFoundScreen, ForbiddenScreen, Button, EmptyScreen } from '../../../shared/components';
+import { PlanUsageBar } from '../../saas/components/PlanUsageBar';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
@@ -19,10 +20,11 @@ import SucursalForm from '../components/SucursalForm';
 import SucursalConfigForm from '../components/SucursalConfigForm';
 import StatusSwitch from '../components/StatusSwitch';
 import SpaceForm from '../components/SpaceForm';
-import usePlanUsage from '../../../shared/hooks/usePlanUsage';
+import usePlanUsage from '../../saas/hooks/usePlanUsage';
 import useSucursal from '../hooks/useSucursal';
 import type { InfoChipProps } from '../interfaces/sucursal.interface';
 import '../styles/Sucursal.css';
+import { usePageHeader } from '../../../shared/store/headerStore';
 
 const STATUS_LABELS = { ACTIVE: 'Activa', INACTIVE: 'Inactiva', MAINTENANCE: 'Mantenimiento' } as const;
 const STATUS_CLASSNAMES = { ACTIVE: 'active', INACTIVE: 'inactive', MAINTENANCE: 'maintenance' } as const;
@@ -41,7 +43,7 @@ const InfoChip = ({ icon: Icon, image, value, title, className, href, trailingIc
 // Detalle de una sucursal — portada hero + tarjeta consolidada de datos en chips + recursos deportivos.
 const Sucursal = () => {
     const navigate = useNavigate();
-    const { publicId, sucursal, config, banner, spaces, isLoading, errorStatus, errorMessage, retry, reloadBanner, reloadSpaces } = useSucursal();
+    const { publicId, sucursal, config, banner, spaces, isLoading, errorStatus, errorMessage, retry, reloadBanner, reloadSpaces, handleToggleStatus, isTogglingStatus } = useSucursal();
     const { planUsage, reloadPlanUsage } = usePlanUsage(sucursal?.companyPublicId ?? undefined);
     const can = usePermission();
     const canEditBanner = can('sucursal.edit');
@@ -79,24 +81,33 @@ const Sucursal = () => {
     // Limpia el timer al desmontar la página.
     useEffect(() => () => { if (closeTimer.current) window.clearTimeout(closeTimer.current); }, []);
 
+    usePageHeader({
+        showCard: false,
+        breadcrumbs: [
+            { label: 'Empresas', path: '/companys' },
+            ...(sucursal?.companyName ? [{ label: sucursal.companyName, path: `/companys/company/${sucursal.companyPublicId}` }] : []),
+            { label: sucursal?.name || 'Cargando...' },
+        ],
+    });
+
     if (isLoading) {
-        return <LoadingScreen message="Cargando sucursal..." size="lg" />;
+        return <LoadingScreen message="Cargando sucursal..." />;
     }
 
     if (errorStatus === 'not_found') {
-        return <NotFoundScreen message={errorMessage || 'La sucursal que buscás no existe.'} />;
+        return <NotFoundScreen onRetry={retry} message={errorMessage || 'No se pudo encontrar información de esta sucursal'} />;
     }
 
     if (errorStatus === 'forbidden') {
-        return <ForbiddenScreen message={errorMessage || 'No tenés acceso a esta sucursal.'} />;
+        return <ForbiddenScreen message={errorMessage} />;
     }
 
     if (errorStatus === 'unknown') {
-        return <NotFoundScreen title="Ocurrió un error" message={errorMessage} onRetry={retry} />;
+        return <NotFoundScreen message={errorMessage} onRetry={retry} />;
     }
 
     if (!sucursal) {
-        return <NotFoundScreen message="No se pudo encontrar información de esta sucursal" />;
+        return <NotFoundScreen onRetry={retry} message="No se pudo encontrar información de esta sucursal" />;
     }
 
     const goBack = () => navigate(`/companys/company/${sucursal.companyPublicId}`);
@@ -133,8 +144,8 @@ const Sucursal = () => {
                 <div className="cover">
                     <button className="btn_back" onClick={() => navigate(-1)}><ArrowLeft /></button>
                     <div className='config_top'>
-                        {canEditBanner && <button className="btn_bg_sucursal" title="Cambiar portada" onClick={() => setIsBannerOpen(true)}><Image size={16} /></button>}
-                        {can('sucursal.config') && (<Button text="Configurar" size="xs" icon={Settings} color="secondary" onClick={() => setIsConfigOpen(true)} />)}
+                        {canEditBanner && <button className="btn_bg_sucursal bg_blur" title="Cambiar portada" onClick={() => setIsBannerOpen(true)}><Image size={16} /></button>}
+                        {can('sucursal.config') && (<button className='btn_bg_sucursal bg_blur' onClick={() => setIsConfigOpen(true)}><Settings size={16} /> </button>)}
                     </div>
                     {banner ? (
                         <img className="cover_image" src={resolveImageUrl(banner.url)} alt={`Portada de ${sucursal.name}`} />
@@ -143,57 +154,61 @@ const Sucursal = () => {
                     )}
                     <div className="cover_overlay" />
                     <div className="cover_identity">
-                        <div className="cover_avatar center"><Store size={30} /></div>
+                        <div className="cover_avatar center bg_blur"><Store size={30} /></div>
                         <div>
                             <h1 className="cover_text">
                                 {sucursal.name}
                             </h1>
-                            <StatusSwitch value={sucursal.status} onChange={(e) => { }} />
+                            <StatusSwitch
+                                value={sucursal.status}
+                                onChange={handleToggleStatus}
+                                disabled={isTogglingStatus}
+                            />
                         </div>
                     </div>
                     <div className="cover_actions">
                         <div className="cover_socials">
-                        {socials.length > 0 && (
-                            <div
-                                ref={fanRef}
-                                className={`cover_socials_fan ${isSocialsOpen ? 'is_open' : ''}`}
-                                onMouseEnter={openSocialsFan}
-                                onMouseLeave={closeSocialsFan}
-                                onFocus={openSocialsFan}
-                                onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) closeSocialsFan(); }}
-                            >
-                                <button
-                                    type="button"
-                                    className="cover_socials_trigger"
-                                    aria-label="Ver redes sociales"
-                                    aria-expanded={isSocialsOpen}
-                                    onClick={openSocialsFan}
+                            {socials.length > 0 && (
+                                <div
+                                    ref={fanRef}
+                                    className={`cover_socials_fan ${isSocialsOpen ? 'is_open' : ''}`}
+                                    onMouseEnter={openSocialsFan}
+                                    onMouseLeave={closeSocialsFan}
+                                    onFocus={openSocialsFan}
+                                    onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) closeSocialsFan(); }}
                                 >
-                                    <Share2 size={18} aria-hidden />
-                                </button>
-                                {socials.map(({ href, label, key, Icon }, idx) => (
-                                    <a
-                                        key={label}
-                                        href={href}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        title={label}
-                                        aria-label={label}
-                                        className={`center cover_social_link ${key}`}
-                                        style={{ '--fan-angle': `${fanAngles[idx]}deg`, '--fan-delay': `${idx * 45}ms` } as CSSProperties}
+                                    <button
+                                        type="button"
+                                        className="cover_socials_trigger"
+                                        aria-label="Ver redes sociales"
+                                        aria-expanded={isSocialsOpen}
+                                        onClick={openSocialsFan}
                                     >
-                                        <Icon size={16} aria-hidden />
-                                    </a>
-                                ))}
-                            </div>
-                        )}
-                        {can('company.view') && (
-                            <Button text="Mi Empresa" size="sm" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
-                        )}
-                        {can('sucursal.edit') && (
-                            <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
-                        )}
-                    </div>
+                                        <Share2 size={18} aria-hidden />
+                                    </button>
+                                    {socials.map(({ href, label, key, Icon }, idx) => (
+                                        <a
+                                            key={label}
+                                            href={href}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            title={label}
+                                            aria-label={label}
+                                            className={`center cover_social_link ${key}`}
+                                            style={{ '--fan-angle': `${fanAngles[idx]}deg`, '--fan-delay': `${idx * 45}ms` } as CSSProperties}
+                                        >
+                                            <Icon size={16} aria-hidden />
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
+                            {can('company.view') && (
+                                <Button text="Mi Empresa" size="sm" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
+                            )}
+                            {can('sucursal.edit') && (
+                                <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -289,7 +304,7 @@ const Sucursal = () => {
                         ))}
                     </div>
                 ) : (
-                    <EmptyScreen icon={Dumbbell} message="Todavía no tiene espacios" title="" size='sm' />
+                    <EmptyScreen icon={Dumbbell} message="Todavía no tiene espacios" size='sm' />
                 )}
             </section>
 
@@ -306,7 +321,6 @@ const Sucursal = () => {
                 <SucursalConfigForm
                     onClose={() => setIsConfigOpen(false)}
                     sucursalPublicId={publicId}
-                    currentStatus={sucursal.status}
                     onSaved={retry}
                 />
             )}

@@ -1,9 +1,9 @@
-import { Pencil, Search, Tags, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Search, Tags, Trash2 } from 'lucide-react';
 import { Table, TableActions } from '../../../shared/components/Table';
 import type { TableColumn } from '../../../shared/components/Table';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
-import { InputField } from '../../../shared/components';
+import { Button, InputField } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { useSportCategories } from '../hooks/useSportCategories';
 import { EditCatalogo } from '../components/EditCatalogo';
@@ -20,6 +20,14 @@ const SportCategoriesPage = () => {
         deletingSportCategory, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
         isCreateOpen, createForm, openCreate, closeCreate, setCreateField, handleCreateSubmit, isCreating,
     } = useSportCategories();
+
+    usePageHeader({
+        title: 'Categorías',
+        subtitle: 'Administra las categorías deportivas del sistema',
+        icon: Tags,
+        extra: <Button text="Nueva categoría" onClick={openCreate} icon={Plus} size="sm" iconPosition="left" />,
+        breadcrumbs: [{ label: 'Categorías' }],
+    });
 
     const columns: TableColumn<SportCategory>[] = [
         { key: 'code', header: 'Código' },
@@ -38,7 +46,6 @@ const SportCategoriesPage = () => {
 
     return (
         <div className="catalog_page">
-            <Header title="Categorías" subtitle="Administra las categorías deportivas del sistema" icon={Tags} action={{ label: 'Nueva categoría', onClick: openCreate }} />
             <div className="catalog_toolbar">
                 <div className="catalog_toolbar_search">
                     <InputField

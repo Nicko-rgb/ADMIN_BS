@@ -5,7 +5,6 @@ import { hasErrors, isValidUrl, type FormErrors } from '../../../shared/utils/fo
 import { trimValues } from '../../../shared/utils/trimValues';
 import toast from '../../../shared/utils/toast';
 import SucursalConfigService from '../service/sucursalConfigService';
-import type { SucursalStatus } from '../interfaces/sucursal.interface';
 import type { SucursalConfigFormValues, SucursalConfigPayload } from '../interfaces/sucursalConfig.interface';
 
 export const EMPTY_SUCURSAL_CONFIG_FORM: SucursalConfigFormValues = {
@@ -19,10 +18,11 @@ export const EMPTY_SUCURSAL_CONFIG_FORM: SucursalConfigFormValues = {
     closing_time: '',
     min_price: '',
     features: '',
-    status: 'ACTIVE',
 };
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/;
+// El cierre admite además '24:00'; '00:00' también se usa como fin del día.
+const END_TIME_PATTERN = /^(([01]\d|2[0-3]):[0-5]\d|24:00)$/;
 
 // 'HH:mm[:ss]' → minutos para comparar apertura vs cierre.
 const toMinutes = (value: string): number | null => {
@@ -30,6 +30,20 @@ const toMinutes = (value: string): number | null => {
     if (!match) return null;
     const [hours, minutes] = value.split(':').map(Number);
     return hours * 60 + minutes;
+};
+
+// Cierre: '00:00' y '24:00' son el mismo instante (fin del día) = 1440.
+const toEndMinutes = (value: string): number | null => (
+    value === '00:00' || value === '24:00' ? 24 * 60 : toMinutes(value)
+);
+
+// La columna TIME del backend devuelve 'HH:mm:ss'; el input usa 'HH:mm'.
+const toShortTime = (value: string | null): string => (value ? value.slice(0, 5) : '');
+
+// El input type="time" no acepta '24:00': se muestra como '00:00' (fin del día).
+const toFormClosingTime = (value: string | null): string => {
+    const short = toShortTime(value);
+    return short === '24:00' ? '00:00' : short;
 };
 
 const urlError = (value: string, label: string): string | undefined => {
@@ -47,11 +61,11 @@ const validateConfigForm = (form: SucursalConfigFormValues): FormErrors<Sucursal
     else if (!TIME_PATTERN.test(form.opening_time.trim())) errors.opening_time = 'Hora no válida (HH:mm)';
 
     if (!form.closing_time.trim()) errors.closing_time = 'El horario de cierre es requerido';
-    else if (!TIME_PATTERN.test(form.closing_time.trim())) errors.closing_time = 'Hora no válida (HH:mm)';
+    else if (!END_TIME_PATTERN.test(form.closing_time.trim())) errors.closing_time = 'Hora no válida (HH:mm; 00:00 = fin del día)';
 
     if (!errors.opening_time && !errors.closing_time) {
         const opening = toMinutes(form.opening_time.trim())!;
-        const closing = toMinutes(form.closing_time.trim())!;
+        const closing = toEndMinutes(form.closing_time.trim())!;
         if (closing <= opening) errors.closing_time = 'El cierre debe ser posterior a la apertura';
     }
 
@@ -81,9 +95,6 @@ const validateConfigForm = (form: SucursalConfigFormValues): FormErrors<Sucursal
 
 interface UseSucursalConfigArgs {
     sucursalPublicId: string;
-    // Estado actual de la sucursal (lo tiene la página) — valor inicial del segmentado
-    // cuando todavía no hay config; si el DTO trae status, ese manda.
-    currentStatus: SucursalStatus | null;
     onClose: () => void;
     // Se llama tras guardar con éxito — la página recarga sucursal+config para reflejar cambios.
     onSaved?: () => void;
@@ -95,8 +106,8 @@ interface UseSucursalConfigArgs {
  * Al guardar hace PUT upsert y cierra; la página no necesita recargarse porque
  * no muestra la config.
  */
-export const useSucursalConfig = ({ sucursalPublicId, currentStatus, onClose, onSaved }: UseSucursalConfigArgs) => {
-    const [form, setForm] = useState<SucursalConfigFormValues>({ ...EMPTY_SUCURSAL_CONFIG_FORM, status: currentStatus ?? 'ACTIVE' });
+export const useSucursalConfig = ({ sucursalPublicId, onClose, onSaved }: UseSucursalConfigArgs) => {
+    const [form, setForm] = useState<SucursalConfigFormValues>({ ...EMPTY_SUCURSAL_CONFIG_FORM });
     const [isLoadingDetail, setIsLoadingDetail] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [hasConfig, setHasConfig] = useState(false);
@@ -117,11 +128,10 @@ export const useSucursalConfig = ({ sucursalPublicId, currentStatus, onClose, on
                     social_youtube: detail.socialYoutube ?? '',
                     social_whatsapp: detail.socialWhatsapp ?? '',
                     whatsapp_message: detail.whatsappMessage ?? '',
-                    opening_time: detail.openingTime ?? '',
-                    closing_time: detail.closingTime ?? '',
+                    opening_time: toShortTime(detail.openingTime),
+                    closing_time: toFormClosingTime(detail.closingTime),
                     min_price: detail.minPrice ?? '',
                     features: detail.features ?? '',
-                    status: detail.status ?? currentStatus ?? 'ACTIVE',
                 });
             })
             .catch((err) => {
@@ -166,7 +176,6 @@ export const useSucursalConfig = ({ sucursalPublicId, currentStatus, onClose, on
                 closing_time: trimmed.closing_time,
                 min_price: trimmed.min_price ? Number(trimmed.min_price) : null,
                 features: trimmed.features || null,
-                status: trimmed.status,
             };
 
             const result = await SucursalConfigService.save(sucursalPublicId, payload);

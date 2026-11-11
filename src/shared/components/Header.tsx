@@ -1,66 +1,70 @@
-import { Fragment } from 'react';
-import type { ComponentType } from 'react';
+import { Bell, ChevronRight, House } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
-import { Button } from './Button';
+import { useHeaderStore } from '../store/headerStore';
 import '../styles/Header.css';
 
-interface HeaderAction {
-    label: string;
-    onClick: () => void;
-}
+const Header = () => {
+    const config = useHeaderStore((state) => state.config);
 
-// Un nivel intermedio del breadcrumb, entre "Home" y el título actual (ej. { label: 'Empresas', path: '/companys' }).
-interface BreadcrumbItem {
-    label: string;
-    path: string;
-}
+    if (config.visible === false) return null;
 
-interface HeaderProps {
-    title: string;
-    subtitle?: string;
-    icon?: ComponentType<{ size?: number }>;
-    action?: HeaderAction;
-    // Niveles entre "Home" y el título — sin esto, el breadcrumb queda como antes (Home > título).
-    breadcrumbs?: BreadcrumbItem[];
-    // Páginas de entidad (ej. detalle de empresa) arman su propio diseño de encabezado —
-    // en `false` solo se muestra el breadcrumb, sin la card de ícono/título/subtítulo.
-    showCard?: boolean;
-}
+    const Icon = config.icon;
 
-// Encabezado de página — breadcrumb (Home > ...breadcrumbs > título) + card con ícono/título/subtítulo y un botón de acción opcional (ej. "Nuevo Plan").
-export const Header = ({ title, subtitle, icon: Icon, action, breadcrumbs = [], showCard = true }: HeaderProps) => (
-    <div className="page_header">
-        <nav className="breadcrumb" aria-label="breadcrumb">
-            <Link to="/home">Home</Link>
-            {breadcrumbs.map((crumb) => (
-                <Fragment key={crumb.path}>
-                    <span className="breadcrumb_separator">{'>'}</span>
-                    <Link to={crumb.path}>{crumb.label}</Link>
-                </Fragment>
-            ))}
-            <span className="breadcrumb_separator">{'>'}</span>
-            <span className="breadcrumb_current">{title}</span>
-        </nav>
-
-        {showCard && (
-            <div className="page_header_card card">
-                <div className="page_header_info">
-                    {Icon && (
-                        <div className="page_header_icon">
-                            <Icon size={26} />
-                        </div>
+    return (
+        <header className={`page_header ${!config.showCard ? 'no_card' : ''}`}>
+            {(config.breadcrumbs || config.showNotification) && (
+                <div className="header_top">
+                    {config.breadcrumbs && (
+                        <nav className="breadcrumb" aria-label="Breadcrumb">
+                            <Link to="/" className="breadcrumb_home" aria-label="Inicio">
+                                <House size={15} strokeWidth={1.8} />
+                            </Link>
+                            {config.breadcrumbs.map((crumb, index) => (
+                                <span className="breadcrumb_segment" key={`${crumb.label}-${index}`}>
+                                    <ChevronRight size={16} strokeWidth={1.6} />
+                                    {crumb.path ? <Link to={crumb.path}>{crumb.label}</Link> : (
+                                        <span className="breadcrumb_current" aria-current="page">{crumb.label}</span>
+                                    )}
+                                </span>
+                            ))}
+                        </nav>
                     )}
-                    <div className="page_header_text">
-                        <h1>{title}</h1>
-                        {subtitle && <p>{subtitle}</p>}
+
+                    <div className='btn_icons'>
+                        {!config.showCard && config.extra && (
+                            config.extra
+                        )}
+                        {config.showNotification && (
+                            <button
+                                type="button"
+                                className="btn_notification"
+                                title="Notificaciones"
+                                aria-label="Notificaciones"
+                                onClick={config.onNotificationClick}
+                            >
+                                <Bell size={16} strokeWidth={2.2} />
+                            </button>
+                        )}
                     </div>
                 </div>
+            )}
 
-                {action && <Button text={action.label} icon={Plus} onClick={action.onClick} />}
-            </div>
-        )}
-    </div>
-);
+            {config.showCard &&
+                <div className="header_main">
+                    <div className="page_header_identity">
+                        {Icon && <div className="header_icon center"><Icon size={25} strokeWidth={1.8} /></div>}
+                        <div className="header_info">
+                            {config.title && <h1>{config.title}</h1>}
+                            {config.subtitle && <p>{config.subtitle}</p>}
+                        </div>
+                    </div>
 
+                    {config.extra && <div className="extras">{config.extra}</div>}
+                </div>
+            }
+        </header>
+    );
+};
+
+export { Header };
 export default Header;

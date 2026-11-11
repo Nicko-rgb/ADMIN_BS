@@ -5,12 +5,12 @@ import '../styles/Button.css';
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 /** Colores con nombre ya definidos en el sistema de diseño (`shared/styles/colors.css`). */
-type ButtonColorName = 'primary' | 'secondary' | 'danger' | 'warning' | 'info';
+type ButtonColorName = 'primary' | 'secondary' | 'accent' | 'danger' | 'warning' | 'info';
 
 /** Nombre de color del sistema, o un hex propio (ej. `'#2c9d75'`) para casos puntuales fuera de la paleta. */
 type ButtonColor = ButtonColorName | `#${string}`;
 
-const NAMED_COLORS: readonly ButtonColorName[] = ['primary', 'secondary', 'danger', 'warning', 'info'];
+const NAMED_COLORS: readonly ButtonColorName[] = ['primary', 'secondary', 'accent', 'danger', 'warning', 'info'];
 const isNamedColor = (color: ButtonColor): color is ButtonColorName =>
     (NAMED_COLORS as readonly string[]).includes(color);
 
@@ -22,7 +22,8 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'chi
     /**
      * Color del botón.
      * - `'primary'` (default) — verde de marca, `var(--primary)`.
-     * - `'secondary'` — contorno neutro, `var(--border-strong)`.
+     * - `'secondary'` — superficie neutra con borde suave.
+     * - `'accent'` — lavanda suave para acciones complementarias.
      * - `'danger'` — rojo, `var(--danger)`.
      * - `'warning'` — ámbar, `var(--warning)`.
      * - Hex propio, ej. `'#2c9d75'` — para un color puntual fuera de la paleta. Texto queda blanco en este caso.
@@ -81,9 +82,10 @@ export const Button = ({
             style={colorStyle}
             disabled={disabled || loading}
             {...rest}
+            aria-busy={loading || rest['aria-busy']}
         >
-            {Icon && !loading && <Icon size={ICON_SIZE_BY_SIZE[size]} className="app-button__icon" />}
-            {loading && <span className="app-button__loader" />}
+            {Icon && !loading && <span className="app-button__icon" aria-hidden="true"><Icon size={ICON_SIZE_BY_SIZE[size]} /></span>}
+            {loading && <span className="app-button__loader" aria-hidden="true" />}
             {text && <span className="app-button__text">{text}</span>}
         </button>
     );

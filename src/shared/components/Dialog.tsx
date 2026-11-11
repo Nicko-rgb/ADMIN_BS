@@ -82,8 +82,8 @@ export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary
     const Icon = VARIANT_ICON[variant];
 
     return (
-        <div className={`dialog_overlay ${isClosing ? 'is_closing' : ''}`} onAnimationEnd={handleAnimationEnd} onClick={onClose}>
-            <div className={`dialog_container dialog_${variant}`} onClick={(e) => e.stopPropagation()}>
+        <div className={`dialog_overlay ${isClosing ? 'is_closing' : ''}`} onAnimationEnd={handleAnimationEnd}>
+            <div className={`dialog_container dialog_${variant}`}>
                 <header className="dialog_header">
                     <h2 className="dialog_title">
                         <span className="dialog_icon">

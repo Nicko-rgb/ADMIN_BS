@@ -7,3 +7,79 @@ export interface SessionUser {
     email: string | null;
     role: string;
 }
+
+export interface ContextCurrency {
+    code: string;
+    name: string;
+    symbol: string;
+}
+
+export interface ContextSpace {
+    publicId: string;
+    name: string;
+    /** Alcance heredado de la sucursal; no sustituye los permisos de acciones. */
+    access: boolean;
+}
+
+export interface ContextSucursal {
+    publicId: string;
+    name: string;
+    access: boolean;
+    /** 'HH:mm' — null si la sucursal todavía no tiene horario configurado. */
+    openTime: string | null;
+    /** 'HH:mm' — '24:00' representa fin del día. */
+    closeTime: string | null;
+    /** Moneda del país de la sucursal; el backend no envía el objeto país. */
+    currency: ContextCurrency | null;
+    spaces: ContextSpace[];
+}
+
+export interface ContextCompany {
+    isPrimary: boolean;
+    publicId: string;
+    name: string;
+    /** Alcance de la empresa; las acciones también requieren sus permisos. */
+    access: boolean;
+    sucursales: ContextSucursal[];
+}
+
+export interface CurrentPlan {
+    name: string;
+    code: string;
+    status: string;
+    isEffective: boolean;
+    currentPeriodStart: string | null;
+    currentPeriodEnd: string | null;
+}
+
+export interface CompanyContextData {
+    companies: ContextCompany[];
+    currentPlan: CurrentPlan | null;
+    loadedAt: string;
+    userPublicId: string;
+}
+
+export interface CompanyContextState extends CompanyContextData {
+    setContext: (userPublicId: string, context: CompanyContextData) => void;
+    clearContext: () => void;
+}
+
+export interface SessionData {
+    token: string | null;
+    user: SessionUser | null;
+    permissions: string[];
+    /** Alcance del rol (1=system … 4=empleado, null=cliente) — pista de UI, la seguridad la decide el backend. */
+    scopeLevel: number | null;
+}
+
+export interface SessionInput extends SessionData {
+    token: string;
+    user: SessionUser;
+    context: CompanyContextData;
+}
+
+export interface SessionState extends SessionData {
+    setSession: (session: SessionInput) => void;
+    updateUser: (fields: Partial<SessionUser>) => void;
+    clearSession: () => void;
+}

@@ -1,0 +1,91 @@
+/**
+ * Sistema de color exclusivo del módulo de reservas (calendario).
+ * Se aplica solo dentro de `.booking_calendar` para no contaminar el
+ * resto del panel. Ningún componente de este módulo debe usar hex directos:
+ * siempre `var(--bk-*)`.
+ */
+.booking_calendar {
+    color-scheme: light;
+
+    --bk-bg: #e9edf3;
+    --bk-surface: #ffffff;
+    --bk-surface-soft: #f6f7fa;
+    --bk-surface-muted: #eef0f5;
+    --bk-border: #e6e9f0;
+    --bk-border-strong: #d7dce6;
+    --bk-closed-pattern: repeating-linear-gradient(135deg,
+        transparent 0, transparent 5px,
+        var(--bk-border) 5px, var(--bk-border) 6px);
+
+    --bk-text: #232735;
+    --bk-text-soft: #5f6474;
+    --bk-text-muted: #9298a7;
+
+    --bk-ink: #1e2230;
+    --bk-on-ink: #ffffff;
+
+    --bk-accent: #6f5bd3;
+    --bk-accent-soft: #ece8fb;
+    --bk-accent-text: #5b49c4;
+
+    --bk-mint-soft: #ddf3e9;
+    --bk-mint-text: #2e7c60;
+    --bk-blue-soft: #dfeafb;
+    --bk-blue-text: #406ea9;
+    --bk-peach-soft: #fde7dc;
+    --bk-peach-text: #ad6042;
+    --bk-lilac-soft: #efe3fa;
+    --bk-lilac-text: #7b55a4;
+    --bk-warning-soft: #fbefd9;
+    --bk-warning-text: #936a24;
+    --bk-danger-soft: #fbe5e7;
+    --bk-danger-text: #b0454f;
+
+    --bk-shadow: 0 30px 80px -50px rgb(30 34 48 / .45);
+    --bk-shadow-soft: 0 8px 22px -16px rgb(30 34 48 / .45);
+
+    --bk-radius-xl: 22px;
+    --bk-radius-lg: 14px;
+    --bk-radius-md: 10px;
+    --bk-radius-sm: 7px;
+
+    --bk-font: 'Outfit', 'Poppins', sans-serif;
+}
+
+[data-theme="dark"] .booking_calendar {
+    color-scheme: dark;
+
+    --bk-bg: #101219;
+    --bk-surface: #191c26;
+    --bk-surface-soft: #141720;
+    --bk-surface-muted: #222634;
+    --bk-border: #262b3a;
+    --bk-border-strong: #333a4d;
+
+    --bk-text: #eef0f7;
+    --bk-text-soft: #b2b8c7;
+    --bk-text-muted: #858ca0;
+
+    --bk-ink: #eef0f7;
+    --bk-on-ink: #171a23;
+
+    --bk-accent: #8e7bea;
+    --bk-accent-soft: #2b2642;
+    --bk-accent-text: #b4a6f5;
+
+    --bk-mint-soft: #1d3b31;
+    --bk-mint-text: #87d6b5;
+    --bk-blue-soft: #1e3049;
+    --bk-blue-text: #9dc3f4;
+    --bk-peach-soft: #422b23;
+    --bk-peach-text: #f0b194;
+    --bk-lilac-soft: #352a45;
+    --bk-lilac-text: #cfb4ef;
+    --bk-warning-soft: #3d3220;
+    --bk-warning-text: #e5c07b;
+    --bk-danger-soft: #40262b;
+    --bk-danger-text: #f0a1a9;
+
+    --bk-shadow: 0 30px 80px -50px rgb(0 0 0 / .8);
+    --bk-shadow-soft: 0 8px 22px -16px rgb(0 0 0 / .8);
+}

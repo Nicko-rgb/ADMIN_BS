@@ -1,4 +1,5 @@
 import type { CountryDisplay } from '../../../shared/interfaces/catalog.interface';
+import type { CompanyContextData, ContextCompany, ContextSucursal, ContextSpace } from '../../../shared/interfaces/session.interface';
 import type { DocumentType, ManagedRole } from '../../users/interfaces/user.interface';
 
 export type CompanyEnabled = 'A' | 'I' | 'P';
@@ -78,10 +79,22 @@ export interface CompanyDetail {
     isEnabled: CompanyEnabled | null;
     country: { id: number; name: string; flagUrl: string; phoneCode: string } | null;
     ubigeo: CompanyUbigeo | null;
-    subsidiaries: CompanySubsidiary[];
-    users: CompanyUser[];
     createdAt: string;
 }
+
+/**
+ * Árbol público empresa → sucursales → espacios
+ * (`GET /companys/public/branches/:publicId/tree`).
+ *
+ * El endpoint devuelve exactamente el mismo contrato que el contexto del login,
+ * así que el service puede devolver `res.data.data` tal cual, sin mapear
+ * propiedad por propiedad. Los alias existen solo para el vocabulario del
+ * calendario.
+ */
+export type CompanyTreeSpace = ContextSpace;
+export type CompanyTreeBranch = ContextSucursal;
+export type CompanyTreeCompany = ContextCompany;
+export type CompanyBranchTree = CompanyContextData;
 
 // Payload de autoedición de la propia empresa — todo opcional, incluye `document` (RUC) por si
 // se cargó mal al registrar; el backend revalida que no choque con el de otra empresa.

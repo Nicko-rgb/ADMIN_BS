@@ -74,7 +74,7 @@ const PasswordFoget = ({ isOpen, onClose }: PasswordFogetProps) => {
                         </li>
                     </ul>
 
-                    <Button text="Entendido" size="lg" className="sent_button" onClick={onClose} />
+                    <Button text="Entendido" className="sent_button" onClick={onClose} />
                 </div>
             ) : (
                 <form className="password_foget" onSubmit={handleSubmit}>

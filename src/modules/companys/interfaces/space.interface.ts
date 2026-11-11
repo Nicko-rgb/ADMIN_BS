@@ -1,6 +1,8 @@
 // Formulario de alta/edición de espacio deportivo — espeja space.schema.ts del backend
 // (mismos nombres snake_case que espera el endpoint).
+import type { LucideIcon } from 'lucide-react';
 import type { EntityStatus } from './sucursal.interface';
+import type { ReactNode } from 'react';
 
 export interface SpaceFormValues {
     name: string;
@@ -39,6 +41,12 @@ export interface SpaceListItem {
 // Detalle completo de un espacio deportivo — espeja toSpaceDto del backend.
 export interface SpaceDetail {
     publicId: string;
+    parent: {
+        sucursalName: string;
+        sucursalPublicId: string;
+        companyName: string | null;
+        companyPublicId: string | null;
+    } | null;
     name: string;
     sport: string | null;
     sportTypeId: number;
@@ -67,14 +75,16 @@ export interface SpaceMediaFile {
     medibleType: string;
 }
 
-// Horario de operación de un espacio — espeja BusinessHour del backend.
-export interface SpaceBusinessHour {
-    hourId: number;
-    dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
-    startTime: string;
-    endTime: string;
-    price: string;
-    isClosed: boolean;
+export type SpaceTab = 'gallery' | 'schedule';
+
+export interface InfoChipProps {
+    icon?: LucideIcon,
+    value?: string | number | null,
+    className?: string,
 }
 
-export type SpaceTab = 'gallery' | 'schedule';
+export interface GroupChipsProps {
+    title: string,
+    icon: LucideIcon,
+    children: ReactNode
+}

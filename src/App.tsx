@@ -10,16 +10,21 @@ import { Toaster } from 'react-hot-toast';
 import AuthRoutes from './modules/auth/index.routes';
 import { companyRoutes } from './modules/companys/index.routes';
 import { systemRoutes } from './modules/system/index.routes';
+import { saasRoutes } from './modules/saas/index.routes';
 import { usersRoutes } from './modules/users/index.routes';
 import { bookingsRoutes } from './modules/bookings/index.routes';
 import AppLayout from './shared/components/AppLayout';
 import ProtectedRoute from './shared/components/ProtectedRoute';
 import NotFoundPage from './shared/pages/NotFoundPage';
+
+import PagePrueba from './shared/pages/Prueba';
+import { LoadingScreen } from './shared/components';
+
 // Router raíz: monta el router de cada módulo bajo su propio <Routes> anidado.
 function App() {
     return (
         <Router>
-            <Suspense fallback={<div className="route_loading">Cargando...</div>}>
+            <Suspense fallback={<div className='route_loading'><LoadingScreen message='Cargando módulo...' /></div>}>
                 <Routes>
                     <Route path="/" element={<Navigate to="/auth/login" replace />} />
 
@@ -27,10 +32,14 @@ function App() {
                     <Route path="auth/*" element={<AuthRoutes />} />
 
                     {/* Área autenticada: sin sesión, ProtectedRoute manda a login */}
-                    <Route path="" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{usersRoutes}</Route>
+                    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{usersRoutes}</Route>
                     <Route path="companys" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{companyRoutes}</Route>
-                    <Route path="system" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{systemRoutes}</Route>
+                    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{systemRoutes}</Route>
+                    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{saasRoutes}</Route>
                     <Route path="bookings" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{bookingsRoutes}</Route>
+
+                    <Route path='prueba' element={<PagePrueba />} />
+
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </Suspense>

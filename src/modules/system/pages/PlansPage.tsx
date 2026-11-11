@@ -1,5 +1,5 @@
 import { Check, Gift, Pencil, Trash2 } from 'lucide-react';
-import { Header } from '../../../shared/components/Header';
+import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
 import { usePlans } from '../hooks/usePlans';
 import { PlanEdit } from '../components/PlanEdit';
@@ -27,9 +27,15 @@ const PlansPage = () => {
         deletingPlan, isDeleteOpen, openDelete, closeDelete, confirmDelete, isDeleting,
     } = usePlans();
 
+    usePageHeader({
+        title: 'Planes SaaS',
+        subtitle: 'Administra los planes de suscripción del sistema',
+        icon: Gift,
+        breadcrumbs: [{ label: 'Planes SaaS' }],
+    });
+
     return (
         <div className="catalog_page">
-            <Header title="Planes SaaS" subtitle="Administra los planes de suscripción del sistema" icon={Gift} />
 
             {isLoading ? (
                 <div className="plan_cards_state">Cargando...</div>

@@ -1,9 +1,9 @@
 import type { FormErrors } from '../../../shared/utils/formErrors';
-import type { SucursalStatus } from './sucursal.interface';
 
 // Configuración de una sucursal (toSucursalConfigDto) — perfil operativo + redes.
 // `minPrice` viaja como string (DECIMAL de la DB); el form lo edita como input numérico.
-// `status` es de la sucursal, no de la config, pero viaja acá para el segmentado.
+// El estado de la sucursal NO va acá: se expone en el detalle de la sucursal
+// (sucursal.interface.ts) y se cambia con su propio endpoint.
 export interface SucursalConfig {
     publicId: string;
     socialFacebook: string | null;
@@ -13,15 +13,14 @@ export interface SucursalConfig {
     socialWhatsapp: string | null;
     whatsappMessage: string | null;
     openingTime: string | null;
+    /** 'HH:mm[:ss]' — el cierre puede ser '24:00' (fin del día). */
     closingTime: string | null;
     minPrice: string | null;
     features: string | null;
-    status: SucursalStatus | null;
 }
 
 // Estado crudo del form — todo string de input. Horarios obligatorios; el resto viaja
-// como '' y se convierte a null al armar el payload. `status` siempre trae valor
-// (precargado del DTO o de la página).
+// como '' y se convierte a null al armar el payload.
 export interface SucursalConfigFormValues {
     social_facebook: string;
     social_instagram: string;
@@ -33,7 +32,6 @@ export interface SucursalConfigFormValues {
     closing_time: string;
     min_price: string;
     features: string;
-    status: SucursalStatus;
 }
 
 export type SucursalConfigFormErrors = FormErrors<SucursalConfigFormValues>;
@@ -51,5 +49,4 @@ export interface SucursalConfigPayload {
     closing_time?: string | null;
     min_price?: number | null;
     features?: string | null;
-    status?: SucursalStatus;
 }

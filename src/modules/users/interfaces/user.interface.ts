@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react';
 import type { CountryDisplay } from '../../../shared/interfaces/catalog.interface';
+import type { LucideIcon } from 'lucide-react';
 
 // Roles base gestionables desde la app — mismos que MANAGED_ROLES del backend (roleHierarchy.ts).
 export type ManagedRole = 'system' | 'super_admin' | 'administrador' | 'empleado' | 'cliente';
@@ -39,7 +41,7 @@ export interface UserDetail {
 export interface ManagedUserAssignment {
     publicId: string;
     name: string;
-    role: string;
+    isOwner: boolean;
 }
 
 export interface ManagedUserDetail extends UserDetail {
@@ -94,4 +96,12 @@ export interface CreateManagedUserPayload extends UpdateOwnProfilePayload {
     password?: string;
     sucursales?: string[];
     company_public_id?: string;
+}
+
+export interface HeaderSectionProps {
+    title: string;
+    subtitle: string;
+    icon: LucideIcon;
+    extra?: ReactNode;
+    className?: string;
 }

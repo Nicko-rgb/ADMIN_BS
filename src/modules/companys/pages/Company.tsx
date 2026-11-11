@@ -4,13 +4,16 @@ import {
     Gift, ShieldCheck, UserCog, Phone, FileText, User, Mail, Calendar,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Header, Button, LoadingScreen, NotFoundScreen, PlanUsageBar, ForbiddenScreen } from '../../../shared/components';
+import { Button, LoadingScreen, NotFoundScreen, ForbiddenScreen } from '../../../shared/components';
+import { usePageHeader } from '../../../shared/store/headerStore';
+import { PlanUsageBar } from '../../saas/components/PlanUsageBar';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import { formatPhone } from '../../../shared/utils/formatText';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { DOCUMENT_TYPE_LABELS, ROLE_LABELS, ROLE_MANAGE_PERMISSIONS } from '../../users/utils/userConstants';
 import { ManageUserPermissions } from '../../users/components/ManageUserPermissions';
 import CompanyEdit from '../components/CompanyEdit';
+import SucursalForm from '../components/SucursalForm';
 import UserAsingSucursal from '../components/UserAsingSucursal';
 import useCompany from '../hooks/useCompany';
 import '../styles/Company.css';
@@ -23,10 +26,11 @@ const SUCURSAL_STATUS_CLASSNAMES = { ACTIVE: 'active', INACTIVE: 'inactive', MAI
 
 const Company = () => {
     const {
-        company, isLoading, errorStatus, errorMessage, retry, planUsage,
+        company, subsidiaries, users, branchesStatus, usersStatus, isLoading, errorStatus, errorMessage, retry, planUsage,
         isEditCompanyOpen, openEditCompany, closeEditCompany, isSavingCompany,
         handleSubmitCompanyEdit, companyEditProps,
         openRegisterSucursal, isUserModalOpen, openUserModal, closeUserModal,
+        isRegisterSucursalOpen, closeRegisterSucursal,
     } = useCompany();
 
     const navigate = useNavigate();
@@ -39,7 +43,15 @@ const Company = () => {
 
     const [managingUser, setManagingUser] = useState<{ publicId: string; name: string } | null>(null);
 
-    if (isLoading) {
+    usePageHeader({
+        showCard: false,
+        breadcrumbs: [
+            { label: 'Empresas', path: '/companys' },
+            { label: company?.name || 'Cargando...' },
+        ],
+    });
+
+    if (isLoading || !company) {
         return <LoadingScreen message="Cargando empresa..." size="lg" />;
     }
 
@@ -52,20 +64,14 @@ const Company = () => {
     }
 
     if (errorStatus === 'unknown') {
-        return <NotFoundScreen title="Ocurrió un error" message={errorMessage} onRetry={retry} />;
+        return <NotFoundScreen message={errorMessage} onRetry={retry} />;
     }
 
-    if (!company) {
-        return null;
-    }
-
-    const owner = company.users.find((u) => u.role === 'super_admin') ?? null;
+    const owner = users.find((u) => u.role === 'super_admin') ?? null;
     const isPrimary = company.publicId === planUsage?.primaryCompany?.publicId;
 
     return (
         <div className="company_detail_page">
-            <Header title={company.name} breadcrumbs={[{ label: 'Empresas', path: '/companys' }]} showCard={false} />
-
             {/* ── Hero / Banner unificado ──────────────────────────── */}
             <div className="company_hero_banner card">
                 <div className="company_hero_main">
@@ -145,7 +151,7 @@ const Company = () => {
                         <User size={15} />
                         <span>Dueño:</span>
                     </div>
-                    {owner ? (
+                    {usersStatus === 'loading' ? <span className="owner_empty">Cargando dueño...</span> : usersStatus === 'error' ? <span className="owner_empty">No se pudo cargar el dueño.</span> : owner ? (
                         <div className="owner_chips_list">
                             <span className="owner_chip name_chip">
                                 <strong>{`${owner.firstName ?? ''} ${owner.lastName ?? ''}`.trim() || '—'}</strong>
@@ -194,9 +200,11 @@ const Company = () => {
                         <Button text="Nueva Sucursal" size="sm" icon={Plus} onClick={openRegisterSucursal} />
                     )}
                 </div>
-                {company.subsidiaries.length > 0 ? (
+                {branchesStatus === 'loading' ? <div className="company_empty_state" role="status">Cargando sucursales...</div> : branchesStatus === 'error' ? (
+                    <div className="company_empty_state" role="alert"><span>No se pudieron cargar las sucursales.</span><Button text="Reintentar" size="sm" onClick={retry} /></div>
+                ) : subsidiaries.length > 0 ? (
                     <div className="company_subsidiaries_grid">
-                        {company.subsidiaries.map((subsidiary) => (
+                        {subsidiaries.map((subsidiary) => (
                             <div className="subsidiary_card" key={subsidiary.publicId}>
                                 {subsidiary.status ? (
                                     <span className={`subsidiary_status_dot ${SUCURSAL_STATUS_CLASSNAMES[subsidiary.status]}`} title={SUCURSAL_STATUS_LABELS[subsidiary.status]} />
@@ -237,12 +245,14 @@ const Company = () => {
                     <h3>Usuarios</h3>
                     <PlanUsageBar value={planUsage?.users} label="Usuarios" />
                     {canManageCompanyUsers && (
-                        <Button text="Nuevo Usuario" size="sm" icon={Plus} onClick={openUserModal} />
+                        <Button text="Nuevo Usuario" size="sm" icon={Plus} onClick={openUserModal} disabled={branchesStatus !== 'ready'} />
                     )}
                 </div>
-                {company.users.length > 0 ? (
+                {usersStatus === 'loading' ? <div className="company_empty_state" role="status">Cargando usuarios...</div> : usersStatus === 'error' ? (
+                    <div className="company_empty_state" role="alert"><span>No se pudieron cargar los usuarios.</span><Button text="Reintentar" size="sm" onClick={retry} /></div>
+                ) : users.length > 0 ? (
                     <div className="users_grid">
-                        {company.users.map((user) => (
+                        {users.map((user) => (
                             <div className="card" key={user.publicId}>
                                 <div className="header">
                                     <span className="name">{`${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || '—'}</span>
@@ -309,7 +319,7 @@ const Company = () => {
             {canManageCompanyUsers && isUserModalOpen && (
                 <UserAsingSucursal
                     onClose={closeUserModal}
-                    subsidiaries={company.subsidiaries}
+                    subsidiaries={subsidiaries}
                     onSaved={retry}
                 />
             )}
@@ -319,6 +329,15 @@ const Company = () => {
                     publicId={managingUser?.publicId ?? null}
                     userName={managingUser?.name ?? ''}
                     onClose={() => setManagingUser(null)}
+                />
+            )}
+
+            {canManageSucursales && isRegisterSucursalOpen && (
+                <SucursalForm
+                    companyPublicId={company.publicId}
+                    sucursalPublicId={null}
+                    onClose={closeRegisterSucursal}
+                    onSaved={retry}
                 />
             )}
         </div>

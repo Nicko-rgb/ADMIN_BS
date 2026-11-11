@@ -79,6 +79,7 @@ export const useSucursalForm = ({ companyPublicId, sucursalPublicId, onClose, on
             toast.error('Completa los campos obligatorios para continuar');
             return;
         }
+        toast.loading('Registrando...')
 
         setIsSubmitting(true);
         try {

@@ -1,16 +1,22 @@
+import { useEffect } from 'react';
 import { InputField, SelectField, FormSection, FormRow } from '../../../shared/components';
+import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import { DOCUMENT_TYPE_OPTIONS } from '../utils/userConstants';
 import type { UpdateOwnProfilePayload, DocumentType } from '../interfaces/user.interface';
 
 interface UserProfileFieldsProps {
     form: Required<UpdateOwnProfilePayload>;
     setField: (name: keyof UpdateOwnProfilePayload) => (value: string | number | boolean | null) => void;
-    countryOptions: { value: number; label: string }[];
 }
 
 /** Datos personales de un usuario — nombre, correo, contacto y documento. Usado por Profile.tsx (autoedición del propio perfil). */
-export const UserProfileFields = ({ form, setField, countryOptions }: UserProfileFieldsProps) => (
-    <>
+export const UserProfileFields = ({ form, setField }: UserProfileFieldsProps) => {
+    const { countries, loadCountries } = useCatalogActive();
+    const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
+
+    useEffect(() => { void loadCountries(); }, [loadCountries]);
+
+    return <>
         <FormSection title="Identificación">
             <FormRow>
                 <InputField name="first_name" label="Nombre" value={form.first_name} onChange={(e) => setField('first_name')(e.target.value)} required />
@@ -37,7 +43,7 @@ export const UserProfileFields = ({ form, setField, countryOptions }: UserProfil
                 <InputField name="date_birth" label="Fecha de nacimiento" type="date" value={form.date_birth ?? ''} onChange={(e) => setField('date_birth')(e.target.value)} />
             </FormRow>
         </FormSection>
-    </>
-);
+    </>;
+};
 
 export default UserProfileFields;

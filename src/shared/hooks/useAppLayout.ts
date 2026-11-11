@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '../store/sessionStore';
+import { AuthService } from '../../modules/auth/service/authService';
+import { getApiErrorStatus, handleApiError } from '../utils/errorHandler';
+import toast from '../utils/toast';
 
 /**
  * Estado y handlers propios de AppLayout — logout, colapso del sidebar y
@@ -87,9 +90,19 @@ export const useAppLayout = () => {
         });
     };
 
-    const logout = () => {
-        clearSession();
-        navigate('/auth/login');
+    const logout = async () => {
+        try {
+            await AuthService.logout();
+            clearSession();
+            navigate('/auth/login');
+        } catch (error) {
+            if (getApiErrorStatus(error) === 401) {
+                clearSession();
+                navigate('/auth/login');
+                return;
+            }
+            toast.error(`No se pudo cerrar la sesión: ${handleApiError(error)}`);
+        }
     };
 
     const toggleSidebar = () => setIsCollapsed((prev) => !prev);

@@ -1,88 +1,109 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Image, Clock, Dumbbell, Calendar, Grid, FileText, MapPin, ImagePlus, Pencil, ClockPlus, Trash2, } from 'lucide-react';
-import { LoadingScreen, NotFoundScreen, ForbiddenScreen, Button, EmptyScreen, Modal, Dialog } from '../../../shared/components';
+import { ArrowLeft, Image, Clock, Dumbbell, Calendar, Grid, FileText, MapPin, ImagePlus, Pencil, Trash2, Play, Users, Info, Box, Settings, } from 'lucide-react';
+import { LoadingScreen, NotFoundScreen, ForbiddenScreen, Button, EmptyScreen, Dialog } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { resolveImageUrl } from '../../../shared/utils/formatText';
 import { Tabs, MedibleImage } from '../../../shared/components';
 import SpaceForm from '../components/SpaceForm';
 import StatusSwitch from '../components/StatusSwitch';
+import BusinessHour from '../components/BussinesHour';
 import SpaceService from '../service/spaceService';
 import useSpace from '../hooks/useSpace';
-import type { SpaceTab, SpaceMediaFile } from '../interfaces/space.interface';
+import type { SpaceTab, SpaceMediaFile, InfoChipProps, GroupChipsProps } from '../interfaces/space.interface';
 import '../styles/Space.css';
+import { usePageHeader } from '../../../shared/store/headerStore';
+
+const InfoChip = ({ icon: Icon, value, className }: InfoChipProps) => {
+    return (
+        <span className={`info_chip ${className}`}>
+            {Icon && <Icon size={14} />}
+            <span>{value || '—'}</span>
+        </span>
+    )
+}
+
+const GroupChips = ({ icon: Icon, title, children }: GroupChipsProps) => {
+    return (
+        <div className="overview_group">
+            <label className="group_label">{Icon && <Icon size={18} />}{title}</label>
+            <div className="chips_row">
+                {children}
+            </div>
+        </div>
+    )
+}
 
 const Space = () => {
     const navigate = useNavigate();
-    const {
-        spacePublicId,
-        space,
-        media,
-        businessHours,
-        isLoading,
-        errorStatus,
-        errorMessage,
-        retry,
-        reloadMedia,
-        activeTab,
-        handleTabChange,
-        isPanelModalOpen,
-        openPanelModal,
-        closePanelModal,
-        mediaToDelete,
-        setMediaToDelete,
-        isDeleting,
-        handleDeleteMedia,
-        isTogglingStatus,
-        handleToggleStatus,
+    const { spacePublicId, space, media, businessHours, isLoading, mLoading, hLoading, errorStatus, errorMessage,
+        retry, reloadMedia, reloadHours, activeTab, handleTabChange, isPanelModalOpen, openPanelModal, closePanelModal,
+        mediaToDelete, setMediaToDelete, isDeleting, handleDeleteMedia, isTogglingStatus, handleToggleStatus,
     } = useSpace();
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     // Archivo de la galería abierto en el visor (modo lectura).
     const [mediaToView, setMediaToView] = useState<SpaceMediaFile | null>(null);
 
+    usePageHeader({
+        showCard: false,
+        breadcrumbs: [
+            { label: 'Empresas', path: '/companys' },
+            ...(space?.parent?.companyName && space.parent.companyPublicId ? [{ label: space.parent.companyName, path: `/companys/company/${space.parent.companyPublicId}` }] : []),
+            ...(space?.parent?.sucursalName && space.parent.sucursalPublicId ? [{ label: space.parent.sucursalName, path: `/companys/company/sucursal/${space.parent.sucursalPublicId}` }] : []),
+            { label: space?.name || 'Cargando...' },
+        ],
+    });
+
     if (isLoading) {
-        return <LoadingScreen message="Cargando espacio deportivo..." size="lg" />;
+        return <LoadingScreen message="Cargando espacio..." />;
     }
 
     if (errorStatus === 'not_found') {
-        return <NotFoundScreen message={errorMessage || 'El espacio deportivo que buscás no existe.'} />;
+        return <NotFoundScreen onRetry={retry} message={errorMessage || 'El espacio deportivo que buscás no existe.'} />;
     }
 
     if (errorStatus === 'forbidden') {
-        return <ForbiddenScreen message={errorMessage || 'No tenés acceso a este espacio.'} />;
+        return <ForbiddenScreen onRetry={retry} message={errorMessage || 'No tenés acceso a este espacio.'} />;
     }
 
     if (errorStatus === 'unknown') {
-        return <NotFoundScreen title="Ocurrió un error" message={errorMessage} onRetry={retry} />;
+        return <NotFoundScreen message={errorMessage} onRetry={retry} />;
     }
 
-    if (!space) {
+    if (!space || !spacePublicId) {
         return <NotFoundScreen message="No se pudo encontrar información de este espacio" />;
     }
 
     const goBack = () => navigate(-1);
+
+    const groupedHours = businessHours.reduce((groups, hour) => {
+        if (!groups[hour.dayOfWeek]) {
+            groups[hour.dayOfWeek] = [];
+        }
+
+        groups[hour.dayOfWeek].push(hour);
+        return groups;
+    }, {} as Record<string, typeof businessHours>);
 
     return (
         <div className="space_page">
             <main>
                 {/* ── Hero del Espacio ────────────────────────────────────────────── */}
                 <section className="space_hero">
-                    <button className="btn_back" onClick={goBack} aria-label="Volver"><ArrowLeft size={24} /></button>
+                    <button className="btn_back bg_blur" onClick={goBack} aria-label="Volver"><ArrowLeft size={24} /></button>
 
                     <div className="cover_placeholder" aria-hidden />
                     <div className="cover_overlay" />
-                    <div className="cover_content">
-                        <div className="cover_identity">
-                            <div className="cover_avatar center">{space.name.charAt(0).toUpperCase()}</div>
-                            <div>
-                                <h1 className="cover_text">{space.name}</h1>
-                                <StatusSwitch
-                                    value={space.status}
-                                    onChange={handleToggleStatus}
-                                    disabled={isTogglingStatus}
-                                />
-                            </div>
+                    <div className="cover_identity">
+                        <div className="cover_avatar center bg_blur">{space.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <h1 className="cover_text">{space.name}</h1>
+                            <StatusSwitch
+                                value={space.status}
+                                onChange={handleToggleStatus}
+                                disabled={isTogglingStatus}
+                            />
                         </div>
                     </div>
                     <div className="cover_actions">
@@ -93,75 +114,27 @@ const Space = () => {
                 {/* ── Tarjeta de información en chips ────────────────────────── */}
                 <section className="card space_details_card">
                     <aside className="row">
-                        {/* Grupo: Tipo de Espacio */}
-                        <div className="overview_group">
-                            <label className="group_label"><Dumbbell size={18} /> Tipo de Espacio</label>
-                            <div className="chips_row">
-                                <span className="info_chip highlight" title="Deporte">
-                                    <Dumbbell size={14} />
-                                    <span>{space.sport || '—'}</span>
-                                </span>
-                                <span className="info_chip" title="Categoría">
-                                    <FileText size={14} />
-                                    <span>{space.categoryName || '—'}</span>
-                                </span>
-                                <span className="info_chip" title="Superficie">
-                                    <Grid size={14} />
-                                    <span>{space.surfaceName || '—'}</span>
-                                </span>
-                            </div>
-                        </div>
+                        <GroupChips icon={Dumbbell} title='Tipo de Espacio'>
+                            <InfoChip icon={Dumbbell} value={space.sport} className='highlight' />
+                            <InfoChip icon={FileText} value={space.categoryName} />
+                            <InfoChip icon={Grid} value={space.surfaceName} />
+                        </GroupChips>
 
-                        {/* Grupo: Reglas de Reserva */}
-                        <div className="overview_group">
-                            <label className="group_label"><Clock size={18} /> Reglas de Reserva</label>
-                            <div className="chips_row">
-                                <span className="info_chip" title="Reserva mínima">
-                                    <Clock size={14} />
-                                    <span>Mín: {space.minimumBookingMinutes} min</span>
-                                </span>
-                                <span className="info_chip" title="Reserva máxima">
-                                    <Clock size={14} />
-                                    <span>Máx: {space.maximumBookingMinutes} min</span>
-                                </span>
-                            </div>
-                        </div>
+                        <GroupChips icon={Calendar} title='Reglas de Reserva'>
+                            <InfoChip icon={Clock} value={`Min: ${space.minimumBookingMinutes} min`} />
+                            <InfoChip icon={Clock} value={`Max: ${space.maximumBookingMinutes} min`} />
+                        </GroupChips>
                     </aside>
 
                     <aside className="row">
-                        {/* Grupo: Capacidad y Dimensiones */}
-                        <div className="overview_group">
-                            <label className="group_label"><Calendar size={18} /> Capacidad y Dimensiones</label>
-                            <div className="chips_row">
-                                {space.capacity && (
-                                    <span className="info_chip highlight" title="Capacidad máxima">
-                                        <span>👥</span>
-                                        <span>{space.capacity} personas</span>
-                                    </span>
-                                )}
-                                <span className="info_chip" title="Dimensiones">
-                                    <MapPin size={14} />
-                                    <span>{space.dimensions || '—'}</span>
-                                </span>
-                                {space.equipment && (
-                                    <span className="info_chip" title="Equipamiento">
-                                        <FileText size={14} />
-                                        <span>{space.equipment}</span>
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Grupo: Fechas */}
-                        <div className="overview_group">
-                            <label className="group_label"><FileText size={18} /> Información</label>
-                            <div className="chips_row">
-                                <span className="info_chip" title="Fecha de creación">
-                                    <Calendar size={14} />
-                                    <span>Creado el {formatDate(space.createdAt)}</span>
-                                </span>
-                            </div>
-                        </div>
+                        <GroupChips icon={Box} title='Capacidad y Dimensiones'>
+                            <InfoChip icon={Users} value={`${space.capacity} personal`} className='highlight' />
+                            <InfoChip icon={MapPin} value={space.dimensions} />
+                            <InfoChip icon={FileText} value={space.equipment} />
+                        </GroupChips>
+                        <GroupChips icon={Info} title='Información'>
+                            <InfoChip icon={Calendar} value={`Creado el ${formatDate(space.createdAt)}`} />
+                        </GroupChips>
                     </aside>
                 </section>
 
@@ -185,45 +158,34 @@ const Space = () => {
                                 </div>
                                 <Button text='Añadir' icon={ImagePlus} color='secondary' onClick={openPanelModal} />
                             </div>
-
-                            {media.length > 0 ? (
-                                <div className="media_grid">
-                                    {media.map((file) => (
-                                        <figure className="media_item" key={file.publicId}>
-                                            {file.type === 'VIDEO' ? (
-                                                // El video se reproduce inline — su click no abre el visor.
-                                                <video
-                                                    src={resolveImageUrl(file.url)}
-                                                    controls
-                                                    preload="metadata"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                />
-                                            ) : (
-                                                <button
-                                                    type="button"
-                                                    className="media_item_preview"
-                                                    onClick={() => setMediaToView(file)}
-                                                    aria-label={`Ver ${file.description || file.fileName}`}
-                                                >
-                                                    <img src={resolveImageUrl(file.url)} alt={file.description || file.fileName} />
+                            {!mLoading ? (
+                                media.length > 0 ? (
+                                    <div className="media_grid">
+                                        {media.map((file) => (
+                                            <figure className="media_item" key={file.publicId}>
+                                                <button className="media_item_preview" onClick={() => setMediaToView(file)}>
+                                                    {file.type === 'VIDEO' ? (
+                                                        <>
+                                                            <Play className='play_icon bg_blur' size={40} />
+                                                            <video src={resolveImageUrl(file.url)} onClick={() => setMediaToView(file)} />
+                                                        </>
+                                                    ) : (
+                                                        <img src={resolveImageUrl(file.url)} alt={file.description || file.fileName} />
+                                                    )}
                                                 </button>
-                                            )}
-                                            <button
-                                                type="button"
-                                                className="media_item_delete"
-                                                onClick={() => setMediaToDelete(file)}
-                                                aria-label={`Eliminar ${file.fileName}`}
-                                                title="Eliminar archivo"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                            <figcaption>{file.description || file.fileName}</figcaption>
-                                        </figure>
-                                    ))}
-                                </div>
+                                                <button className="media_item_delete" onClick={() => setMediaToDelete(file)} ><Trash2 size={16} /></button>
+                                                <figcaption>{file.description || file.fileName}</figcaption>
+                                            </figure>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <EmptyScreen icon={Image} message='Agregá fotos o videos del espacio' size='sm' />
+                                )
                             ) : (
-                                <EmptyScreen icon={Image} title='Sin archivos multimedia' message='Agregá fotos o videos del espacio' size='sm' />
+                                <LoadingScreen message='Cargando galería...' size='sm' />
                             )}
+
+
                         </section>
                     )}
 
@@ -235,34 +197,65 @@ const Space = () => {
                                     <Clock size={20} />
                                     <h3>Horarios de Operación</h3>
                                 </div>
-                                <Button text='Añadir' icon={ClockPlus} color='secondary' onClick={openPanelModal} />
+                                <Button text='Configurar' icon={Settings} color='secondary' onClick={openPanelModal} />
                             </div>
+                            {!hLoading ? (
+                                businessHours.length > 0 ? (
+                                    <div className="schedule_box">
+                                        <table className="schedule_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Día</th>
+                                                    <th>Horario</th>
+                                                    <th>Precio</th>
+                                                    <th>Estado</th>
+                                                </tr>
+                                            </thead>
 
-                            {businessHours.length > 0 ? (
-                                <ul className="schedule_list">
-                                    {businessHours.map((hour) => (
-                                        <li key={hour.hourId}>{hour.dayOfWeek}: {hour.startTime} – {hour.endTime}</li>
-                                    ))}
-                                </ul>
+                                            <tbody>
+                                                {Object.entries(groupedHours).map(([day, hours]) =>
+                                                    hours.map((hour, index) => (
+                                                        <tr key={hour.hourId}>
+                                                             {index === 0 && (
+                                                                <td className="schedule_day" rowSpan={hours.length}>{day}</td>
+                                                            )}
+                                                            <td><span className="schedule_time">{hour.startTime} – {hour.endTime}</span></td>
+                                                            <td><span className="schedule_price">S/ {Number(hour.price).toFixed(2)}</span></td>
+                                                            <td><span className={`schedule_status ${hour.isClosed ? 'closed' : 'open'}`}>{hour.isClosed ? 'Cerrado' : 'Abierto'}</span></td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <EmptyScreen message='No hay ningun horario rgistrado' size='sm' />
+                                )
                             ) : (
-                                <EmptyScreen icon={Clock} title='Sin horarios configurados' message='Los horarios de operación se gestionan desde la configuración de la sucursal' size='sm' />
+                                <LoadingScreen message='Cargando horarios...' size='sm' />
                             )}
                         </section>
                     )}
                 </div>
             </main>
 
-            {/* ── Visor de un archivo de la galería ─────────────────────────────────── */}
+            {/* ── Galería del espacio — UN componente cubre vista y registro:
+                con `media` es visor (con eliminar); sin `media`, registro ── */}
             <MedibleImage
-                isOpen={mediaToView !== null}
-                onClose={() => setMediaToView(null)}
-                title={mediaToView?.description || mediaToView?.fileName || 'Archivo'}
+                isOpen={mediaToView !== null || (isPanelModalOpen && activeTab === 'gallery')}
+                onClose={mediaToView ? () => setMediaToView(null) : closePanelModal}
+                title='Galería del espacio'
                 icon={Image}
                 accept="media"
                 showDescription
                 media={mediaToView}
-                remove={spacePublicId ? SpaceService.removeMedia(spacePublicId) : undefined}
-                onChanged={() => { reloadMedia(); setMediaToView(null); }}
+                save={!mediaToView ? SpaceService.uploadMedia(spacePublicId) : undefined}
+                remove={SpaceService.removeMedia(spacePublicId)}
+                onChanged={() => {
+                    reloadMedia();
+                    if (mediaToView) setMediaToView(null);
+                    else closePanelModal();
+                }}
             />
 
             {/* ── Confirmación de borrado de un archivo de la galería ───────────────── */}
@@ -280,33 +273,8 @@ const Space = () => {
                 secondaryAction={{ label: 'Cancelar', onClick: () => setMediaToDelete(null) }}
             />
 
-            {/* ── Modales de sección — UN solo estado de apertura (isPanelModalOpen);
-                   cuál se muestra lo decide la pestaña activa (activeTab). ───────── */}
-            <MedibleImage
-                isOpen={isPanelModalOpen && activeTab === 'gallery'}
-                onClose={closePanelModal}
-                title="Galería del espacio"
-                icon={Image}
-                showDescription
-                accept="media"
-                save={spacePublicId ? SpaceService.uploadMedia(spacePublicId) : undefined}
-                onChanged={() => { reloadMedia(); closePanelModal(); }}
-            />
-
-            {/* TODO: modal de horarios — falta el componente de gestión de
-                BusinessHour (backend sin endpoint todavía). */}
-            <Modal
-                isOpen={isPanelModalOpen && activeTab === 'schedule'}
-                onClose={closePanelModal}
-                title="Horarios de operación"
-                icon={Clock}
-                size="lg"
-            >
-                <EmptyScreen icon={Clock} title='Próximamente' message='La gestión de horarios por espacio todavía no está disponible' size='sm' />
-            </Modal>
-
             {/* ── Modal Editar Espacio ───────────────────────────────────────── */}
-            {isEditOpen && spacePublicId && (
+            {isEditOpen && (
                 <SpaceForm
                     mode="edit"
                     sucursalPublicId={spacePublicId}
@@ -316,6 +284,15 @@ const Space = () => {
                     onSaved={retry}
                 />
             )}
+
+            {/* ── Horarios y Precio del Espacio ───────────────────────────────────────── */}
+            <BusinessHour
+                isOpen={isPanelModalOpen && activeTab === 'schedule'}
+                onClose={closePanelModal}
+                spacePublicId={spacePublicId}
+                businessHours={businessHours}
+                onSaved={reloadHours}
+            />
         </div>
     );
 };

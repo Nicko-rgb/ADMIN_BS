@@ -4,90 +4,92 @@ button {
     justify-content: center;
     gap: .5rem;
     border: none;
-    outline: none;
     cursor: pointer;
     font-weight: 500;
-    /* Transiciones acotadas a las propiedades que realmente cambian. Con `all` + `linear`,
-       el salto del secondary (#e8e8e8 → #141414) se interpola por el gris medio —donde el
-       ojo es más sensible— y se lee como un flash; `ease` lo suaviza sin perder el cambio. */
-    transition:
-        background-color .25s ease,
-        border-color .25s ease,
-        color .25s ease,
-        opacity .2s ease,
-        transform .15s ease;
+    transition: var(--transition);
 }
 
 .btn_app {
-    border-radius: 6px;
-    font-size: 1.1rem;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: .7rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 1.4;
+    box-shadow: var(--shadow);
+    transition: var(--transition), transform .12s ease;
 
-    /* &:hover { transform: scale(1.01); } */
-    &:active { transform: scale(0.97); }
-    &:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* Ícono a la izquierda del texto en vez de a la derecha (default) ───────── */
-    &.icon_left { flex-direction: row-reverse; }
+    &:active:not(:disabled) { transform: translateY(1px); }
+    &:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+    &:focus-visible { outline: 2px solid var(--primary-text); outline-offset: 3px; }
+    &.icon_left { flex-direction: row; }
 
     .app-button__text { white-space: nowrap; }
-
+    .app-button__icon { display: inline-flex; flex-shrink: 0; }
     .app-button__loader {
-        width: 1.2rem;
-        height: 1.2rem;
-        border: 2px solid rgba(255, 255, 255, 0.4);
-        border-top-color: var(--text-white);
+        width: 1.2em;
+        height: 1.2em;
+        flex-shrink: 0;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
         border-radius: 50%;
-        animation: spin 0.8s linear infinite;
+        animation: btn-spin .8s linear infinite;
     }
 
-    /* ── Colores ───────────────────────────────────────────────────────────── */
     &.btn_app_primary {
-        background-color: var(--primary);
+        background: var(--primary);
         color: var(--text-white);
-        &:hover:not(:disabled) { background-color: var(--primary-dark); }
+        &:hover:not(:disabled) { background: var(--primary-dark); }
     }
-
     &.btn_app_secondary {
-        background-color: var(--gray-medium);
-        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        border-color: var(--border);
         color: var(--text-soft);
-        &:hover:not(:disabled) { background-color: var(--gray-dark); color: var(--text); }
+        &:hover:not(:disabled) { background: var(--gray-light); color: var(--text); }
     }
-
+    &.btn_app_accent {
+        background: var(--accent);
+        color: var(--accent-text);
+        border-color: var(--accent-hover);
+        box-shadow: none;
+        &:hover:not(:disabled) { background: var(--accent-hover); }
+    }
     &.btn_app_danger {
-        background-color: var(--danger);
-        color: var(--text-white);
-        &:hover:not(:disabled) { filter: brightness(0.92); }
+        background: var(--danger-soft);
+        color: var(--danger-text);
+        box-shadow: none;
+        &:hover:not(:disabled) { border-color: var(--danger-text); }
     }
-
     &.btn_app_warning {
-        background-color: var(--warning);
-        color: var(--text-white);
-        &:hover:not(:disabled) { filter: brightness(0.92); }
+        background: var(--warning-soft);
+        color: var(--warning-text);
+        box-shadow: none;
+        &:hover:not(:disabled) { border-color: var(--warning-text); }
     }
-
     &.btn_app_info {
-        background-color: var(--info);
-        color: var(--text-white);
-        &:hover:not(:disabled) { filter: brightness(0.92); }
+        background: var(--info-soft);
+        color: var(--info-text);
+        box-shadow: none;
+        &:hover:not(:disabled) { border-color: var(--info-text); }
     }
-
-    /* Color hex propio — llega vía la custom property --btn-custom-color que
-       pone Button.tsx en `style`; sin shade de hover fijo por ser un color
-       arbitrario, se oscurece con un filtro en vez de un background nuevo. */
     &.btn_app_custom {
-        background-color: var(--btn-custom-color);
+        background: var(--btn-custom-color);
         color: var(--text-white);
-        &:hover:not(:disabled) { filter: brightness(0.9); }
+        &:hover:not(:disabled) { filter: brightness(.9); }
     }
 
-    /* ── Tamaños ───────────────────────────────────────────────────────────── */
-    &.btn_app_xs { padding: .6rem .6rem; font-size: 1.2rem; border-radius: 4px; }
-    &.btn_app_sm { padding: .7rem .8rem; font-size: 1.3rem; border-radius: 4px; }
-    &.btn_app_md { padding: .8rem 1rem; font-size: 1.4rem; }
-    &.btn_app_lg { padding: .9rem 1.2rem; font-size: 1.5rem; border-radius: 6px; }
+    &.btn_app_xs { padding: .5rem .8rem; font-size: 1.2rem; min-height: 2.8rem; }
+    &.btn_app_sm { padding: .7rem 1rem; font-size: 1.3rem; min-height: 3.4rem; }
+    &.btn_app_md { padding: .9rem 1.4rem; font-size: 1.4rem; min-height: 4rem; }
+    &.btn_app_lg { padding: 1.1rem 1.8rem; font-size: 1.5rem; min-height: 4.6rem; border-radius: var(--radius-md); }
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .btn_app { transition: none; }
+    .btn_app:active:not(:disabled) { transform: none; }
+    .btn_app .app-button__loader { animation: none; }
 }
