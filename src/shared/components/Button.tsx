@@ -14,7 +14,7 @@ const NAMED_COLORS: readonly ButtonColorName[] = ['primary', 'secondary', 'accen
 const isNamedColor = (color: ButtonColor): color is ButtonColorName =>
     (NAMED_COLORS as readonly string[]).includes(color);
 
-const ICON_SIZE_BY_SIZE: Record<ButtonSize, number> = { xs: 14, sm: 16, md: 18, lg: 20 };
+const ICON_SIZE_BY_SIZE: Record<ButtonSize, number> = { xs: 15, sm: 16, md: 18, lg: 19 };
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
     /** Texto visible dentro del botón. */

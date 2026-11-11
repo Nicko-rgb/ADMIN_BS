@@ -1,13 +1,15 @@
 
-import { LoadingScreen, NotFoundScreen, EmptyScreen, ForbiddenScreen } from "../components";
+import './prueba.css'
+import { Button } from '../components';
+import { Home } from 'lucide-react';
 
 const PagePrueba = () => {
     return (
-        <div className="center" style={{ display: 'flex', gap: 10, flex: 1, height: '100%' }} >
-            <LoadingScreen size="md" />
-            <NotFoundScreen onRetry={() => {}} />
-            <EmptyScreen size="md" />
-            <ForbiddenScreen />
+        <div className="prueba center">
+            <Button text='Mi Boton' size='xs' icon={Home} />
+            <Button text='Mi Boton' size='sm' icon={Home} />
+            <Button text='Mi Boton' size='md' icon={Home} />
+            <Button text='Mi Boton' size='lg' icon={Home} />
         </div>
     )
 }
