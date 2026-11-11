@@ -53,7 +53,7 @@ const Bookings = () => {
         if (errorMessage) return { message: errorMessage, kind: 'error' };
         if (!selectedBranch) return { message: 'No hay una sucursal seleccionada.', kind: 'warning' };
         if (!hasSpaces) return { message: 'La sucursal no tiene espacios disponibles.', kind: 'warning' };
-        if (!hasBranchWindow) return { message: 'La sucursal no tiene horario de apertura y cierre configurado.', kind: 'warning' };
+        if (!hasBranchWindow) return { message: 'La sucursal no tiene horario configurado', kind: 'warning' };
         if (!hasSpaceHours) return { message: 'Sin bloques de horarios configurados.', kind: 'warning' };
         return null;
     };

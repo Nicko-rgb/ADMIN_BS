@@ -31,7 +31,7 @@ export interface SubscriptionPrimaryCompany {
     name: string;
 }
 
-// Suscripción que cubre a una empresa raíz — `GET /api/saas/subscription/:companyPublicId/current-plan`.
+// Suscripción que cubre a una empresa raíz — `GET /api/v2/saas/subscription/:companyPublicId/current-plan`.
 export interface CompanySubscription {
     publicId: string;
     status: SubscriptionStatus;

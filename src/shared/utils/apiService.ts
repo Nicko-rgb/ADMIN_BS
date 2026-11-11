@@ -3,7 +3,7 @@ import { useSessionStore } from '../store/sessionStore';
 
 /**
  * Única instancia de axios de toda la app — ningún service llama a axios
- * directo, todos pasan por acá. Base URL relativa (`/api`) en dev pega
+ * directo, todos pasan por acá. Base URL relativa (`/api/v2`) en dev pega
  * contra el proxy de Vite (vite.config.ts); en producción, VITE_API_URL
  * apunta directo al backend real.
  */
