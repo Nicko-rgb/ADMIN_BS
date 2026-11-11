@@ -1,4 +1,4 @@
-import { Bell, ChevronRight, House } from 'lucide-react';
+import { Bell, BookOpen, ChevronRight, House } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useHeaderStore } from '../store/headerStore';
 import '../styles/Header.css';
@@ -34,6 +34,8 @@ const Header = () => {
                         {!config.showCard && config.extra && (
                             config.extra
                         )}
+                        <BookOpen className='context_app' onClick={() => window.location.href = '/context-app'} />
+                            
                         {config.showNotification && (
                             <button
                                 type="button"
@@ -59,7 +61,7 @@ const Header = () => {
                         </div>
                     </div>
 
-                    {config.extra && <div className="extras">{config.extra}</div>}
+                    {config.extra && (config.extra)}
                 </div>
             }
         </header>

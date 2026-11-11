@@ -61,6 +61,14 @@
             gap: 1rem;
             flex: 1;
 
+            .context_app {
+                color: var(--primary);
+                width: 30px;
+                height: 30px;
+                padding: 4px;
+                cursor: pointer;
+            }
+
             .btn_notification {
                 position: relative;
                 width: 30px;
@@ -116,9 +124,4 @@
     }
 
     /* ===== EXTRAS ===== */
-    .extras {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-    }
 }
