@@ -118,6 +118,15 @@
             overflow-y: auto;
 
             /* background: var(--color-bg); */
+
+            .form_section {
+                box-shadow: var(--shadow-sm);
+                border: none;
+
+                [data-theme="dark"] & {
+                    box-shadow: none;
+                }
+            }
         }
     }
 }

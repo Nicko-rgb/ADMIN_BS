@@ -1,11 +1,21 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { Bell, ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, ShieldUser, UserCircle } from 'lucide-react';
+import { DynamicIcon } from 'lucide-react/dynamic';
+import { TbCalendarCheck } from 'react-icons/tb';
 import { useMenu } from '../hooks/useMenu';
 import { useSessionStore } from '../store/sessionStore';
 import { useAppLayout } from '../hooks/useAppLayout';
-import { resolveMenuIcon } from '../utils/menuTree';
+import type { MenuIconProps } from '../interfaces/menu.interface';
+import { resolveLucideIconName } from '../utils/menuTree';
 import { Header } from './Header';
 import '../styles/AppLayout.css';
+
+const MenuIcon = ({ name, ...props }: MenuIconProps) => {
+    if (name === 'TbCalendarCheck') return <TbCalendarCheck {...props} />;
+
+    const iconName = resolveLucideIconName(name);
+    return iconName ? <DynamicIcon key={iconName} name={iconName} {...props} /> : null;
+};
 
 // Shell del panel admin: sidebar con el menú del usuario (agrupado, con submenús) + área de contenido con las rutas hijas.
 export const AppLayout = () => {
@@ -43,7 +53,6 @@ export const AppLayout = () => {
                                 )}
 
                                 {group.items.map((item) => {
-                                    const Icon = resolveMenuIcon(item.icon);
                                     const hasChildren = item.children.length > 0;
                                     const isExpanded = expandedKeys.has(item.key);
 
@@ -55,26 +64,23 @@ export const AppLayout = () => {
                                                     className={`menu_item ${isExpanded ? 'expanded' : ''}`}
                                                     onClick={() => toggleExpanded(item.key)}
                                                 >
-                                                    {Icon && <Icon size={18} />}
+                                                    <MenuIcon name={item.icon} size={18} />
                                                     <span className="menu_item_label">{item.label}</span>
                                                     <ChevronDown size={14} className="menu_chevron" />
                                                 </button>
 
                                                 {isExpanded && (
                                                     <div className="menu_submenu">
-                                                        {item.children.map((child) => {
-                                                            const ChildIcon = resolveMenuIcon(child.icon);
-                                                            return (
-                                                                <NavLink
-                                                                    key={child.key}
-                                                                    to={child.path ?? '#'}
-                                                                    className={({ isActive }) => `menu_item submenu_item ${isActive ? 'active' : ''}`}
-                                                                >
-                                                                    {ChildIcon && <ChildIcon size={16} />}
-                                                                    <span className="menu_item_label">{child.label}</span>
-                                                                </NavLink>
-                                                            );
-                                                        })}
+                                                        {item.children.map((child) => (
+                                                            <NavLink
+                                                                key={child.key}
+                                                                to={child.path ?? '#'}
+                                                                className={({ isActive }) => `menu_item submenu_item ${isActive ? 'active' : ''}`}
+                                                            >
+                                                                <MenuIcon name={child.icon} size={16} />
+                                                                <span className="menu_item_label">{child.label}</span>
+                                                            </NavLink>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
@@ -87,7 +93,7 @@ export const AppLayout = () => {
                                             to={item.path ?? '#'}
                                             className={({ isActive }) => `menu_item ${isActive ? 'active' : ''}`}
                                         >
-                                            {Icon && <Icon size={16} />}
+                                            <MenuIcon name={item.icon} size={16} />
                                             <span className="menu_item_label">{item.label}</span>
                                         </NavLink>
                                     );

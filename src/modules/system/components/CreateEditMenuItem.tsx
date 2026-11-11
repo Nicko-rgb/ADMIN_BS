@@ -30,7 +30,7 @@ interface CreateEditMenuItemProps {
 
 /** Modal único de creación/edición de un ítem de menú — key queda de solo lectura al editar, para no huerfanar a los hijos que la referencian por parent_key. */
 export const CreateEditMenuItem = ({ isOpen, onClose, onSubmit, mode, form, setField, toggleRole, parentOptions, roles, isSaving = false }: CreateEditMenuItemProps) => (
-    <Modal isOpen={isOpen} onClose={onClose} title={mode === 'create' ? 'Registrar ítem de menú' : 'Editar ítem de menú'} icon={LayoutGrid} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={mode === 'create' ? 'Registrar ítem de menú' : 'Editar ítem de menú'} icon={LayoutGrid}>
         <form onSubmit={onSubmit}>
             <FormSection title="Identificación" icon={LayoutGrid}>
                 <FormRow>

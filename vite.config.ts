@@ -9,9 +9,9 @@ export default defineConfig({
   plugins: [react(), basicSsl()],
   server: {
     port: 5000,
-    // Evita CORS en dev: el navegador ve /api como same-origin, Vite lo reenvía al backend.
+    // Evita CORS en dev: el navegador ve /api/v2 como same-origin, Vite lo reenvía al backend.
     proxy: {
-      '/api': 'http://localhost:5010',
+      '/api/v2': 'http://localhost:5020',
     },
   },
 })
