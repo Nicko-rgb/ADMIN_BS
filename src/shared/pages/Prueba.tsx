@@ -1,15 +1,14 @@
 
 import './prueba.css'
-import { Button } from '../components';
-import { Home } from 'lucide-react';
 
 const PagePrueba = () => {
     return (
         <div className="prueba center">
-            <Button text='Mi Boton' size='xs' icon={Home} />
-            <Button text='Mi Boton' size='sm' icon={Home} />
-            <Button text='Mi Boton' size='md' icon={Home} />
-            <Button text='Mi Boton' size='lg' icon={Home} />
+            <div className='box'>
+                <aside className='shad1'></aside>
+                <aside className='shad2'></aside>
+                <aside className='shad3'></aside>
+            </div>
         </div>
     )
 }

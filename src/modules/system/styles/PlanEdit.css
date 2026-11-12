@@ -4,6 +4,12 @@
     gap: 1.5rem;
 }
 
+.plan_limits_hint {
+    margin-top: -.7rem;
+    color: var(--text-muted);
+    font-size: 1.15rem;
+}
+
 .plan_features_editor {
     display: flex;
     flex-direction: column;

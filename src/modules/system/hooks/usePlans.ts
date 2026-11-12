@@ -74,7 +74,7 @@ export const usePlans = () => {
         setNewFeature('');
     };
 
-    const setField = (name: keyof UpdatePlanPayload) => (value: string | number | boolean) => {
+    const setField = (name: keyof UpdatePlanPayload) => (value: string | number | boolean | null) => {
         setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
     };
 

@@ -13,10 +13,10 @@ export interface SubscriptionPlan {
     code: string;
     priceMonthly: string;
     priceYearly: string;
-    maxSubsidiaries: number;
-    maxSpaces: number;
-    maxUsers: number;
-    maxInvoicesMonthly: number;
+    maxSubsidiaries: number | null;
+    maxSpaces: number | null;
+    maxUsers: number | null;
+    maxInvoicesMonthly: number | null;
     notificationsTier: PlanNotificationsTier;
     allowsMultiCompany: boolean;
     hasAdvancedReports: boolean;

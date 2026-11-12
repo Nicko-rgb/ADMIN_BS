@@ -134,11 +134,11 @@ export interface UpdatePlanPayload {
     code?: string;
     price_monthly?: string;
     price_yearly?: string;
-    max_subsidiaries?: number;
-    max_spaces?: number;
-    max_users?: number;
+    max_subsidiaries?: number | null;
+    max_spaces?: number | null;
+    max_users?: number | null;
     has_stripe_connect?: boolean;
-    max_invoices_monthly?: number;
+    max_invoices_monthly?: number | null;
     notifications_tier?: PlanNotificationsTier;
     has_advanced_reports?: boolean;
     allows_multi_company?: boolean;

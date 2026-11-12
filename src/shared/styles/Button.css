@@ -44,10 +44,10 @@ button {
         &:hover:not(:disabled) { background: var(--primary-dark); }
     }
     &.btn_app_secondary {
-        background: var(--surface);
+        background: var(--gray-light);
         border-color: var(--border);
         color: var(--text-soft);
-        &:hover:not(:disabled) { background: var(--gray-light); color: var(--text); }
+        &:hover:not(:disabled) { background: var(--gray-medium); color: var(--text); }
     }
     &.btn_app_accent {
         background: var(--accent);
@@ -57,22 +57,22 @@ button {
         &:hover:not(:disabled) { background: var(--accent-hover); }
     }
     &.btn_app_danger {
-        background: var(--danger-soft);
-        color: var(--danger-text);
+        background: var(--danger);
+        color: var(--text-white);
         box-shadow: none;
-        &:hover:not(:disabled) { border-color: var(--danger-text); }
+        &:hover:not(:disabled) { background: var(--danger-text); }
     }
     &.btn_app_warning {
-        background: var(--warning-soft);
-        color: var(--warning-text);
+        background: var(--warning);
+        color: var(--text-white);
         box-shadow: none;
-        &:hover:not(:disabled) { border-color: var(--warning-text); }
+        &:hover:not(:disabled) { background: var(--warning-text); }
     }
     &.btn_app_info {
-        background: var(--info-soft);
-        color: var(--info-text);
+        background: var(--info);
+        color: var(--text-white);
         box-shadow: none;
-        &:hover:not(:disabled) { border-color: var(--info-text); }
+        &:hover:not(:disabled) { background: var(--info-text); }
     }
     &.btn_app_custom {
         background: var(--btn-custom-color);
@@ -81,9 +81,9 @@ button {
     }
 
     &.btn_app_xs { padding: .4rem .8rem; font-size: 1.2rem;  }
-    &.btn_app_sm { padding: .55rem 1rem; font-size: 1.25rem; }
-    &.btn_app_md { padding: .7rem 1.2rem; font-size: 1.3rem; }
-    &.btn_app_lg { padding: .8rem 1.4rem; font-size: 1.4rem; border-radius: 5px; }
+    &.btn_app_sm { padding: .5rem 1rem; font-size: 1.3rem; }
+    &.btn_app_md { padding: .6rem 1.2rem; font-size: 1.3rem; }
+    &.btn_app_lg { padding: .7rem 1.4rem; font-size: 1.4rem; }
 }
 
 @keyframes btn-spin { to { transform: rotate(360deg); } }
