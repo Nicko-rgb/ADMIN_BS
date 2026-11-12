@@ -14,7 +14,7 @@ const Usage = () => {
         subscriptionState, periodStart, periodEnd, updatedAt, branchCount, spaceCount } = useUsage();
 
     if (!companyPublicId) return <EmptyScreen icon={Building2} message="No tienes una empresa asociada para consultar el uso de un plan." />;
-    if (isLoading && !data) return <LoadingScreen message="Consultando el uso de tu plan..." />;
+    if (isLoading ) return <LoadingScreen message="Consultando uso..." size='sm' />;
     if (error) return <EmptyScreen icon={AlertCircle} message={error} actionText="Volver a intentar" iconBtn={RefreshCw} onAction={reload} />;
     if (!data) return <EmptyScreen icon={Crown} message="No hay información de uso disponible para tu empresa." />;
 

@@ -93,8 +93,8 @@ const PasswordFoget = ({ isOpen, onClose }: PasswordFogetProps) => {
                     />
 
                     <FormActions>
-                        <Button text="Cancelar" color="secondary" onClick={onClose} disabled={isSending} />
-                        <Button text="Enviar correo" type="submit" loading={isSending} icon={IoSendOutline} />
+                        <Button text="Cancelar" color="secondary" size='lg' onClick={onClose} disabled={isSending} />
+                        <Button text="Enviar correo" type="submit" size='lg' loading={isSending} icon={IoSendOutline} />
                     </FormActions>
                 </form>
             )}

@@ -11,6 +11,8 @@ export interface HeaderBreadcrumb {
 export interface HeaderConfig {
     visible?: boolean;
     title?: string;
+    /** Título de la pestaña del navegador. Sin valor usa "Admin BS". */
+    documentTitle?: string;
     subtitle?: string;
     icon?: LucideIcon;
     breadcrumbs?: HeaderBreadcrumb[];

@@ -32,6 +32,7 @@ export const useUsage = () => {
         subtitle: 'Conoce tu capacidad disponible y anticipa lo que tu empresa necesita.',
         icon: Gauge,
         breadcrumbs: [{ label: 'Uso del plan' }],
+        documentTitle: 'Uso de Plan'
     });
 
     useEffect(() => {

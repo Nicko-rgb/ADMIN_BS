@@ -1,6 +1,7 @@
 import { IoArrowForwardOutline, IoLockClosedOutline, IoMailOutline } from 'react-icons/io5';
 import { MdAdminPanelSettings } from 'react-icons/md';
 import { Button, InputField } from '../../../shared/components';
+import { useDocumentTitle } from '../../../shared/store/headerStore';
 import { GradientWaves } from '../components/GradientWaves';
 import { useLogin } from '../hooks/useLogin';
 import PasswordFoget from '../components/PasswordFoget';
@@ -9,6 +10,8 @@ import '../styles/LoginPage.css';
 // Vista de inicio de sesión del panel admin — formulario sobre fondo animado.
 const LoginPage = () => {
     const { email, setEmail, password, setPassword, isSubmitting, handleSubmit, handlePasswordFoget, isOpen } = useLogin();
+
+    useDocumentTitle('Login');
 
     return (
         <div className="login_page">
@@ -65,6 +68,7 @@ const LoginPage = () => {
                         <Button
                             text="Iniciar sesión"
                             type="submit"
+                            size='lg'
                             className="login_submit"
                             disabled={isSubmitting}
                             loading={isSubmitting}
