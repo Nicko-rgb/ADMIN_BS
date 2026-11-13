@@ -85,6 +85,7 @@ const Bookings = () => {
         visible: true,
         title: 'Hola',
         showCard: false,
+        documentTitle: 'Calendario de Reservas',
         breadcrumbs: [
             { label: 'Reservas', path: '/bookings' },
             { label: isTreeLoading ? 'Cargando...' : company?.name || '-' },

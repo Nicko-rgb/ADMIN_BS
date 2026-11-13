@@ -35,6 +35,9 @@ const Header = () => {
                     )}
 
                     <div className='btn_icons'>
+                        {!config.showCard && config.extra && (
+                            config.extra
+                        )}
                         <button
                             className="icon_button context_app"
                             data-tooltip="Documentación y pruebas"
