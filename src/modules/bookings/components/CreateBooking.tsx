@@ -1,9 +1,10 @@
 import { CalendarPlus, Clock, CreditCard, RefreshCw, UserRound, X } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
-import { FormActions, FormRow, FormSection, InputField, SelectField, TextAreaField, ToggleField } from '../../../shared/components/FormComponents';
+import { FormActions, FormRow, FormSection, InputField, SelectField, TextAreaField } from '../../../shared/components/FormComponents';
 import { Modal } from '../../../shared/components/Modal';
 import useCreateBooking from '../hooks/useCreateBooking';
-import type { BookingData, CreateBookingContext } from '../interfaces/createBooking.interface';
+import { INITIAL_PAYMENT_OPTIONS } from '../utils/bookingPaymentForm';
+import type { BookingData, BookingPaymentStatus, CreateBookingContext } from '../interfaces/createBooking.interface';
 import '../styles/CreateBooking.css';
 
 interface CreateBookingProps extends CreateBookingContext {
@@ -15,8 +16,14 @@ interface CreateBookingProps extends CreateBookingContext {
 export const CreateBooking = ({ spaceName, branchName, ...args }: CreateBookingProps) => {
     const {
         form, setField, errors, handleSubmit, close, isSubmitting, submitError,
-        canCreate, canConfirmPayment, paymentOptions, isLoadingPaymentTypes, retryPaymentTypes,
+        canCreate, canConfirmPayment, balance, paymentOptions, isLoadingPaymentTypes, retryPaymentTypes,
     } = useCreateBooking(args);
+
+    const paymentHint = {
+        PENDING: 'Todo el pago quedará pendiente de cobro.',
+        DEPOSIT: balance ? `Saldo pendiente a cobrar en la cancha: ${balance}` : 'Ingresa el adelanto recibido; el resto quedará pendiente.',
+        PAID: 'El pago total se registrará como cobrado.',
+    }[form.payment_status];
 
     return (
         <Modal isOpen onClose={close} title="Nueva reserva" description={`${branchName} · ${spaceName}`} icon={CalendarPlus} isLoading={isSubmitting}>
@@ -56,9 +63,14 @@ export const CreateBooking = ({ spaceName, branchName, ...args }: CreateBookingP
                             </div>
                         )}
                         {canConfirmPayment && (
-                            <ToggleField name="booking_payment_paid" label="Pago recibido" checked={form.payment_status === 'PAID'} onChange={(e) => setField('payment_status')(e.target.checked ? 'PAID' : 'PENDING')} disabled={isSubmitting} />
+                            <FormRow>
+                                <SelectField name="booking_payment_status" label="Pago al reservar" value={form.payment_status} onChange={(e) => setField('payment_status')(e.target.value as BookingPaymentStatus)} options={INITIAL_PAYMENT_OPTIONS} disabled={isSubmitting} showDefaultOption={false} />
+                                {form.payment_status === 'DEPOSIT' && (
+                                    <InputField name="booking_deposit" label="Adelanto recibido" type="number" inputMode="decimal" min="0.01" step="0.01" value={form.deposit_amount} onChange={(e) => setField('deposit_amount')(e.target.value)} placeholder="0.00" required error={errors.deposit_amount} />
+                                )}
+                            </FormRow>
                         )}
-                        <p className="booking_form_hint">{form.payment_status === 'PAID' ? 'El pago se registrará como pagado.' : 'El pago quedará pendiente.'}</p>
+                        <p className="booking_form_hint">{paymentHint}</p>
                     </FormSection>
 
                     <FormRow>

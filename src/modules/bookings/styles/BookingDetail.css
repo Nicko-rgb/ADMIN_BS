@@ -1,0 +1,171 @@
+/* Detalle de reserva con su estado de cobro. Solo tokens globales (colors.css). */
+.booking_detail {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+
+    fieldset {
+        min-width: 0;
+        padding: 0;
+        margin: 0;
+        border: 0;
+    }
+
+    .error_message {
+        position: static;
+    }
+
+    .booking_detail_facts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+        gap: 1rem 1.6rem;
+        margin: 0;
+
+        dt {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        dd {
+            margin: .2rem 0 0;
+            color: var(--text);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+    }
+
+    .booking_detail_notes,
+    .booking_detail_hint,
+    .booking_detail_empty,
+    .booking_detail_feedback {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        line-height: 1.5;
+    }
+
+    .booking_detail_notes {
+        margin-top: 1rem;
+        font-style: italic;
+    }
+
+    .booking_detail_feedback {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .booking_detail_totals {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        padding: 1.4rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+
+            span {
+                color: var(--text-muted);
+                font-size: 1.1rem;
+            }
+
+            strong {
+                color: var(--text);
+                font-size: 1.6rem;
+            }
+        }
+
+        .booking_detail_state {
+            grid-column: 1 / -1;
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        &.is_pending,
+        &.is_partial {
+            .is_pending strong,
+            .booking_detail_state {
+                color: var(--danger-text);
+            }
+        }
+
+        &.is_paid .booking_detail_state {
+            color: var(--success);
+        }
+    }
+
+    .booking_detail_payments {
+        display: flex;
+        flex-direction: column;
+        gap: .8rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+
+            > div {
+                display: flex;
+                flex-direction: column;
+                gap: .2rem;
+                min-width: 0;
+            }
+
+            span {
+                color: var(--text-muted);
+                font-size: 1.1rem;
+            }
+
+            strong {
+                color: var(--text);
+                font-size: 1.3rem;
+            }
+
+            &.is_pending {
+                border-style: dashed;
+
+                > strong {
+                    color: var(--danger-text);
+                }
+            }
+        }
+    }
+
+    .booking_detail_error {
+        margin-top: 1rem;
+        color: var(--danger-text);
+        font-size: 1.3rem;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+        .booking_detail_totals {
+            grid-template-columns: 1fr;
+        }
+
+        .form_row {
+            flex-direction: column;
+
+            > .input_group {
+                width: 100%;
+            }
+        }
+
+        .form_actions {
+            flex-wrap: wrap;
+        }
+    }
+}
