@@ -43,16 +43,20 @@ const Company = () => {
 
     const [managingUser, setManagingUser] = useState<{ publicId: string; name: string } | null>(null);
 
+    // Los hooks van SIEMPRE antes de cualquier return condicional. El header se
+    // configura con datos opcionales y se actualiza solo cuando llega la empresa.
     usePageHeader({
+        visible: Boolean(company) && !errorStatus,
         showCard: false,
         breadcrumbs: [
             { label: 'Empresas', path: '/companys' },
-            { label: company?.name || 'Cargando...' },
+            { label: company?.name ?? 'Cargando...' },
         ],
+        documentTitle: errorStatus ? undefined : company?.name,
     });
 
-    if (isLoading || !company) {
-        return <LoadingScreen message="Cargando empresa..." size="lg" />;
+    if (isLoading) {
+        return <LoadingScreen message="Cargando empresa..." size="sm" />;
     }
 
     if (errorStatus === 'not_found') {
@@ -65,6 +69,10 @@ const Company = () => {
 
     if (errorStatus === 'unknown') {
         return <NotFoundScreen message={errorMessage} onRetry={retry} />;
+    }
+
+    if (!company) {
+        return <LoadingScreen message="Cargando empresa..." size="sm" />;
     }
 
     const owner = users.find((u) => u.role === 'super_admin') ?? null;
