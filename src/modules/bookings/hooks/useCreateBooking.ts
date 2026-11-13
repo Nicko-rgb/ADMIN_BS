@@ -5,7 +5,7 @@ import { usePermission } from '../../../shared/hooks/usePermission';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import toast from '../../../shared/utils/toast';
 import BookingService from '../service/bookingService';
-import { emptyBookingForm, toCreateBookingPayload, validateBookingForm } from '../utils/createBookingForm';
+import { depositBalance, emptyBookingForm, toCreateBookingPayload, validateBookingForm } from '../utils/createBookingForm';
 import type { BookingData, CreateBookingForm } from '../interfaces/createBooking.interface';
 
 interface UseCreateBookingArgs {
@@ -47,6 +47,7 @@ export const useCreateBooking = ({
         label: payment.countryName ? `${payment.name} · ${payment.countryName}` : payment.name,
     }));
     const errors = validateBookingForm(form);
+    const balance = depositBalance(form);
 
     const setField = <K extends keyof CreateBookingForm>(name: K) => (value: CreateBookingForm[K]) => {
         if (submitting.current) return;
@@ -64,7 +65,8 @@ export const useCreateBooking = ({
         setShowErrors(true);
         setSubmitError(null);
         if (Object.keys(errors).length > 0) return;
-        if (!canCreate || (form.payment_status === 'PAID' && !canConfirmPayment)) {
+        // Cobrar dinero al reservar (adelanto o total) exige confirmar pagos.
+        if (!canCreate || (form.payment_status !== 'PENDING' && !canConfirmPayment)) {
             setSubmitError('No tienes los permisos necesarios para registrar esta reserva.');
             return;
         }
@@ -95,7 +97,7 @@ export const useCreateBooking = ({
 
     return {
         form, setField, errors: showErrors ? errors : {}, handleSubmit, close,
-        isSubmitting, submitError, canCreate, canConfirmPayment,
+        isSubmitting, submitError, canCreate, canConfirmPayment, balance,
         paymentOptions, isLoadingPaymentTypes, retryPaymentTypes: loadPaymentTypes,
     };
 };

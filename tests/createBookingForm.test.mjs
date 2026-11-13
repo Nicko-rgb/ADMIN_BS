@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { emptyBookingForm, toCreateBookingPayload, validateBookingForm } from '../src/modules/bookings/utils/createBookingForm.ts';
+import { depositBalance, emptyBookingForm, toCreateBookingPayload, validateBookingForm } from '../src/modules/bookings/utils/createBookingForm.ts';
+import { emptyPaymentForm, formatMoney, toPaymentPayload, validatePaymentForm } from '../src/modules/bookings/utils/bookingPaymentForm.ts';
 
 const validForm = () => ({
     ...emptyBookingForm('2099-11-07'),
@@ -65,4 +66,36 @@ test('cada apertura empieza con nuevos datos y pago pendiente', () => {
     assert.equal(payload.client.email, 'ana@example.com');
     assert.equal(payload.notes, 'Recibido en recepción');
     assert.equal(payload.payment_status, 'PAID');
+});
+
+test('con adelanto exige un monto positivo menor al total y lo envía en el contrato', () => {
+    const form = { ...validForm(), total_amount: '40', payment_status: 'DEPOSIT', deposit_amount: '10.50' };
+    assert.deepEqual(validateBookingForm(form), {});
+    assert.equal(depositBalance(form), '29.50');
+    const payload = toCreateBookingPayload(form);
+    assert.equal(payload.payment_status, 'DEPOSIT');
+    assert.equal(payload.deposit_amount, 10.5);
+
+    for (const deposit_amount of ['', '0', '40', '41', '10.123']) {
+        assert.ok(validateBookingForm({ ...form, deposit_amount }).deposit_amount, deposit_amount);
+    }
+    assert.equal(depositBalance({ ...form, deposit_amount: '40' }), null);
+});
+
+test('sin adelanto no envía deposit_amount aunque el campo tenga texto', () => {
+    const payload = toCreateBookingPayload({ ...validForm(), payment_status: 'PAID', deposit_amount: '10' });
+    assert.equal('deposit_amount' in payload, false);
+    assert.equal(validateBookingForm({ ...validForm(), payment_status: 'PENDING', deposit_amount: 'x' }).deposit_amount, undefined);
+});
+
+test('el cobro sugiere el saldo completo y no permite superarlo', () => {
+    const form = emptyPaymentForm('29.5');
+    assert.deepEqual(form, { amount: '29.50', payment_type_id: '' });
+    assert.ok(validatePaymentForm(form, '29.50').payment_type_id);
+    assert.deepEqual(validatePaymentForm({ ...form, payment_type_id: '3' }, '29.50'), {});
+    assert.deepEqual(validatePaymentForm({ amount: '10', payment_type_id: '3' }, '29.50'), {});
+    assert.match(validatePaymentForm({ amount: '29.51', payment_type_id: '3' }, '29.50').amount, /29\.50/);
+    assert.ok(validatePaymentForm({ amount: '0', payment_type_id: '3' }, '29.50').amount);
+    assert.deepEqual(toPaymentPayload({ amount: ' 10.5 ', payment_type_id: '3' }), { amount: 10.5, payment_type_id: 3 });
+    assert.equal(formatMoney('20', 'PEN'), 'PEN 20.00');
 });

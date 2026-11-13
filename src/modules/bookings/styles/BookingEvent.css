@@ -125,3 +125,33 @@
         .booking_list_spinner { animation: none; }
     }
 }
+
+/* Reserva con detalle y cobros: clicable y con el saldo pendiente a la vista. */
+.booking_calendar .calendar_booking {
+    &.is_selectable {
+        cursor: pointer;
+
+        &:hover {
+            box-shadow: var(--bk-shadow-soft);
+        }
+    }
+
+    .calendar_booking_pending {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--bk-danger-text);
+    }
+
+    /* En la vista mensual, un saldo pendiente se marca con un punto. */
+    &.is_compact.payment_pending::after,
+    &.is_compact.payment_partial::after {
+        content: '';
+        position: absolute;
+        top: .4rem;
+        right: .4rem;
+        width: .6rem;
+        height: .6rem;
+        border-radius: 50%;
+        background: var(--bk-danger-text);
+    }
+}
