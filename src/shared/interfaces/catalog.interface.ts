@@ -81,11 +81,11 @@ export interface Plan {
     code: string;
     priceMonthly: string;
     priceYearly: string;
-    maxSubsidiaries: number;
-    maxSpaces: number;
-    maxUsers: number;
+    maxSubsidiaries: number | null;
+    maxSpaces: number | null;
+    maxUsers: number | null;
     hasStripeConnect: boolean;
-    maxInvoicesMonthly: number;
+    maxInvoicesMonthly: number | null;
     notificationsTier: PlanNotificationsTier;
     hasAdvancedReports: boolean;
     allowsMultiCompany: boolean;

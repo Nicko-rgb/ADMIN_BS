@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CompanyContextState, SessionData, SessionState } from '../interfaces/session.interface';
 
-const EMPTY_CONTEXT = { companies: [], userPublicId: null, loadedAt: null };
+const EMPTY_CONTEXT = { companies: [], currentPlan: null, loadedAt: '', userPublicId: '' };
 
 /**
  * Árbol empresa → sucursales → espacios recibido en el login.
@@ -15,16 +15,17 @@ export const useCompanyContextStore = create<CompanyContextState>()(
             ...EMPTY_CONTEXT,
             setContext: (userPublicId, context) => set({
                 companies: context.companies,
+                currentPlan: context.currentPlan,
+                loadedAt: context.loadedAt,
                 userPublicId,
-                loadedAt: new Date().toISOString(),
             }),
             clearContext: () => set(EMPTY_CONTEXT),
         }),
         {
             name: 'admin-context',
-            version: 2,
+            version: 3,
             migrate: () => EMPTY_CONTEXT,
-            partialize: ({ companies, userPublicId, loadedAt }) => ({ companies, userPublicId, loadedAt }),
+            partialize: ({ companies, currentPlan, loadedAt, userPublicId }) => ({ companies, currentPlan, loadedAt, userPublicId }),
         }
     )
 );

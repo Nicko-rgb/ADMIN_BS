@@ -18,6 +18,7 @@ import ProtectedRoute from './shared/components/ProtectedRoute';
 import NotFoundPage from './shared/pages/NotFoundPage';
 
 import PagePrueba from './shared/pages/Prueba';
+import ContextPrueba from './shared/pages/ContextPrueba';
 import { LoadingScreen } from './shared/components';
 
 // Router raíz: monta el router de cada módulo bajo su propio <Routes> anidado.
@@ -39,7 +40,7 @@ function App() {
                     <Route path="bookings" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{bookingsRoutes}</Route>
 
                     <Route path='prueba' element={<PagePrueba />} />
-
+                    <Route path='context-app' element={<ContextPrueba />}  />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </Suspense>

@@ -87,9 +87,8 @@ html.theme-switching *::after {
 .card {
     background-color: var(--surface);
     border-radius: 7px; 
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
-                0 2px 4px -2px rgb(0 0 0 / 0.1);
-    border: 1px solid var(--gray-light);
+    box-shadow: var(--shadow-sm);
+    /* border: 1px solid var(--gray-light); */
     padding: 15px;
 }
 
@@ -98,7 +97,7 @@ html.theme-switching *::after {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.35);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-sm);
     color: var(--text-white);
     text-shadow: 0 0 1px black;
     svg {

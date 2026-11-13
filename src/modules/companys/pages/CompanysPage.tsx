@@ -52,7 +52,7 @@ const CompanysPage = () => {
         icon: Building2,
         breadcrumbs: [{ label: 'Empresas' }],
         extra: canCreate ? (
-            <Button text="Crear empresa" size="sm" icon={Plus} iconPosition="left" onClick={() => navigate('/companys/register-company')} />
+            <Button text="Crear empresa" size='md' icon={Plus} iconPosition="left" onClick={() => navigate('/companys/register-company')} />
         ) : undefined,
     });
 

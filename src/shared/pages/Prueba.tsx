@@ -1,13 +1,14 @@
 
-import { LoadingScreen, NotFoundScreen, EmptyScreen, ForbiddenScreen } from "../components";
+import './prueba.css'
 
 const PagePrueba = () => {
     return (
-        <div className="center" style={{ display: 'flex', gap: 10, flex: 1, height: '100%' }} >
-            <LoadingScreen size="md" />
-            <NotFoundScreen onRetry={() => {}} />
-            <EmptyScreen size="md" />
-            <ForbiddenScreen />
+        <div className="prueba center">
+            <div className='box'>
+                <aside className='shad1'></aside>
+                <aside className='shad2'></aside>
+                <aside className='shad3'></aside>
+            </div>
         </div>
     )
 }

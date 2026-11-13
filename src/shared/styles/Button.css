@@ -18,7 +18,7 @@ button {
     font-size: 1.4rem;
     font-weight: 500;
     line-height: 1.4;
-    box-shadow: var(--shadow);
+    /* box-shadow: var(--shadow); */
     transition: var(--transition), transform .12s ease;
 
     &:active:not(:disabled) { transform: translateY(1px); }
@@ -44,10 +44,10 @@ button {
         &:hover:not(:disabled) { background: var(--primary-dark); }
     }
     &.btn_app_secondary {
-        background: var(--surface);
-        border-color: var(--border);
+        background: var(--gray-light);
+        border-color: var(--gray-light);
         color: var(--text-soft);
-        &:hover:not(:disabled) { background: var(--gray-light); color: var(--text); }
+        &:hover:not(:disabled) { background: var(--gray-medium); color: var(--text); }
     }
     &.btn_app_accent {
         background: var(--accent);
@@ -57,22 +57,22 @@ button {
         &:hover:not(:disabled) { background: var(--accent-hover); }
     }
     &.btn_app_danger {
-        background: var(--danger-soft);
-        color: var(--danger-text);
+        background: var(--danger);
+        color: var(--text-white);
         box-shadow: none;
-        &:hover:not(:disabled) { border-color: var(--danger-text); }
+        &:hover:not(:disabled) { background: var(--danger-text); }
     }
     &.btn_app_warning {
-        background: var(--warning-soft);
-        color: var(--warning-text);
+        background: var(--warning);
+        color: var(--text-white);
         box-shadow: none;
-        &:hover:not(:disabled) { border-color: var(--warning-text); }
+        &:hover:not(:disabled) { background: var(--warning-text); }
     }
     &.btn_app_info {
-        background: var(--info-soft);
-        color: var(--info-text);
+        background: var(--info);
+        color: var(--text-white);
         box-shadow: none;
-        &:hover:not(:disabled) { border-color: var(--info-text); }
+        &:hover:not(:disabled) { background: var(--info-text); }
     }
     &.btn_app_custom {
         background: var(--btn-custom-color);
@@ -80,10 +80,10 @@ button {
         &:hover:not(:disabled) { filter: brightness(.9); }
     }
 
-    &.btn_app_xs { padding: .5rem .8rem; font-size: 1.2rem; min-height: 2.8rem; }
-    &.btn_app_sm { padding: .7rem 1rem; font-size: 1.3rem; min-height: 3.4rem; }
-    &.btn_app_md { padding: .9rem 1.4rem; font-size: 1.4rem; min-height: 4rem; }
-    &.btn_app_lg { padding: 1.1rem 1.8rem; font-size: 1.5rem; min-height: 4.6rem; border-radius: var(--radius-md); }
+    &.btn_app_xs { padding: .4rem .8rem; font-size: 1.2rem;  }
+    &.btn_app_sm { padding: .5rem 1rem; font-size: 1.3rem; }
+    &.btn_app_md { padding: .6rem 1.2rem; font-size: 1.3rem; }
+    &.btn_app_lg { padding: .7rem 1.4rem; font-size: 1.4rem; }
 }
 
 @keyframes btn-spin { to { transform: rotate(360deg); } }

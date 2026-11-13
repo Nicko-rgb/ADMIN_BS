@@ -1,0 +1,26 @@
+.prueba {
+    flex: 1;
+    height: 100%;
+    gap: 2rem;
+    background-color: var(--surface);
+    div {
+        display: flex;
+        gap: 3rem;
+        align-items: center;
+        aside {
+            width: 200px;
+            height: 100px;
+            border-radius: 10px;
+            background-color: var(--surface);
+            &.shad1 {
+                box-shadow: var(--shadow-xs);
+            }
+            &.shad2 {
+                box-shadow: var(--shadow-sm);
+            }
+            &.shad3 {
+                box-shadow: var(--shadow-md);
+            }
+        }
+    }
+}

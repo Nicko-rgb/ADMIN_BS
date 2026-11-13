@@ -18,3 +18,9 @@ export interface MenuGroup {
     title: string;
     items: MenuNode[];
 }
+
+export interface MenuIconProps {
+    name: string | null;
+    size?: number;
+    className?: string;
+}
