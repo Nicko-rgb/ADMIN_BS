@@ -66,7 +66,7 @@ export interface CreateSurfaceTypePayload {
 }
 
 export interface UpdatePaymentTypePayload {
-    country_id?: number;
+    country_id?: number | null;
     name?: string;
     code?: string;
     category?: string;
@@ -84,7 +84,7 @@ export interface UpdatePaymentTypePayload {
 // Payload de creación — mismas claves que UpdatePaymentTypePayload; requeridas las que el backend exige
 // (country_id, name, code, category, is_enabled), el resto opcional/nullable igual que en el modelo.
 export interface CreatePaymentTypePayload {
-    country_id: number;
+    country_id: number | null;
     name: string;
     code: string;
     category: string;

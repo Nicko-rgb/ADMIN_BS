@@ -42,7 +42,7 @@ export const useBookingPayment = (initialBooking: BookingData, onClose: () => vo
 
     const paymentOptions = paymentTypes.map((payment) => ({
         value: payment.id,
-        label: payment.countryName ? `${payment.name} · ${payment.countryName}` : payment.name,
+        label: payment.countryId === null ? `${payment.name} · GLOBAL` : payment.countryName ? `${payment.name} · ${payment.countryName}` : payment.name,
     }));
     const errors = validatePaymentForm(form, pendingAmount);
 

@@ -53,7 +53,7 @@ export interface SurfaceType {
 
 export interface PaymentType {
     id: number;
-    countryId: number;
+    countryId: number | null;
     countryName: string | null;
     name: string;
     code: string;

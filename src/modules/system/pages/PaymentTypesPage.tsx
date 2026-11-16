@@ -31,7 +31,7 @@ const PaymentTypesPage = () => {
         title: 'Tipos de pago',
         subtitle: 'Administra los tipos de pago disponibles en el sistema',
         icon: CreditCard,
-        extra: <Button text="Nuevo tipo de pago" onClick={openCreate} icon={Plus} size="sm" iconPosition="left" />,
+        extra: <Button text="Nuevo Tipo" onClick={openCreate} icon={Plus} iconPosition="left" />,
         breadcrumbs: [{ label: 'Tipos de pago' }],
     });
 
@@ -45,7 +45,7 @@ const PaymentTypesPage = () => {
             )
         },
         { key: 'code', header: 'Código' },
-        { key: 'countryName', header: 'País', render: (row) => row.countryName ?? '—' },
+        { key: 'countryName', header: 'País', render: (row) => row.countryId === null ? 'GLOBAL' : row.countryName ?? '—' },
         { key: 'category', header: 'Categoría' },
         { key: 'provider', header: 'Proveedor', render: (row) => row.provider ?? '—' },
         { key: 'commissionPercentage', header: 'Comisión', render: (row) => ( `${(Number(row.commissionPercentage) * 100).toFixed(2)}% + ${row.fixedCommission}`)},
