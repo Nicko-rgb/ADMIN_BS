@@ -71,7 +71,7 @@
         }
 
         .usage_count {
-            color: var(--danger-text);
+            color: var(--danger-dark);
         }
     }
 

@@ -38,7 +38,7 @@
         }
 
         .plan_kicker {
-            color: var(--primary-text);
+            color: var(--primary);
             font-weight: 700;
             letter-spacing: .09em;
             text-transform: uppercase;
@@ -71,7 +71,7 @@
             width: 58px;
             height: 58px;
             border-radius: 18px;
-            color: var(--primary-text);
+            color: var(--primary);
             background: var(--surface);
             box-shadow: var(--shadow-sm);
         }
@@ -126,7 +126,7 @@
 
             span svg {
                 flex: 0 0 auto;
-                color: var(--primary-text);
+                color: var(--primary);
             }
 
             strong {
@@ -148,8 +148,8 @@
             gap: .55rem;
             padding: .9rem 1.1rem;
             border-radius: 12px;
-            color: var(--warning-text);
-            background: var(--warning-soft);
+            color: var(--warning);
+            background: var(--warning-light);
             font-size: 1.2rem;
             font-weight: 500;
 
@@ -179,22 +179,22 @@
 
         &.success {
             color: var(--success);
-            background: var(--success-soft);
+            background: var(--success-light);
         }
 
         &.info {
-            color: var(--info-text);
-            background: var(--info-soft);
+            color: var(--info);
+            background: var(--info-light);
         }
 
         &.warning {
-            color: var(--warning-text);
-            background: var(--warning-soft);
+            color: var(--warning);
+            background: var(--warning-light);
         }
 
         &.danger {
-            color: var(--danger-text);
-            background: var(--danger-soft);
+            color: var(--danger-dark);
+            background: var(--danger-light);
         }
 
         &.neutral {
@@ -234,17 +234,17 @@
             height: 42px;
             margin-bottom: .65rem;
             border-radius: 14px;
-            color: var(--primary-text);
+            color: var(--primary);
             background: var(--primary-light);
 
             &.lavender {
-                color: var(--accent-text);
+                color: var(--color-bg);
                 background: var(--accent);
             }
 
             &.blue {
-                color: var(--info-text);
-                background: var(--info-soft);
+                color: var(--info);
+                background: var(--info-light);
             }
         }
 
@@ -299,8 +299,8 @@
                 width: 38px;
                 height: 38px;
                 border-radius: 12px;
-                color: var(--warning-text);
-                background: var(--warning-soft);
+                color: var(--warning);
+                background: var(--warning-light);
             }
 
             h2 {
@@ -338,13 +338,13 @@
             }
 
             &.warning {
-                color: var(--warning-text);
-                background: var(--warning-soft);
+                color: var(--warning);
+                background: var(--warning-light);
             }
 
             &.danger {
-                color: var(--danger-text);
-                background: var(--danger-soft);
+                color: var(--danger-dark);
+                background: var(--danger-light);
             }
         }
     }
@@ -360,7 +360,7 @@
         .section_kicker {
             display: inline-block;
             margin-bottom: .45rem;
-            color: var(--primary-text);
+            color: var(--primary);
             font-size: 1.05rem;
             font-weight: 700;
             letter-spacing: .1em;
@@ -449,7 +449,7 @@
                 width: 44px;
                 height: 44px;
                 border-radius: 14px;
-                color: var(--primary-text);
+                color: var(--primary);
                 background: var(--primary-light);
             }
 
@@ -501,11 +501,11 @@
                 width: 34px;
                 height: 34px;
                 border-radius: 11px;
-                color: var(--primary-text);
+                color: var(--primary);
                 background: var(--primary-light);
 
                 &.lavender {
-                    color: var(--accent-text);
+                    color: var(--color-bg);
                     background: var(--accent);
                 }
             }
@@ -581,7 +581,7 @@
                 width: 32px;
                 height: 32px;
                 border-radius: 10px;
-                color: var(--primary-text);
+                color: var(--primary);
                 background: var(--surface);
                 box-shadow: var(--shadow-xs);
             }
@@ -619,8 +619,8 @@
             gap: .35rem;
             padding: .35rem .65rem;
             border-radius: 999px;
-            color: var(--warning-text);
-            background: var(--warning-soft);
+            color: var(--warning);
+            background: var(--warning-light);
             font-size: 1.1rem;
             font-weight: 600;
 
@@ -666,7 +666,7 @@
         width: 40px;
         height: 40px;
         border-radius: 13px;
-        color: var(--accent-text);
+        color: var(--color-bg);
         background: var(--accent);
     }
 
@@ -699,7 +699,7 @@
             height: 32px;
             border-radius: 50%;
             color: var(--success);
-            background: var(--success-soft);
+            background: var(--success-light);
         }
 
         .feature_body {
@@ -728,7 +728,7 @@
             padding: .3rem .65rem;
             border-radius: 999px;
             color: var(--success);
-            background: var(--success-soft);
+            background: var(--success-light);
             font-size: 1.05rem;
             font-weight: 600;
             white-space: nowrap;
@@ -736,8 +736,8 @@
 
         &.excluded {
             .feature_icon {
-                color: var(--danger-text);
-                background: var(--danger-soft);
+                color: var(--danger-dark);
+                background: var(--danger-light);
             }
 
             .feature_state {
@@ -767,7 +767,7 @@
 
             svg {
                 flex: 0 0 auto;
-                color: var(--primary-text);
+                color: var(--primary);
             }
         }
     }

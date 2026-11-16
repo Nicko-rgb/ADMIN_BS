@@ -179,7 +179,7 @@
                 width: 34px;
                 height: 18px;
                 border-radius: 999px;
-                background: var(--border-strong);
+                background: var(--gray-dark);
                 transition: background .2s ease;
                 flex-shrink: 0;
 

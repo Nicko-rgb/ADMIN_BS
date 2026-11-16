@@ -66,9 +66,9 @@
                 flex-shrink: 0;
                 border-radius: 6px;
                 background: transparent;
-                color: var(--danger-text);
+                color: var(--danger-dark);
 
-                &:hover { background: var(--danger-soft); }
+                &:hover { background: var(--danger-light); }
             }
         }
     }

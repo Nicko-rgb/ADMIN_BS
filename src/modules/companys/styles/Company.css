@@ -1,517 +1,367 @@
-.company_detail_page {
+.company_page {
     display: flex;
     flex-direction: column;
-    gap: 1.4rem;
+    gap: 2rem;
+    padding-bottom: 10rem;
 
-    /* ── Hero / Banner unificado ────────────────────────────── */
-    .company_hero_banner {
+    .banner,
+    .section_company {
+        background: var(--surface);
+        padding: clamp(1.6rem, 2vw, 2rem);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-light);
+        box-shadow: var(--shadow-xs);
+    }
+
+    .banner {
         display: flex;
         flex-direction: column;
-        gap: 1.4rem;
-        padding: 1.8rem 2rem;
+        gap: 1rem;
 
-        .company_hero_main {
+        .kicker {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 1.6rem;
-            flex-wrap: wrap;
+            gap: .7rem;
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: .09em;
+        }
 
-            .company_hero_avatar {
-                flex-shrink: 0;
-                width: 64px;
-                height: 64px;
-                border-radius: 14px;
-                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-                color: var(--text-white);
-                font-size: 2.6rem;
+        .hero_main {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            .avatar {
+                width: 70px;
+                height: 70px;
+                border-radius: 19px;
+                background: var(--primary-light);
+                color: var(--primary);
+                font-size: 2.8rem;
                 font-weight: 700;
-                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
             }
 
-            .company_hero_content {
+            .hero_content {
                 display: flex;
                 flex-direction: column;
-                gap: .4rem;
-                flex: 1;
-                min-width: 0;
+                gap: 5px;
 
-                .company_hero_title_row {
-                    display: flex;
-                    align-items: center;
-                    gap: .8rem;
-                    flex-wrap: wrap;
-
-                    h1 {
-                        font-size: 2.2rem;
-                        font-weight: 700;
-                        color: var(--text);
-                        line-height: 1.2;
-                    }
-
-                    .status_badge {
-                        padding: .25rem .8rem;
-                        border-radius: 999px;
-                        font-size: 1.2rem;
-                        font-weight: 600;
-
-                        &.active {
-                            background: var(--success-soft);
-                            color: var(--success-text);
-                        }
-
-                        &.inactive {
-                            background: var(--danger-soft);
-                            color: var(--danger-text);
-                        }
-
-                        &.pending {
-                            background: var(--warning-soft);
-                            color: var(--warning-text);
-                        }
-                    }
-
-                    .company_plan_badge {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: .4rem;
-                        padding: .25rem .8rem;
-                        border-radius: 999px;
-                        background: var(--primary-light);
-                        color: var(--primary);
-                        font-size: 1.25rem;
-                        font-weight: 600;
-                    }
-
-                    .company_primary_badge {
-                        display: inline-flex;
-                        align-items: center;
-                        padding: .25rem .8rem;
-                        border-radius: 999px;
-                        background: var(--purple-soft);
-                        color: var(--purple-text);
-                        font-size: 1.25rem;
-                        font-weight: 600;
-                    }
+                .name_company {
+                    color: var(--text);
+                    font-size: clamp(2.2rem, 2.6vw, 3rem);
+                    line-height: 1.2;
                 }
 
-                .company_hero_document {
-                    font-size: 1.35rem;
-                    color: var(--text-muted);
-                    font-weight: 500;
+                .badges {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+
+                    span {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: .5rem;
+                        padding: .3rem .9rem;
+                        border-radius: 999px;
+                        font-size: 1.3rem;
+                        font-weight: 600;
+
+                        &.plan {
+                            background: var(--primary-light);
+                            color: var(--primary);
+                        }
+
+                        &.primary {
+                            background: var(--accent-light);
+                            color: var(--accent);
+                        }
+
+                        &.secondary,
+                        &.document {
+                            background-color: var(--secondary);
+                            color: var(--text-muted);
+                        }
+                    }
                 }
             }
 
-            .company_hero_actions {
+            .actions {
                 display: flex;
                 align-items: center;
-                gap: .8rem;
-                flex-shrink: 0;
+                gap: 1rem;
+                margin-left: auto;
             }
         }
 
-        /* Metadatos rápidos de la empresa */
-        .company_hero_meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: .9rem 1.4rem;
-            padding: 1.2rem 1.4rem;
-            background: var(--color-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+        .hero_meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
 
             .meta_item {
+                flex: 1;
                 display: flex;
-                align-items: center;
-                gap: .7rem;
-                font-size: 1.35rem;
-                color: var(--text);
-                min-width: 0;
+                flex-direction: column;
+                padding: 1rem 1.5rem;
 
-                svg {
-                    color: var(--primary);
-                    flex-shrink: 0;
+                h4 {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    color: var(--text-muted);
+                    font-size: 1.2rem;
+                    font-weight: 600;
+
+                    svg {
+                        color: var(--primary);
+                    }
                 }
 
                 span {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-
-                .meta_country {
-                    display: inline-flex;
+                    font-size: 1.3rem;
+                    font-weight: 500;
+                    color: var(--text);
+                    display: flex;
                     align-items: center;
-                    gap: .5rem;
-                    min-width: 0;
+                    text-wrap: nowrap;
+                    gap: 5px;
+                    padding-left: 20px;
 
                     img {
-                        width: 20px;
-                        height: 14px;
+                        width: 1.8rem;
+                        height: 1.3rem;
                         border-radius: 2px;
                         object-fit: cover;
-                        flex-shrink: 0;
                     }
+                }
+            }
+        }
+
+
+        .hero_owner {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--secondary);
+
+            .owner_label {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                font-weight: 700;
+                letter-spacing: .06em;
+
+                svg {
+                    color: var(--primary);
+                }
+            }
+
+            .owner_chips {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+
+                .owner_chip {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                    padding: .5rem .9rem;
+                    border-radius: 999px;
+                    background: var(--secondary);
+                    color: var(--text-soft);
+                    font-size: 1.3rem;
+                    font-weight: 500;
 
                     span {
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;
                     }
-                }
-            }
-        }
-
-        /* Fila de información resumida del dueño */
-        .company_hero_owner {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            padding-top: .2rem;
-
-            .owner_label {
-                display: inline-flex;
-                align-items: center;
-                gap: .4rem;
-                font-size: 1.25rem;
-                font-weight: 700;
-                color: var(--text-soft);
-                text-transform: uppercase;
-                letter-spacing: .5px;
-
-                svg {
-                    color: var(--primary);
-                }
-            }
-
-            .owner_chips_list {
-                display: flex;
-                align-items: center;
-                gap: .6rem;
-                flex-wrap: wrap;
-
-                .owner_chip {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: .5rem;
-                    padding: .4rem .9rem;
-                    border-radius: 20px;
-                    font-size: 1.3rem;
-                    background: var(--color-bg);
-                    border: 1px solid var(--border);
-                    color: var(--text-soft);
-                    font-weight: 500;
-
-                    svg {
-                        color: var(--text-muted);
-                        flex-shrink: 0;
-                    }
 
                     &.name_chip {
                         background: var(--primary-light);
-                        border-color: transparent;
                         color: var(--primary);
-                        font-weight: 600;
                     }
 
-                    .owner_country_flag {
-                        width: 16px;
-                        height: 12px;
+                    .owner_country {
+                        width: 1.8rem;
+                        height: 1.3rem;
                         border-radius: 2px;
                         object-fit: cover;
-                        flex-shrink: 0;
                     }
                 }
             }
 
             .owner_empty {
-                font-size: 1.3rem;
-                font-style: italic;
                 color: var(--text-muted);
+                font-size: 1.2rem;
             }
         }
     }
 
-    /* ── Secciones compartidas (Sucursales y Usuarios) ─────── */
     .section_company {
         display: flex;
         flex-direction: column;
-        gap: 1.2rem;
-        padding: 1.6rem 2rem;
-    }
-
-    .title_card {
-        display: flex;
-        align-items: center;
-        gap: .8rem;
-        padding-bottom: .8rem;
-        border-bottom: 1px solid var(--border);
-        color: var(--primary);
-
-        h3 {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: var(--text);
-            flex: 1;
-        }
-    }
-
-    /* ── Grid de Sucursales ────────────────────────────────── */
-    .company_subsidiaries_grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1rem;
 
-        .subsidiary_card {
-            position: relative;
+        .header {
             display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 1rem;
-            padding: 1.2rem;
-            background: var(--color-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--secondary);
 
-            .subsidiary_status_dot {
-                position: absolute;
-                top: 1rem;
-                right: 1rem;
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background: currentColor;
-
-                &.active {
-                    color: var(--primary);
-                }
-
-                &.inactive {
-                    color: var(--danger-text);
-                }
-
-                &.maintenance {
-                    color: var(--warning-text);
-                }
+            .icon {
+                width: 4rem;
+                height: 4rem;
+                border-radius: var(--radius-md);
+                background: var(--primary-light);
+                color: var(--primary);
             }
 
-            .header {
-                display: flex;
-                align-items: center;
-                gap: .8rem;
-                min-width: 0;
+            .heading {
 
-                .avatar {
-                    flex-shrink: 0;
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    background: var(--primary);
-                    color: var(--text-white);
-                    font-size: 2rem;
-                    font-weight: 700;
-                }
-
-                .name {
-                    min-width: 0;
-                    font-size: 1.6rem;
-                    font-weight: 600;
+                h2 {
                     color: var(--text);
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                    font-size: 1.7rem;
+                    line-height: 1.2;
                 }
-            }
-
-            .info {
-                display: flex;
-                flex-direction: column;
-                gap: .3rem;
 
                 p {
-                    display: flex;
-                    align-items: center;
-                    gap: .5rem;
                     color: var(--text-muted);
-
-                    svg {
-                        width: 20px;
-                        height: 22px;
-                        flex-shrink: 0;
-                    }
-
-                    span {
-                        font-size: 1.4rem;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
-                }
-            }
-
-            .action {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    }
-
-    /* ── Grid de Usuarios ──────────────────────────────────── */
-    .users_grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1rem;
-
-        .card {
-            display: flex;
-            flex-direction: column;
-            gap: .8rem;
-            padding: 1.2rem;
-            background: var(--color-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-
-            .header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: .8rem;
-                min-width: 0;
-
-                .name {
-                    min-width: 0;
-                    font-size: 1.6rem;
-                    font-weight: 600;
-                    color: var(--text);
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-
-                .role {
-                    flex-shrink: 0;
-                    padding: 3px 10px;
-                    border-radius: 20px;
                     font-size: 1.2rem;
-                    font-weight: 600;
-                    background: var(--gray-medium);
-                    color: var(--text-soft);
-
-                    &.super_admin {
-                        background: var(--success-soft);
-                        color: var(--success-text);
-                    }
-
-                    &.administrador {
-                        background: var(--purple-soft);
-                        color: var(--purple-text);
-                    }
-
-                    &.empleado {
-                        background: var(--info-soft);
-                        color: var(--info-text);
-                    }
                 }
             }
 
-            .info {
+            .controls {
+                margin-left: auto;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+
+
+        .subsidiaries_grid,
+        .users_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 32rem), 1fr));
+            gap: 2rem;
+
+            article {
                 display: flex;
                 flex-direction: column;
-                gap: .3rem;
+                gap: 1rem;
 
-                span {
-                    font-size: 1.4rem;
-                    color: var(--text-muted);
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-            }
-
-            .user_country {
-                display: inline-flex;
-                align-items: center;
-                gap: .4rem;
-                font-size: 1.3rem;
-                color: var(--text-muted);
-
-                img {
-                    width: 16px;
-                    height: 12px;
-                    border-radius: 2px;
-                    object-fit: cover;
-                    flex-shrink: 0;
-                }
-            }
-
-            .user_sucursales {
-                display: flex;
-                flex-wrap: wrap;
-                gap: .4rem;
-
-                .sucursal_pill {
+                .header {
                     display: flex;
                     align-items: center;
-                    gap: .3rem;
-                    padding: 2px 8px;
-                    border-radius: 20px;
-                    font-size: 1.4rem;
-                    font-weight: 500;
-                    background: var(--gray-medium);
-                    color: var(--text-soft);
+                    gap: 1rem;
+
+                    .name {
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+                        color: var(--text);
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                    .avatar {
+                        width: 3.5rem;
+                        height: 3.5rem;
+                        border-radius: var(--radius-md);
+                        background: var(--primary-light);
+                        color: var(--primary);
+                        font-size: 2rem;
+                        font-weight: 700;
+                    }
+
+                    .role {
+                        margin-left: auto;
+                        padding: .4rem .8rem;
+                        border-radius: 999px;
+                        font-size: 1.2rem;
+                        font-weight: 600;
+
+                        &.super_admin {
+                            background: var(--success-light);
+                            color: var(--success);
+                        }
+
+                        &.administrador {
+                            background: var(--accent-light);
+                            color: var(--accent);
+                        }
+
+                        &.empleado {
+                            background: var(--info-light);
+                            color: var(--info);
+                        }
+                    }
                 }
-            }
 
-            .user_card_actions {
-                display: flex;
-                flex-wrap: wrap;
-                gap: .8rem;
-                padding-top: .8rem;
-                border-top: 1px solid var(--border);
+                .info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
 
-                button {
-                    flex: 1;
+                    p {
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                        font-size: 1.3rem;
+                        color: var(--text-soft);
+                        line-height: 1.2;
+                        font-weight: 500;
+
+                        img {
+                            width: 1.8rem;
+                            height: 1.3rem;
+                            border-radius: 2px;
+                            object-fit: cover;
+                        }
+                    }
                 }
-            }
-        }
-    }
 
-    /* Estado vacío */
-    .company_empty_state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: .6rem;
-        padding: 2.2rem 1rem;
-        color: var(--text-muted);
+                .user_sucursales {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: .5rem;
 
-        span {
-            font-size: 1.4rem;
-            font-style: italic;
-        }
-    }
+                    .sucursal_pill {
+                        gap: 5px;
+                        padding: .4rem .7rem;
+                        border-radius: var(--radius-sm);
+                        background: var(--accent-light);
+                        color: var(--accent);
+                        font-size: 1.3rem;
+                        font-weight: 500;
+                    }
+                }
 
-    /* ── Responsive ────────────────────────────────────────── */
-    @media (max-width: 768px) {
-        .company_hero_banner {
-            padding: 1.4rem;
-
-            .company_hero_main {
-                flex-direction: column;
-                align-items: flex-start;
-
-                .company_hero_actions {
-                    width: 100%;
+                .card_actions {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: .7rem;
+                    margin-top: auto;
+                    padding-top: 1.2rem;
+                    border-top: 1px solid var(--border);
 
                     button {
                         flex: 1;
                     }
                 }
             }
-
-            .company_hero_meta {
-                grid-template-columns: 1fr;
-            }
         }
+
     }
 }

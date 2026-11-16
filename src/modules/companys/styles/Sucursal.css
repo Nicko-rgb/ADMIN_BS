@@ -370,7 +370,7 @@
                             }
 
                             &.highlight_green {
-                                background: var(--success-soft);
+                                background: var(--success-light);
                                 border-color: transparent;
                                 color: var(--primary);
                                 font-weight: 600;

@@ -64,7 +64,7 @@
     }
 
     .profile_context_sucursal h4 { color: var(--text); font-size: 1.4rem; line-height: 1.35; }
-    .profile_context_primary { display: inline-flex; align-items: center; gap: .35rem; color: var(--purple-text); font-size: 1.2rem; font-weight: 600; }
+    .profile_context_primary { display: inline-flex; align-items: center; gap: .35rem; color: var(--accent); font-size: 1.2rem; font-weight: 600; }
     .profile_context_company_meta,
     .profile_context_sucursal_meta { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; margin-top: .45rem; }
     .profile_context_meta { display: inline-flex; align-items: center; gap: .4rem; color: var(--text-muted); font-size: 1.2rem; line-height: 1.45; }
@@ -81,7 +81,7 @@
         font-weight: 600;
         white-space: nowrap;
 
-        &.has_access { color: var(--primary); background: var(--success-soft); padding: .2rem .5rem; border-radius: 4px; }
+        &.has_access { color: var(--primary); background: var(--success-light); padding: .2rem .5rem; border-radius: 4px; }
     }
 
     .profile_context_navigation {
@@ -103,7 +103,7 @@
             padding: 0;
             border: 0;
             border-radius: 50%;
-            color: var(--primary-text);
+            color: var(--primary);
             background: var(--primary-light);
             cursor: pointer;
             transition: var(--transition);
@@ -122,7 +122,7 @@
         margin: .3rem 0 0 2.1rem;
         padding: .4rem 0 .1rem 3rem;
 
-        &::before { content: ''; position: absolute; top: 0; bottom: 2.2rem; left: 0; border-left: 1px solid var(--border-strong); }
+        &::before { content: ''; position: absolute; top: 0; bottom: 2.2rem; left: 0; border-left: 1px solid var(--gray-dark); }
     }
 
     .profile_context_sucursal,
@@ -138,7 +138,7 @@
         top: 2.7rem;
         left: -3rem;
         width: 3rem;
-        border-top: 1px solid var(--border-strong);
+        border-top: 1px solid var(--gray-dark);
     }
 
     .profile_context_spaces {
@@ -146,7 +146,7 @@
         margin: .4rem 0 0 1.7rem;
         padding-left: 3rem;
 
-        &::before { content: ''; position: absolute; top: 0; bottom: 2.1rem; left: 0; border-left: 1px solid var(--border-strong); }
+        &::before { content: ''; position: absolute; top: 0; bottom: 2.1rem; left: 0; border-left: 1px solid var(--gray-dark); }
     }
 
     .profile_context_space {

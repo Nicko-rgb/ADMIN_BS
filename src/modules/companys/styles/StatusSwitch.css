@@ -36,11 +36,11 @@
         }
 
         &.is_maintenance {
-            background: var(--warning-soft);
+            background: var(--warning-light);
         }
 
         &.is_inactive {
-            background: var(--danger-soft);
+            background: var(--danger-light);
         }
     }
 
@@ -80,11 +80,11 @@
         }
 
         &.is_selected.is_maintenance {
-            color: var(--warning-text);
+            color: var(--warning);
         }
 
         &.is_selected.is_inactive {
-            color: var(--danger-text);
+            color: var(--danger-dark);
         }
     }
 }

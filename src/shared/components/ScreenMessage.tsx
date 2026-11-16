@@ -13,7 +13,7 @@ type ScreenMessageSize = 'sm' | 'md' | 'lg';
 interface LoadingScreenProps {
     /** Texto bajo el spinner. */
     message?: string;
-    /** Escala el spinner y el texto — `sm` para un slot chico (modal, card), `lg` para página completa. */
+    /** sm - md - lg */
     size?: ScreenMessageSize;
 }
 

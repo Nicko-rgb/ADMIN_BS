@@ -16,7 +16,7 @@ interface CompanyEditProps {
 
 /** Modal de edición de la propia empresa — reusa CompanyStepForm, incluido el documento (RUC), por si se cargó mal al registrar. */
 export const CompanyEdit = ({ isOpen, onClose, onSubmit, isSaving = false, fields }: CompanyEditProps) => (
-    <Modal isOpen={isOpen} onClose={onClose} title="Editar empresa" icon={Building2} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Editar empresa" icon={Building2}>
         <form onSubmit={onSubmit} noValidate>
             <CompanyStepForm {...fields} />
 

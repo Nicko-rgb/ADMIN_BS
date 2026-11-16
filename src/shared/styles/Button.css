@@ -14,7 +14,7 @@ button {
     flex-direction: row-reverse;
     gap: .7rem;
     border: 1px solid transparent;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     font-size: 1.4rem;
     font-weight: 500;
     line-height: 1.4;
@@ -23,7 +23,7 @@ button {
 
     &:active:not(:disabled) { transform: translateY(1px); }
     &:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
-    &:focus-visible { outline: 2px solid var(--primary-text); outline-offset: 3px; }
+    &:focus-visible { outline: 2px solid var(--focus-border); outline-offset: 3px; }
     &.icon_left { flex-direction: row; }
 
     .app-button__text { white-space: nowrap; }
@@ -38,45 +38,54 @@ button {
         animation: btn-spin .8s linear infinite;
     }
 
+    /* PRIMARY */
     &.btn_app_primary {
         background: var(--primary);
         color: var(--text-white);
-        &:hover:not(:disabled) { background: var(--primary-dark); }
+        &:hover:not(:disabled) { background: var(--primary-dark); color: var(--text-white); }
     }
+
+    /* SECONDARY */
     &.btn_app_secondary {
-        background: var(--gray-light);
-        border-color: var(--gray-light);
-        color: var(--text-soft);
-        &:hover:not(:disabled) { background: var(--gray-medium); color: var(--text); }
+        background: var(--secondary);
+        color: var(--secondary-text);
+        border-color: var(--secondary-light);
+        &:hover:not(:disabled) { background: var(--secondary-dark); border-color: var(--secondary-dark); }
     }
+
+    /* ACCENT */
     &.btn_app_accent {
-        background: var(--accent);
-        color: var(--accent-text);
-        border-color: var(--accent-hover);
-        box-shadow: none;
-        &:hover:not(:disabled) { background: var(--accent-hover); }
+        background: var(--accent-light);
+        color: var(--accent);
+        border-color: var(--accent-light);
+        &:hover:not(:disabled) { border-color: var(--accent); }
     }
+
+    /* DANGER */
     &.btn_app_danger {
         background: var(--danger);
         color: var(--text-white);
-        box-shadow: none;
-        &:hover:not(:disabled) { background: var(--danger-text); }
+        &:hover:not(:disabled) { background: var(--danger-dark); }
     }
+
+    /* WARNING */
     &.btn_app_warning {
         background: var(--warning);
-        color: var(--text-white);
-        box-shadow: none;
-        &:hover:not(:disabled) { background: var(--warning-text); }
+        color: #111111;
+        &:hover:not(:disabled) { background: var(--warning-dark); color: var(--text-white); }
     }
+
+    /* INFO */
     &.btn_app_info {
         background: var(--info);
         color: var(--text-white);
-        box-shadow: none;
-        &:hover:not(:disabled) { background: var(--info-text); }
+        &:hover:not(:disabled) { background: var(--info-dark); }
     }
+
+    /* CUSTOM HEX */
     &.btn_app_custom {
         background: var(--btn-custom-color);
-        color: var(--text-white);
+        color: #FFFFFF;
         &:hover:not(:disabled) { filter: brightness(.9); }
     }
 

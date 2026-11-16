@@ -22,13 +22,13 @@
 }
 
 .form_section {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     padding: 1rem 1.5rem;
     padding-bottom: 2rem;
     border-radius: 8px;
     background-color: var(--surface);
     border: 1px solid var(--border);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-sm);
 
     .form_section_title {
         display: flex;
@@ -69,12 +69,12 @@
     }
 
     .required {
-        color: var(--danger-text);
+        color: var(--danger);
         margin-left: 2px;
     }
 
     .error_message {
-        color: var(--danger-text);
+        color: var(--danger);
         font-size: 1rem;
         font-weight: 500;
         display: flex;
@@ -102,7 +102,7 @@
             font-family: var(--font-primary);
             color: var(--text);
             background-color: var(--input-bg);
-            border: 1px solid var(--border-strong);
+            border: 1px solid var(--gray-dark);
             border-radius: 6px;
             outline: none;
             transition: all 0.3s ease;
@@ -113,8 +113,8 @@
             }
 
             &:focus {
-                border-color: var(--primary);
-                box-shadow: 0 0 0 3px var(--ring);
+                border-color: var(--focus-border);
+                box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 30%, transparent);
             }
 
             &:disabled {
@@ -126,7 +126,7 @@
                 border-color: var(--danger);
 
                 &:focus {
-                    box-shadow: 0 0 0 3px var(--danger-soft);
+                    box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 25%, transparent);
                 }
             }
         }
@@ -171,7 +171,7 @@
     /* ── Campo de teléfono con prefijo de código de país ──────────────────── */
     &.is_phone {
         .input_container {
-            border: 1px solid var(--border-strong);
+            border: 1px solid var(--gray-dark);
             border-radius: 6px;
             background-color: var(--input-bg);
             transition: all 0.3s ease;
@@ -193,8 +193,8 @@
         }
 
         &:focus-within .input_container {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--ring);
+            border-color: var(--focus-border);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 35%, transparent);
         }
 
         .phone_code_prefix {
@@ -210,7 +210,7 @@
             font-size: 1.3rem;
             font-weight: 600;
             color: var(--text-muted);
-            border-right: 1px solid var(--border-strong);
+            border-right: 1px solid var(--gray-dark);
             pointer-events: none;
 
             &.has_code {
@@ -303,7 +303,7 @@
             flex-shrink: 0;
             width: 38px;
             height: 20px;
-            background: var(--border-strong);
+            background: var(--gray-dark);
             border-radius: 999px;
             transition: background .2s ease;
 
@@ -337,7 +337,7 @@
    stacking context como hermano de body, no como descendiente. */
 .custom_dropdown_menu {
     background: var(--surface);
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--gray-dark);
     border-radius: 8px;
     box-shadow: var(--shadow-md);
     z-index: 1200;

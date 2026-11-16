@@ -73,7 +73,7 @@ html.theme-switching *::after {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--border-strong);
+    background: var(--gray-dark);
     border-radius: 10px;
 }
 
@@ -86,9 +86,9 @@ html.theme-switching *::after {
 /* Cards UI */
 .card {
     background-color: var(--surface);
-    border-radius: 7px; 
-    box-shadow: var(--shadow-sm);
-    /* border: 1px solid var(--gray-light); */
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--secondary);
     padding: 15px;
 }
 
@@ -138,13 +138,13 @@ html.theme-switching *::after {
     }
 
     &.inactive {
-        background: var(--danger-soft);
-        color: var(--danger-text);
+        background: var(--danger-light);
+        color: var(--danger);
     }
 
     &.pending, &.maintenance {
-        background: var(--warning-soft);
-        color: var(--warning-text);
+        background: var(--warning-light);
+        color: var(--warning);
     }
 
     @media (prefers-reduced-motion: reduce) {

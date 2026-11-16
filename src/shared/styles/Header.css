@@ -45,7 +45,7 @@
                 color: var(--text-muted);
 
                 &:hover {
-                    color: var(--primary-text);
+                    color: var(--primary);
                     background: var(--primary-light);
                 }
             }
@@ -58,7 +58,7 @@
 
                 > svg {
                     flex: 0 0 auto;
-                    color: var(--border-strong);
+                    color: var(--gray-dark);
                 }
 
                 > a,
@@ -115,7 +115,7 @@
                 }
 
                 &:focus-visible {
-                    outline: 2px solid var(--primary-text);
+                    outline: 2px solid var(--focus-border);
                     outline-offset: 2px;
                 }
 
@@ -163,12 +163,11 @@
             }
 
             .context_app {
-                color: var(--accent-text);
-                background: var(--accent);
+                color: var(--accent);
+                background: var(--accent-light);
 
                 &:hover {
-                    color: var(--accent-text);
-                    background: var(--accent-hover);
+                    color: var(--accent-dark);
                 }
             }
 
@@ -210,7 +209,7 @@
                     height: 26px;
                     border-radius: 50%;
                     background: var(--primary-light);
-                    color: var(--primary-text);
+                    color: var(--primary);
                 }
 
                 .user_name {
@@ -242,7 +241,7 @@
                 height: 38px;
                 border-radius: 10px;
                 background: var(--primary-light);
-                color: var(--primary-text);
+                color: var(--primary);
             }
 
             .header_info {
