@@ -14,7 +14,7 @@ button {
     flex-direction: row-reverse;
     gap: .7rem;
     border: 1px solid transparent;
-    border-radius: var(--radius-md);
+    border-radius: 3px;
     font-size: 1.4rem;
     font-weight: 500;
     line-height: 1.4;
@@ -89,10 +89,9 @@ button {
         &:hover:not(:disabled) { filter: brightness(.9); }
     }
 
-    &.btn_app_xs { padding: .4rem .8rem; font-size: 1.2rem;  }
-    &.btn_app_sm { padding: .5rem 1rem; font-size: 1.3rem; }
-    &.btn_app_md { padding: .6rem 1.2rem; font-size: 1.3rem; }
-    &.btn_app_lg { padding: .7rem 1.4rem; font-size: 1.4rem; }
+    &.btn_app_sm { padding: .4rem .8rem; font-size: 1.2rem; }
+    &.btn_app_md { padding: .6rem 1.2rem; font-size: 1.35rem; }
+    &.btn_app_lg { padding: .6rem 1.4rem; font-size: 1.5rem; }
 }
 
 @keyframes btn-spin { to { transform: rotate(360deg); } }

@@ -2,12 +2,11 @@
 .form_row {
     display: flex;
     align-items: flex-start;
-
     position: relative;
     gap: 1.5rem;
     width: 100%;
 
-    > .input_group {
+    >.input_group {
         flex: 1;
         min-width: 0;
         width: auto;
@@ -17,6 +16,7 @@
 .form_actions {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 1rem;
     margin-top: 2rem;
 }
@@ -25,16 +25,15 @@
     margin-bottom: 2rem;
     padding: 1rem 1.5rem;
     padding-bottom: 2rem;
-    border-radius: 8px;
+    border: 1px solid transparent;
     background-color: var(--surface);
-    border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
 
     .form_section_title {
         display: flex;
         align-items: center;
         gap: 1rem;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
         border-bottom: 1px solid var(--border);
         padding-bottom: .6rem;
 
@@ -55,8 +54,9 @@
 .input_group {
     display: flex;
     flex-direction: column;
+    align-items: start;
     position: relative;
-    gap: 2px;
+    gap: 4px;
     width: 100%;
 
     .label {
@@ -66,11 +66,14 @@
         font-family: var(--font-secondary);
         padding-left: 4px;
         text-wrap: nowrap;
-    }
+        position: relative;
 
-    .required {
-        color: var(--danger);
-        margin-left: 2px;
+        .required {
+            position: absolute;
+            top: -3px;
+            right: -10px;
+            color: var(--danger);
+        }
     }
 
     .error_message {
@@ -92,6 +95,7 @@
         position: relative;
         display: flex;
         align-items: center;
+        width: 100%;
 
         .form_input,
         .form_textarea {
@@ -284,7 +288,7 @@
             width: 0;
             height: 0;
 
-            &:checked + .toggle_track {
+            &:checked+.toggle_track {
                 background: var(--primary);
 
                 .toggle_thumb {
@@ -292,7 +296,7 @@
                 }
             }
 
-            &:disabled + .toggle_track {
+            &:disabled+.toggle_track {
                 opacity: 0.6;
                 cursor: not-allowed;
             }

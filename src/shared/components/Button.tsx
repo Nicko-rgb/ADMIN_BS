@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ComponentType, CSSProperties } from 'react';
 import '../styles/Button.css';
 
 /** Tamaños disponibles — cada uno define su propio padding/font-size/radius. */
-type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 /** Colores con nombre ya definidos en el sistema de diseño (`shared/styles/colors.css`). */
 type ButtonColorName = 'primary' | 'secondary' | 'accent' | 'danger' | 'warning' | 'info';
@@ -14,7 +14,7 @@ const NAMED_COLORS: readonly ButtonColorName[] = ['primary', 'secondary', 'accen
 const isNamedColor = (color: ButtonColor): color is ButtonColorName =>
     (NAMED_COLORS as readonly string[]).includes(color);
 
-const ICON_SIZE_BY_SIZE: Record<ButtonSize, number> = { xs: 15, sm: 16, md: 17, lg: 18 };
+const ICON_SIZE_BY_SIZE: Record<ButtonSize, number> = { sm: 16, md: 17, lg: 17 };
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
     /** Texto visible dentro del botón. */

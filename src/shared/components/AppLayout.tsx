@@ -1,7 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Bell, ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, ShieldUser, UserCircle } from 'lucide-react';
+import { Bell, CalendarCheck, ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, ShieldUser, UserCircle } from 'lucide-react';
 import { DynamicIcon } from 'lucide-react/dynamic';
-import { TbCalendarCheck } from 'react-icons/tb';
 import { useMenu } from '../hooks/useMenu';
 import { useSessionStore } from '../store/sessionStore';
 import { useAppLayout } from '../hooks/useAppLayout';
@@ -11,7 +10,7 @@ import { Header } from './Header';
 import '../styles/AppLayout.css';
 
 const MenuIcon = ({ name, ...props }: MenuIconProps) => {
-    if (name === 'TbCalendarCheck') return <TbCalendarCheck {...props} />;
+    if (name === 'TbCalendarCheck') return <CalendarCheck {...props} />;
 
     const iconName = resolveLucideIconName(name);
     return iconName ? <DynamicIcon key={iconName} name={iconName} {...props} /> : null;
