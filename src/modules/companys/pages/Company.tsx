@@ -39,6 +39,7 @@ const Company = () => {
     const can = usePermission();
     const canEditCompany = can('company.edit');
     const canManageSucursales = can('sucursal.create');
+    const canManagePayments = can('payment.account_manage');
     const canManageCompanyUsers = can(ROLE_MANAGE_PERMISSIONS.administrador, ROLE_MANAGE_PERMISSIONS.empleado);
     const canManagePermissions = can('user.permission_manage');
 
@@ -104,12 +105,14 @@ const Company = () => {
                                 onClick={openEditCompany}
                             />
                         )}
-                        <Button
-                            text="Configurar Pagos"
-                            icon={Settings}
-                            color="secondary"
-                            onClick={() => { }}
-                        />
+                        {canManagePayments && (
+                            <Button
+                                text="Configurar Pagos"
+                                icon={Settings}
+                                color="secondary"
+                                onClick={() => navigate(`/company/payments/config?company=${company.publicId}`)}
+                            />
+                        )}
                     </div>
                 </div>
 
@@ -207,7 +210,7 @@ const Company = () => {
                                                 text="Administrar"
                                                 icon={Settings}
                                                 color="secondary"
-                                                onClick={() => navigate(`/companys/company/sucursal/${subsidiary.publicId}`)}
+                                                onClick={() => navigate(`/company/sucursal/${subsidiary.publicId}`)}
                                             />
                                         )}
                                     </div>

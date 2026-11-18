@@ -1,0 +1,411 @@
+.payment_config_page {
+    display: grid;
+    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    gap: 1.6rem;
+    align-items: start;
+
+    .card {
+        padding: 0;
+    }
+
+    /* ── Estructura común de los dos paneles ─────────────────────── */
+    .payment_config_tree,
+    .payment_config_detail {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .payment_config_tree {
+        position: sticky;
+        top: 1.6rem;
+    }
+
+    .payment_config_detail {
+        min-height: 45rem;
+    }
+
+    .section_header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.4rem 1.6rem;
+        border-bottom: 1px solid var(--border);
+
+        .icon_box {
+            flex-shrink: 0;
+            width: 3.6rem;
+            height: 3.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .heading {
+            flex: 1;
+            min-width: 0;
+
+            h2 {
+                color: var(--text);
+                font-size: 1.5rem;
+                font-weight: 700;
+                line-height: 1.3;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            p {
+                color: var(--text-muted);
+                font-size: 1.2rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+    }
+
+    .header_actions {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        gap: .8rem;
+    }
+
+    .count_pill {
+        flex-shrink: 0;
+        padding: .4rem 1rem;
+        border-radius: 999px;
+        background: var(--surface-muted);
+        color: var(--text-soft);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    /* Credencial de Mercado Pago registrada en esta sesión. */
+    .mp_connected {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        gap: .4rem;
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        background: var(--primary-light);
+        color: var(--primary-dark);
+        font-size: 1.15rem;
+        font-weight: 600;
+    }
+
+    /* ── Árbol empresa → sucursales ──────────────────────────────── */
+    .tree_body {
+        display: flex;
+        flex-direction: column;
+        gap: .4rem;
+        padding: 1rem;
+    }
+
+    .tree_node {
+        display: flex;
+        align-items: center;
+        gap: .9rem;
+        width: 100%;
+        padding: .8rem .9rem;
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+        transition: var(--transition);
+
+        &:hover {
+            background: var(--surface-muted);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--focus-ring);
+            outline-offset: -2px;
+        }
+
+        .node_icon {
+            flex-shrink: 0;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            background: var(--gray-light);
+            color: var(--text-soft);
+        }
+
+        .node_text {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: .1rem;
+
+            strong {
+                color: var(--text);
+                font-size: 1.35rem;
+                font-weight: 600;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            small {
+                color: var(--text-muted);
+                font-size: 1.15rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .node_flag {
+            flex-shrink: 0;
+            width: 2rem;
+            height: 1.4rem;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .node_chevron {
+            flex-shrink: 0;
+            color: var(--text-muted);
+        }
+    }
+
+    .tree_company {
+        background: var(--surface-muted);
+
+        .node_icon {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+    }
+
+    .tree_children {
+        display: flex;
+        flex-direction: column;
+        gap: .3rem;
+        margin-left: 1.6rem;
+        padding-left: .8rem;
+        border-left: 1px solid var(--border);
+    }
+
+    .tree_branch {
+        .node_icon {
+            width: 2.7rem;
+            height: 2.7rem;
+        }
+
+        .status_badge {
+            flex-shrink: 0;
+            padding: 2px 7px;
+            font-size: 1rem;
+
+            &::before {
+                width: 6px;
+                height: 6px;
+            }
+        }
+
+        &.active {
+            background: var(--primary-light);
+            box-shadow: inset 3px 0 0 var(--primary);
+
+            .node_icon {
+                background: var(--surface);
+                color: var(--primary);
+            }
+
+            .node_text strong {
+                color: var(--primary-dark);
+            }
+        }
+    }
+
+    /* ── Detalle: tipos de pago del país ─────────────────────────── */
+    .detail_body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 1.6rem;
+        padding: 1.6rem;
+    }
+
+    .payment_types {
+        display: flex;
+        flex-direction: column;
+        gap: 1.8rem;
+    }
+
+    .payment_types_group {
+        display: flex;
+        flex-direction: column;
+        gap: .9rem;
+
+        .group_header {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+
+            .group_icon {
+                width: 2.6rem;
+                height: 2.6rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: var(--radius-sm);
+                background: var(--surface-muted);
+                color: var(--text-soft);
+            }
+
+            h3 {
+                color: var(--text-soft);
+                font-size: 1.25rem;
+                font-weight: 700;
+                letter-spacing: .04em;
+                text-transform: uppercase;
+            }
+
+            .group_count {
+                padding: .1rem .6rem;
+                border-radius: 999px;
+                background: var(--surface-muted);
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .payment_types_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+    }
+
+    .payment_type_card {
+        display: flex;
+        flex-direction: column;
+        gap: .8rem;
+        padding: 1.2rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--color-bg);
+
+        .type_header {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+
+            .type_icon {
+                flex-shrink: 0;
+                width: 3.4rem;
+                height: 3.4rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: var(--radius-sm);
+                background: var(--surface);
+                border: 1px solid var(--border);
+                color: var(--primary);
+
+                img {
+                    width: 2rem;
+                    height: 2rem;
+                    object-fit: contain;
+                }
+            }
+
+            .type_title {
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: .1rem;
+
+                h4 {
+                    color: var(--text);
+                    font-size: 1.35rem;
+                    font-weight: 600;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .type_code {
+                    color: var(--text-muted);
+                    font-size: 1.1rem;
+                    letter-spacing: .03em;
+                }
+            }
+        }
+
+        .type_description {
+            color: var(--text-soft);
+            font-size: 1.2rem;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .type_meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+            margin-top: auto;
+
+            .type_chip {
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+                padding: .25rem .7rem;
+                border-radius: 999px;
+                background: var(--surface-muted);
+                color: var(--text-soft);
+                font-size: 1.1rem;
+                font-weight: 500;
+
+                &.global {
+                    background: var(--accent-light);
+                    color: var(--accent);
+                }
+            }
+        }
+    }
+
+    /* ── Responsive: un panel arriba del otro ────────────────────── */
+    @media (max-width: 960px) {
+        grid-template-columns: 1fr;
+
+        .payment_config_tree {
+            position: static;
+        }
+
+        .payment_config_detail {
+            min-height: auto;
+        }
+    }
+
+    /* Encabezado angosto: el botón de Mercado Pago baja debajo del título. */
+    @media (max-width: 640px) {
+        .section_header {
+            flex-wrap: wrap;
+        }
+
+        .header_actions {
+            width: 100%;
+        }
+    }
+}

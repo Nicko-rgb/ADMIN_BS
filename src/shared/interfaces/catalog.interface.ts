@@ -55,6 +55,8 @@ export interface PaymentType {
     id: number;
     countryId: number | null;
     countryName: string | null;
+    /** Símbolo de la moneda del país ('S/', '$') — la comisión fija está en esa moneda. */
+    countryCurrency: string | null;
     name: string;
     code: string;
     category: string;

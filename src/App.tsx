@@ -34,7 +34,7 @@ function App() {
 
                     {/* Área autenticada: sin sesión, ProtectedRoute manda a login */}
                     <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{usersRoutes}</Route>
-                    <Route path="companys" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{companyRoutes}</Route>
+                    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{companyRoutes}</Route>
                     <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{systemRoutes}</Route>
                     <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{saasRoutes}</Route>
                     <Route path="bookings" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>{bookingsRoutes}</Route>

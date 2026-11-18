@@ -5,6 +5,7 @@ import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
 import { Button, InputField, SelectField } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
+import { formatPaymentCommission } from '../../../shared/utils/formatPaymentCommission';
 import { usePaymentTypes } from '../hooks/usePaymentTypes';
 import { EditCatalogo } from '../components/EditCatalogo';
 import { CreatePaymentType } from '../components/CreatePaymentType';
@@ -48,7 +49,7 @@ const PaymentTypesPage = () => {
         { key: 'countryName', header: 'País', render: (row) => row.countryId === null ? 'GLOBAL' : row.countryName ?? '—' },
         { key: 'category', header: 'Categoría' },
         { key: 'provider', header: 'Proveedor', render: (row) => row.provider ?? '—' },
-        { key: 'commissionPercentage', header: 'Comisión', render: (row) => ( `${(Number(row.commissionPercentage) * 100).toFixed(2)}% + ${row.fixedCommission}`)},
+        { key: 'commissionPercentage', header: 'Comisión', render: (row) => formatPaymentCommission(row.commissionPercentage, row.fixedCommission, row.countryCurrency) ?? '—' },
         { key: 'isActive', header: 'Estado', render: (row) => <span className={`status_badge ${row.isActive ? 'active' : 'inactive'}`}>{row.isActive ? 'Activo' : 'Inactivo'}</span> },
         { key: 'referencesCount', header: 'Referencias', render: (row) => <span className="references_badge">{row.referencesCount}</span> },
         { key: 'createdAt', header: 'Creado', render: (row) => formatDate(row.createdAt) },

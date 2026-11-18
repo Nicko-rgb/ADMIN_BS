@@ -85,7 +85,7 @@ const Sucursal = () => {
         showCard: false,
         breadcrumbs: [
             { label: 'Empresas', path: '/companys' },
-            ...(sucursal?.companyName ? [{ label: sucursal.companyName, path: `/companys/company/${sucursal.companyPublicId}` }] : []),
+            ...(sucursal?.companyName ? [{ label: sucursal.companyName, path: `/company/${sucursal.companyPublicId}` }] : []),
             { label: sucursal?.name || 'Cargando...' },
         ],
     });
@@ -110,7 +110,7 @@ const Sucursal = () => {
         return <NotFoundScreen onRetry={retry} message="No se pudo encontrar información de esta sucursal" />;
     }
 
-    const goBack = () => navigate(`/companys/company/${sucursal.companyPublicId}`);
+    const goBack = () => navigate(`/company/${sucursal.companyPublicId}`);
 
     // Redes con valor para el cover — brand icons vía react-icons.
     const socials = [
@@ -203,11 +203,14 @@ const Sucursal = () => {
                                 </div>
                             )}
                             {can('company.view') && (
-                                <Button text="Mi Empresa" size="sm" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
+                                <Button text="Mi Empresa" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
                             )}
                             {can('sucursal.edit') && (
-                                <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
+                                <Button text="Editar" icon={Pencil} onClick={() => setIsEditOpen(true)} />
                             )}
+                            {can('payment.account_manage') &&
+                                <Button text='Cuentas de Pago' />
+                            }
                         </div>
                     </div>
                 </div>
@@ -299,7 +302,7 @@ const Sucursal = () => {
                                 <div className="info">
                                     <p><Dumbbell size={20} /><span>{space.sport}</span></p>
                                 </div>
-                                <Button text='Administrar' color='secondary' icon={Settings} onClick={() => navigate(`/companys/company/space/${space.publicId}`)} />
+                                <Button text='Administrar' color='secondary' icon={Settings} onClick={() => navigate(`/company/space/${space.publicId}`)} />
                             </article>
                         ))}
                     </div>

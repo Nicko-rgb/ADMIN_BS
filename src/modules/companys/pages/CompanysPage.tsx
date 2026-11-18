@@ -52,11 +52,11 @@ const CompanysPage = () => {
         icon: Building2,
         breadcrumbs: [{ label: 'Empresas' }],
         extra: canCreate ? (
-            <Button text="Crear empresa" size='md' icon={Plus} iconPosition="left" onClick={() => navigate('/companys/register-company')} />
+            <Button text="Crear empresa" size='md' icon={Plus} iconPosition="left" onClick={() => navigate('/company/register')} />
         ) : undefined,
     });
 
-    const goToCompany = (company: CompanyAdmin) => navigate(`/companys/company/${company.publicId}`);
+    const goToCompany = (company: CompanyAdmin) => navigate(`/company/${company.publicId}`);
 
     const columns: TableColumn<CompanyAdmin>[] = [
         { key: 'name', header: 'Empresa' },
