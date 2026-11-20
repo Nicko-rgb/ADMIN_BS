@@ -86,8 +86,8 @@ html.theme-switching *::after {
 /* Cards UI */
 .card {
     background-color: var(--surface);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow);
+    /* border-radius: var(--radius-md);
+    box-shadow: var(--shadow); */
     border: 1px solid var(--secondary);
     padding: 15px;
 }
@@ -129,8 +129,8 @@ html.theme-switching *::after {
     }
 
     &.active {
-        background: var(--primary-light);
-        color: var(--primary);
+        background: var(--success-light);
+        color: var(--success);
 
         &::before {
             animation: status_badge_pulse 1.8s ease-out infinite;

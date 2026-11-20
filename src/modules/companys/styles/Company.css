@@ -1,15 +1,13 @@
 .company_page {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     padding-bottom: 10rem;
 
     .banner,
     .section_company {
         background: var(--surface);
         padding: clamp(1.6rem, 2vw, 2rem);
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--gray-light);
         box-shadow: var(--shadow-xs);
     }
 
@@ -89,7 +87,7 @@
 
             .actions {
                 display: flex;
-                align-items: center;
+                align-items: end;
                 gap: 1rem;
                 margin-left: auto;
             }
@@ -214,19 +212,19 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--secondary);
+            /* padding-bottom: 1rem; */
+            /* border-bottom: 1px solid var(--secondary); */
 
             .icon {
                 width: 4rem;
                 height: 4rem;
+                flex-shrink: 0;
                 border-radius: var(--radius-md);
                 background: var(--primary-light);
                 color: var(--primary);
             }
 
             .heading {
-
                 h2 {
                     color: var(--text);
                     font-size: 1.7rem;
@@ -263,6 +261,8 @@
                     display: flex;
                     align-items: center;
                     gap: 1rem;
+                    padding-bottom: 1rem;
+                    border-bottom: 1px solid var(--secondary);
 
                     .name {
                         display: flex;

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, LinkIcon, ShieldCheck } from 'lucide-react';
-import { IoLockClosedOutline } from 'react-icons/io5';
+import { CheckCircle2, LinkIcon, Lock, ShieldCheck } from 'lucide-react';
 import { Button, InputField, LoadingScreen } from '../../../shared/components';
 import toast from '../../../shared/utils/toast';
 import { handleApiError } from '../../../shared/utils/errorHandler';
@@ -112,7 +111,7 @@ const ResetPasswordPage = () => {
                                 autoComplete="new-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                icon={IoLockClosedOutline}
+                                icon={Lock}
                                 error={isTooShort ? `Debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres` : ''}
                                 required
                             />
@@ -124,7 +123,7 @@ const ResetPasswordPage = () => {
                                 autoComplete="new-password"
                                 value={confirmation}
                                 onChange={(e) => setConfirmation(e.target.value)}
-                                icon={IoLockClosedOutline}
+                                icon={Lock}
                                 error={isMismatched ? 'Las contraseñas no coinciden' : ''}
                                 required
                             />
