@@ -7,6 +7,7 @@ const Company = lazy(() => import('./pages/Company'));
 const RegisterCompany = lazy(() => import('./pages/RegisterCompany'));
 const Sucursal = lazy(() => import('./pages/Sucursal'));
 const Space = lazy(() => import('./pages/Space'));
+const PaymentConfig = lazy(() => import('./pages/PaymentConfig'));
 
 
 /**
@@ -15,10 +16,11 @@ const Space = lazy(() => import('./pages/Space'));
  */
 export const companyRoutes = (
     <>
-        <Route index element={<CompanysPage />} />
+        <Route path='companys' element={<CompanysPage />} />
         <Route path="company/:publicId" element={<Company />} />
-        <Route path="register-company" element={<RegisterCompany />} />
+        <Route path="/company/register" element={<RegisterCompany />} />
         <Route path='company/sucursal/:publicId' element={<Sucursal />} />
         <Route path='company/space/:spacePublicId' element={<Space />} />
+        <Route path='company/payments/config' element={<PaymentConfig />} />
     </>
 );

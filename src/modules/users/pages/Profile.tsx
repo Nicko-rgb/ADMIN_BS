@@ -1,4 +1,4 @@
-import { BadgeCheck, Building2, CalendarDays, CheckCircle2, CreditCard, Crown, Edit, KeyRound, Mail, Phone, ShieldCheck, UserCircle, UploadCloud, X } from 'lucide-react';
+import { BadgeCheck, CalendarDays, CheckCircle2, CreditCard, Crown, Edit, KeyRound, Mail, Phone, ShieldCheck, UserCircle, UploadCloud, X } from 'lucide-react';
 import { LoadingScreen, ForbiddenScreen, Button, Modal, FormActions } from '../../../shared/components';
 import { usePageHeader } from '../../../shared/store/headerStore';
 import ProfileCompanyContext from '../components/ProfileCompanyContext';
@@ -92,7 +92,7 @@ const Profile = () => {
                                     icon={BadgeCheck}
                                     subtitle='Plan y estado de tu empresa.'
                                     className='accent'
-                                    extra={<Button text='Ver Suscripción' icon={Crown} size='sm' color='accent' onClick={navigateToSubscriptions} />}
+                                    extra={<Button text='Ver Suscripción' icon={Crown} color='accent' onClick={navigateToSubscriptions} />}
                                 />
 
                                 {isLoadingSubscription ? (
@@ -124,10 +124,6 @@ const Profile = () => {
                                                 <dt><CreditCard size={15} />Facturación</dt>
                                                 <dd>{billingPeriodLabel}</dd>
                                             </div>
-                                            <div>
-                                                <dt><Building2 size={15} />Empresa titular</dt>
-                                                <dd>{subscription.primaryCompany?.name ?? '—'}</dd>
-                                            </div>
                                         </dl>
 
                                         {subscription.status === 'CANCELED' && subscription.isEffective ? (
@@ -148,17 +144,17 @@ const Profile = () => {
                         <div className="profile_security_list">
                             <article>
                                 <div className="profile_security_icon"><KeyRound size={18} /></div>
-                                <div><h3>Contraseña</h3><p>Podés restablecerla mediante un enlace enviado a tu correo.</p></div>
+                                <div><h3>Contraseña</h3><p>Restablece tu contraseña.</p></div>
                                 <Button text="Restablecer" icon={KeyRound} onClick={openPasswordReset} size='sm' color='accent' />
                             </article>
                             <article>
                                 <div className="profile_security_icon"><ShieldCheck size={18} /></div>
-                                <div><h3>Sesión actual</h3><p>Tu sesión está protegida con un token de acceso y se puede cerrar desde el menú.</p></div>
+                                <div><h3>Sesión actual</h3><p>Tu sesión está protegida.</p></div>
                                 <span className="profile_security_status active">Activa</span>
                             </article>
                             <article>
                                 <div className="profile_security_icon muted"><BadgeCheck size={18} /></div>
-                                <div><h3>Sesiones al cambiar contraseña</h3><p>El backend invalida las sesiones existentes cuando se restablece la contraseña.</p></div>
+                                <div><h3>Sesiones al cambiar contraseña</h3><p>Todas las sesiones se invalidan al cambiar contraseña.</p></div>
                                 <span className="profile_security_status neutral">Protegido</span>
                             </article>
                         </div>

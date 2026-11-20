@@ -48,10 +48,10 @@
                     border-radius: var(--radius-md);
                     align-items: center;
                     gap: .35rem;
-                    color: var(--primary-text);
+                    color: var(--accent);
                     font-size: 1.2rem;
                     font-weight: 600;
-                    background-color: var(--accent);
+                    background-color: var(--accent-light);
                 }
             }
 
@@ -69,9 +69,9 @@
             align-items: center;
             gap: .7rem;
             padding: .8rem 1rem;
-            border: 1px solid var(--primary-border);
+            border: 1px solid var(--primary);
             border-radius: var(--radius-md);
-            background: var(--success-soft);
+            background: var(--success-light);
 
             span {
                 width: 9px;
@@ -112,7 +112,7 @@
             align-items: center;
             justify-content: space-between;
             padding-bottom: 1.25rem;
-            border-bottom: 1px solid var(--primary-border);
+            border-bottom: 1px solid var(--primary-light);
 
             .heading_left {
                 display: flex;
@@ -130,7 +130,7 @@
                     background: var(--primary-light);
 
                     &.security {
-                        color: var(--accent-text);
+                        color: var(--color-bg);
                         background: var(--accent);
                     }
                 }
@@ -147,13 +147,13 @@
             }
 
             &.accent {
-                border-bottom: 1px solid var(--accent);
+                border-bottom: 1px solid var(--accent-light);
                 h2 {
-                    color: var(--accent-text);
+                    color: var(--accent);
                 }
                 .icon {
-                    background: var(--accent);
-                    color: var(--accent-text);
+                    background: var(--accent-light);
+                    color: var(--accent);
                 }
             }
         }
@@ -229,7 +229,7 @@
             .subscription_plan_code {
                 padding: .2rem .55rem;
                 border-radius: 999px;
-                color: var(--accent-text);
+                color: var(--color-bg);
                 background: var(--accent);
                 font-size: 1.05rem;
                 font-weight: 600;
@@ -250,22 +250,22 @@
 
                 &.success {
                     color: var(--success);
-                    background: var(--success-soft);
+                    background: var(--success-light);
                 }
 
                 &.info {
-                    color: var(--info-text);
-                    background: var(--info-soft);
+                    color: var(--info);
+                    background: var(--info-light);
                 }
 
                 &.warning {
-                    color: var(--warning-text);
-                    background: var(--warning-soft);
+                    color: var(--warning);
+                    background: var(--warning-light);
                 }
 
                 &.danger {
-                    color: var(--danger-text);
-                    background: var(--danger-soft);
+                    color: var(--danger-dark);
+                    background: var(--danger-light);
                 }
 
                 &.neutral {
@@ -305,7 +305,7 @@
 
                     svg {
                         flex: 0 0 auto;
-                        color: var(--accent-text);
+                        color: var(--accent);
                     }
                 }
 
@@ -324,8 +324,8 @@
                 margin-top: 1.2rem;
                 padding: .8rem 1rem;
                 border-radius: var(--radius-md);
-                color: var(--warning-text);
-                background: var(--warning-soft);
+                color: var(--warning);
+                background: var(--warning-light);
                 font-size: 1.3rem;
                 line-height: 1.45;
             }
@@ -385,7 +385,7 @@
                 width: 34px;
                 height: 34px;
                 border-radius: 9px;
-                color: var(--primary-text);
+                color: var(--primary);
                 background: var(--primary-light);
 
                 &.muted {
@@ -403,13 +403,13 @@
                 white-space: nowrap;
 
                 &.available {
-                    color: var(--accent-text);
+                    color: var(--color-bg);
                     background: var(--accent);
                 }
 
                 &.active {
                     color: var(--success);
-                    background: var(--success-soft);
+                    background: var(--success-light);
                 }
 
                 &.neutral {

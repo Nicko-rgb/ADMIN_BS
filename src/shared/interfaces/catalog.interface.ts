@@ -53,8 +53,10 @@ export interface SurfaceType {
 
 export interface PaymentType {
     id: number;
-    countryId: number;
+    countryId: number | null;
     countryName: string | null;
+    /** Símbolo de la moneda del país ('S/', '$') — la comisión fija está en esa moneda. */
+    countryCurrency: string | null;
     name: string;
     code: string;
     category: string;
@@ -81,11 +83,11 @@ export interface Plan {
     code: string;
     priceMonthly: string;
     priceYearly: string;
-    maxSubsidiaries: number;
-    maxSpaces: number;
-    maxUsers: number;
+    maxSubsidiaries: number | null;
+    maxSpaces: number | null;
+    maxUsers: number | null;
     hasStripeConnect: boolean;
-    maxInvoicesMonthly: number;
+    maxInvoicesMonthly: number | null;
     notificationsTier: PlanNotificationsTier;
     hasAdvancedReports: boolean;
     allowsMultiCompany: boolean;

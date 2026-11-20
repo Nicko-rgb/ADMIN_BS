@@ -3,7 +3,11 @@ import { lazy } from 'react';
 import { Route } from 'react-router-dom';
 
 const SubscriptionsPage = lazy(() => import('./pages/SubscriptionsPage'));
+const Usage = lazy(() => import('./pages/Usage'));
 
 export const saasRoutes = (
-    <Route path="suscriptions" element={<SubscriptionsPage />} />
+    <>
+        <Route path="suscriptions" element={<SubscriptionsPage />} />
+        <Route path="usage" element={<Usage />} />
+    </>
 );

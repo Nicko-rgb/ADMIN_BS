@@ -38,18 +38,18 @@
         font-weight: 600;
 
         &.app_access_badge_admin {
-            background: var(--purple-soft);
-            color: var(--purple-text);
+            background: var(--accent-light);
+            color: var(--accent);
         }
 
         &.app_access_badge_booking {
-            background: var(--info-soft);
-            color: var(--info-text);
+            background: var(--info-light);
+            color: var(--info);
         }
 
         &.app_access_badge_both {
-            background: var(--success-soft);
-            color: var(--success-text);
+            background: var(--success-light);
+            color: var(--success);
         }
     }
 

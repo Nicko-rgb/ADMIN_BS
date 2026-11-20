@@ -61,7 +61,10 @@ const toEditForm = (paymentType: PaymentType): Required<UpdatePaymentTypePayload
 /** Listado de tipos de pago (búsqueda/filtro/paginación en el front) + edición: todo se maneja íntegramente acá. */
 export const usePaymentTypes = () => {
     const { countries, loadCountries } = useCatalogActive();
-    const countryOptions = countries.map((country) => ({ value: country.id, label: country.country }));
+    const countryOptions = [
+        { value: 'GLOBAL', label: 'GLOBAL' },
+        ...countries.map((country) => ({ value: country.id, label: country.country })),
+    ];
 
     useEffect(() => { loadCountries(); }, [loadCountries]);
 
@@ -109,7 +112,8 @@ export const usePaymentTypes = () => {
                 || normalizeStr(item.name).includes(term)
                 || normalizeStr(item.code).includes(term)
                 || normalizeStr(item.provider).includes(term)
-                || normalizeStr(item.category).includes(term);
+                || normalizeStr(item.category).includes(term)
+                || normalizeStr(item.countryId === null ? 'GLOBAL' : item.countryName).includes(term);
             const matchesStatus = statusFilter === 'all' || (statusFilter === 'active' ? item.isActive : !item.isActive);
             return matchesSearch && matchesStatus;
         });
@@ -133,7 +137,7 @@ export const usePaymentTypes = () => {
         setForm(null);
     };
 
-    const setField = (name: keyof UpdatePaymentTypePayload) => (value: string | number | boolean) => {
+    const setField = (name: keyof UpdatePaymentTypePayload) => (value: string | number | boolean | null) => {
         setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
     };
 
@@ -207,7 +211,7 @@ export const usePaymentTypes = () => {
     const fields: CatalogFormField[] = form ? [
         { name: 'name', label: 'Nombre', value: form.name, onChange: setField('name'), required: true, row: 1 },
         { name: 'code', label: 'Código', value: form.code, onChange: setField('code'), required: true, row: 1, mayus: true },
-        { name: 'country_id', label: 'País', type: 'select', value: form.country_id, onChange: setField('country_id'), options: countryOptions, required: true, row: 1 },
+        { name: 'country_id', label: 'País', type: 'select', value: form.country_id === null ? 'GLOBAL' : form.country_id, onChange: (value) => setField('country_id')(value === 'GLOBAL' ? null : Number(value)), options: countryOptions, required: true, row: 1 },
         { name: 'category', label: 'Categoría', type: 'select', value: form.category, onChange: setField('category'), options: CATEGORY_OPTIONS, required: true, row: 2 },
         { name: 'provider', label: 'Proveedor', value: form.provider, onChange: setField('provider'), row: 2 },
         { name: 'icon_url', label: 'URL del ícono', placeholder: 'https://icon.img', value: form.icon_url, onChange: setField('icon_url'), row: 3 },

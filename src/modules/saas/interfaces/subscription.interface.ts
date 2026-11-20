@@ -13,10 +13,10 @@ export interface SubscriptionPlan {
     code: string;
     priceMonthly: string;
     priceYearly: string;
-    maxSubsidiaries: number;
-    maxSpaces: number;
-    maxUsers: number;
-    maxInvoicesMonthly: number;
+    maxSubsidiaries: number | null;
+    maxSpaces: number | null;
+    maxUsers: number | null;
+    maxInvoicesMonthly: number | null;
     notificationsTier: PlanNotificationsTier;
     allowsMultiCompany: boolean;
     hasAdvancedReports: boolean;
@@ -31,7 +31,7 @@ export interface SubscriptionPrimaryCompany {
     name: string;
 }
 
-// Suscripción que cubre a una empresa raíz — `GET /api/saas/subscription/:companyPublicId/current-plan`.
+// Suscripción que cubre a una empresa raíz — `GET /api/v2/saas/subscription/:companyPublicId/current-plan`.
 export interface CompanySubscription {
     publicId: string;
     status: SubscriptionStatus;

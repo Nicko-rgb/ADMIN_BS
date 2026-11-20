@@ -51,7 +51,7 @@ export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions =
                     <InputField name="last_name" label="Apellidos" value={values.last_name} onChange={(e) => onChange('last_name', e.target.value)} error={errors.last_name} {...fields.last_name} />
                 </FormRow>
                 <FormRow>
-                    <InputField name="date_birth" label="Fecha de nacimiento (opcional)" type="date" value={values.date_birth} onChange={(e) => onChange('date_birth', e.target.value)} error={errors.date_birth} />
+                    <InputField name="date_birth" label="Fecha de nacimiento (opcional)" value={values.date_birth} onChange={(e) => onChange('date_birth', e.target.value)} error={errors.date_birth} />
                     <InputField name="phone" label="Teléfono celular" isPhone phoneCode={phoneCode} value={values.phone} onChange={(e) => onChange('phone', e.target.value)} error={errors.phone} {...fields.phone} />
                 </FormRow>
             </FormSection>
@@ -68,11 +68,11 @@ export const FormUserManage = ({ role, mode, values, onChange, sucursalOptions =
                     <SelectField name="document_type" label="Tipo de documento" value={values.document_type} onChange={(e) => onChange('document_type', e.target.value as DocumentType)} options={DOCUMENT_TYPE_OPTIONS} required={fields.document_type?.required} error={errors.document_type} />
                     <InputField name="document_number" label="Número de documento" value={values.document_number} onChange={(e) => onChange('document_number', e.target.value)} error={errors.document_number} {...fields.document_number} />
                 </FormRow>
-                <FormRow>
-                    {fields.is_enabled && (
+                {fields.is_enabled && (
+                    <FormRow>
                         <ToggleField name="is_enabled" label="Habilitado" checked={values.is_enabled} onChange={(e) => onChange('is_enabled', e.target.checked)} />
-                    )}
-                </FormRow>
+                    </FormRow>
+                )}
             </FormSection>
 
             {showRole && (

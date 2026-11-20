@@ -5,6 +5,7 @@ import { usePageHeader } from '../../../shared/store/headerStore';
 import { Dialog } from '../../../shared/components/Dialog';
 import { Button, InputField, SelectField } from '../../../shared/components';
 import { formatDate } from '../../../shared/utils/formatDate';
+import { formatPaymentCommission } from '../../../shared/utils/formatPaymentCommission';
 import { usePaymentTypes } from '../hooks/usePaymentTypes';
 import { EditCatalogo } from '../components/EditCatalogo';
 import { CreatePaymentType } from '../components/CreatePaymentType';
@@ -31,7 +32,7 @@ const PaymentTypesPage = () => {
         title: 'Tipos de pago',
         subtitle: 'Administra los tipos de pago disponibles en el sistema',
         icon: CreditCard,
-        extra: <Button text="Nuevo tipo de pago" onClick={openCreate} icon={Plus} size="sm" iconPosition="left" />,
+        extra: <Button text="Nuevo Tipo" onClick={openCreate} icon={Plus} iconPosition="left" />,
         breadcrumbs: [{ label: 'Tipos de pago' }],
     });
 
@@ -45,10 +46,10 @@ const PaymentTypesPage = () => {
             )
         },
         { key: 'code', header: 'Código' },
-        { key: 'countryName', header: 'País', render: (row) => row.countryName ?? '—' },
+        { key: 'countryName', header: 'País', render: (row) => row.countryId === null ? 'GLOBAL' : row.countryName ?? '—' },
         { key: 'category', header: 'Categoría' },
         { key: 'provider', header: 'Proveedor', render: (row) => row.provider ?? '—' },
-        { key: 'commissionPercentage', header: 'Comisión', render: (row) => ( `${(Number(row.commissionPercentage) * 100).toFixed(2)}% + ${row.fixedCommission}`)},
+        { key: 'commissionPercentage', header: 'Comisión', render: (row) => formatPaymentCommission(row.commissionPercentage, row.fixedCommission, row.countryCurrency) ?? '—' },
         { key: 'isActive', header: 'Estado', render: (row) => <span className={`status_badge ${row.isActive ? 'active' : 'inactive'}`}>{row.isActive ? 'Activo' : 'Inactivo'}</span> },
         { key: 'referencesCount', header: 'Referencias', render: (row) => <span className="references_badge">{row.referencesCount}</span> },
         { key: 'createdAt', header: 'Creado', render: (row) => formatDate(row.createdAt) },

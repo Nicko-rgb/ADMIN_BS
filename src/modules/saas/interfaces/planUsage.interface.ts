@@ -22,3 +22,34 @@ export interface PlanUsage {
     spaces: PlanLimitUsage;
     invoicesMonthly: PlanLimitUsage;
 }
+import type { CompanySubscription } from './subscription.interface';
+
+
+export interface PlanBranchUsage {
+    publicId: string;
+    name: string;
+    spaces: PlanLimitUsage;
+    invoicesMonthly: { used: number | null; max: number | null };
+}
+
+export interface PlanCompanyUsage extends PlanPrimaryCompany {
+    isPrimary: boolean;
+    subsidiaries: PlanLimitUsage;
+    users: PlanLimitUsage;
+    branches: PlanBranchUsage[];
+}
+
+export interface PlanUsageOverview {
+    company: PlanPrimaryCompany;
+    subscription: CompanySubscription;
+    companies: PlanLimitUsage;
+    companyUsage: PlanCompanyUsage[];
+    invoicesTrackingAvailable: boolean;
+    updatedAt: string;
+}
+
+export interface PlanUsageAlert {
+    key: string;
+    message: string;
+    tone: 'warning' | 'danger';
+}

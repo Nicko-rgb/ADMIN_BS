@@ -1,0 +1,57 @@
+.mp_form {
+    .mp_form_note {
+        display: flex;
+        align-items: flex-start;
+        gap: .7rem;
+        margin: 1.4rem 0 0;
+        padding: 1rem 1.2rem;
+        border-radius: var(--radius-sm);
+        background: var(--surface-muted);
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        line-height: 1.45;
+
+        svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+            color: var(--primary);
+        }
+    }
+}
+
+/* ── Cuenta conectada ────────────────────────────────────────────────── */
+
+.mp_account {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+.mp_connected_status {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.2rem 1.4rem;
+    border: 1px solid var(--success);
+    border-radius: var(--radius-sm);
+    background: var(--success-light);
+
+    .mp_connected_icon {
+        display: flex;
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: var(--success);
+    }
+
+    strong {
+        color: var(--success-dark);
+        font-size: 1.35rem;
+    }
+
+    p {
+        margin: .35rem 0 0;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        line-height: 1.45;
+    }
+}

@@ -49,8 +49,8 @@ const Space = () => {
         showCard: false,
         breadcrumbs: [
             { label: 'Empresas', path: '/companys' },
-            ...(space?.parent?.companyName && space.parent.companyPublicId ? [{ label: space.parent.companyName, path: `/companys/company/${space.parent.companyPublicId}` }] : []),
-            ...(space?.parent?.sucursalName && space.parent.sucursalPublicId ? [{ label: space.parent.sucursalName, path: `/companys/company/sucursal/${space.parent.sucursalPublicId}` }] : []),
+            ...(space?.parent?.companyName && space.parent.companyPublicId ? [{ label: space.parent.companyName, path: `/company/${space.parent.companyPublicId}` }] : []),
+            ...(space?.parent?.sucursalName && space.parent.sucursalPublicId ? [{ label: space.parent.sucursalName, path: `/company/sucursal/${space.parent.sucursalPublicId}` }] : []),
             { label: space?.name || 'Cargando...' },
         ],
     });

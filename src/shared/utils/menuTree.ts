@@ -1,10 +1,14 @@
-import type { ComponentType } from 'react';
-import {
-    Home, Building2, Users2, ShieldCheck, Menu, Layers, Globe, Trophy, Tags,
-    Grid3x3, CreditCard, MapPin, Gift, Crown, Eye, FileText, BarChart2,
-} from 'lucide-react';
-import { TbCalendarCheck } from 'react-icons/tb';
+import { iconNames, type IconName } from 'lucide-react/dynamic';
 import type { MenuGroup, MenuItem, MenuNode } from '../interfaces/menu.interface';
+
+const normalizeIconName = (name: string): string => name.trim().replace(/-/g, '').toLowerCase();
+
+const lucideNames = new Map<string, IconName>(
+    iconNames.map((name) => [normalizeIconName(name), name]),
+);
+
+export const resolveLucideIconName = (name: string | null): IconName | null =>
+    name ? lucideNames.get(normalizeIconName(name)) ?? null : null;
 
 /**
  * Arma la estructura de secciones/árbol del sidebar a partir del listado
@@ -34,18 +38,3 @@ export const buildMenuGroups = (items: MenuItem[] = []): MenuGroup[] => {
 
     return groups;
 };
-
-type IconComponent = ComponentType<{ size?: number; className?: string }>;
-
-// Nombre del ícono tal como lo guarda dsg_bss_menu_items -> componente. La
-// mayoría son de lucide-react; TbCalendarCheck es la única excepción de
-// react-icons/tb que ya trae la data sembrada así.
-const MENU_ICONS: Record<string, IconComponent> = {
-    Home, Building2, Users2, ShieldCheck, Menu, Layers, Globe, Trophy, Tags,
-    Grid3x3, CreditCard, MapPin, Gift, Crown, Eye, FileText, BarChart2,
-    TbCalendarCheck,
-};
-
-// Resuelve el nombre de ícono de la DB a su componente — null si no hay match, para no romper el render.
-export const resolveMenuIcon = (iconName: string | null): IconComponent | null =>
-    iconName ? (MENU_ICONS[iconName] ?? null) : null;

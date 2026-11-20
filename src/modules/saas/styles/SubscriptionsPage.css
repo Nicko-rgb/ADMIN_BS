@@ -40,9 +40,9 @@
 .subscriptions_current p, .subscriptions_section_heading p { color: var(--text-muted); font-size: 1.25rem; }
 .subscriptions_status_group { justify-content: flex-end; flex-wrap: wrap; gap: .5rem; }
 .subscriptions_pill { padding: .5rem .8rem; border-radius: 999px; color: var(--text-soft); background: var(--gray-medium); font-size: 1.1rem; font-weight: 650; }
-.subscriptions_pill.effective { display: inline-flex; align-items: center; gap: .35rem; color: var(--success); background: var(--success-soft); }
+.subscriptions_pill.effective { display: inline-flex; align-items: center; gap: .35rem; color: var(--success); background: var(--success-light); }
 .subscriptions_facts { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
-.subscriptions_facts > div { min-width: 0; padding: .9rem 1rem; border: 1px solid var(--primary-border); border-radius: var(--radius-md); background: color-mix(in srgb, var(--surface) 78%, transparent); }
+.subscriptions_facts > div { min-width: 0; padding: .9rem 1rem; border: 1px solid var(--primary); border-radius: var(--radius-md); background: color-mix(in srgb, var(--surface) 78%, transparent); }
 .subscriptions_facts span { gap: .4rem; color: var(--text-muted); font-size: 1.15rem; }
 .subscriptions_facts span svg, .subscriptions_usage_title svg { color: var(--primary); }
 .subscriptions_facts strong { display: block; margin-top: .4rem; overflow: hidden; font-size: 1.3rem; text-overflow: ellipsis; white-space: nowrap; }
@@ -60,7 +60,7 @@
 .subscriptions_plans_grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; gap: 1rem; }
 .subscriptions_plan_card { position: relative; display: flex; flex-direction: column; padding: 1.4rem; overflow: hidden; }
 .subscriptions_plan_card.featured { border: 1px solid var(--primary); box-shadow: var(--shadow-md); }
-.subscriptions_recommended { align-self: flex-start; margin-bottom: .5rem; padding: .3rem .6rem; border-radius: 999px; color: var(--primary-text); background: var(--primary-light); font-size: 1rem; font-weight: 700; }
+.subscriptions_recommended { align-self: flex-start; margin-bottom: .5rem; padding: .3rem .6rem; border-radius: 999px; color: var(--primary); background: var(--primary-light); font-size: 1rem; font-weight: 700; }
 .subscriptions_plan_card h3 { font-size: 1.6rem; }
 .subscriptions_plan_description { min-height: 3.6rem; margin-top: .3rem; color: var(--text-muted); font-size: 1.2rem; line-height: 1.5; }
 .subscriptions_price { margin: 1rem 0; font-size: 2rem; font-weight: 750; }

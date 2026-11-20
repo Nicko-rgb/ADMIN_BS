@@ -8,10 +8,8 @@ import '../styles/PlansPage.css';
 import { Button } from '../../../shared/components';
 
 const FEATURES_PREVIEW_LIMIT = 5; // cuántas características se muestran antes del "+N más"
-const UNLIMITED_LIMIT = 999; // convención del backend para "ilimitado" en max_subsidiaries/max_spaces/max_users (ver comentario del modelo SaaSPlan)
-
-// Formatea un límite numérico del plan — "∞" cuando alcanza el tope de "ilimitado".
-const formatPlanLimit = (value: number) => (value >= UNLIMITED_LIMIT ? '∞' : value);
+// Formatea un límite numérico del plan — "∞" cuando es NULL (ilimitado).
+const formatPlanLimit = (value: number | null) => (value === null ? '∞' : value);
 
 const NOTIFICATIONS_TIER_LABELS: Record<string, string> = {
     basic: 'Notif. básicas',

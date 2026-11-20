@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Clock, Inbox, Lock, MailCheck, ShieldCheck } from 'lucide-react';
-import { IoMailOutline, IoSendOutline } from 'react-icons/io5';
+import { Clock, Inbox, Lock, Mail, MailCheck, Send, ShieldCheck } from 'lucide-react';
 import { Button, FormActions, InputField, Modal } from '../../../shared/components';
 import toast from '../../../shared/utils/toast';
 import { handleApiError } from '../../../shared/utils/errorHandler';
@@ -88,13 +87,13 @@ const PasswordFoget = ({ isOpen, onClose }: PasswordFogetProps) => {
                         autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        icon={IoMailOutline}
+                        icon={Mail}
                         required
                     />
 
                     <FormActions>
-                        <Button text="Cancelar" color="secondary" onClick={onClose} disabled={isSending} />
-                        <Button text="Enviar correo" type="submit" loading={isSending} icon={IoSendOutline} />
+                        <Button text="Cancelar" color="secondary" size='lg' onClick={onClose} disabled={isSending} />
+                        <Button text="Enviar correo" type="submit" size='lg' loading={isSending} icon={Send} />
                     </FormActions>
                 </form>
             )}

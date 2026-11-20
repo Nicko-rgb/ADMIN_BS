@@ -18,10 +18,10 @@ export const formatPhone = (phoneCode: string | null | undefined, phone: string 
 
 // Completa una ruta relativa de archivo (/uploads/...) a URL absoluta lista para <img>.
 // El backend sirve /uploads/... en la raíz, no bajo /api (ver app.ts) — VITE_API_URL
-// suele terminar en /api, así que se recorta. Las absolutas se devuelven tal cual.
+// puede terminar en /api/v2, así que se recorta. Las absolutas se devuelven tal cual.
 export const resolveImageUrl = (url: string | null | undefined): string => {
     if (!url) return '';
     if (/^https?:\/\//.test(url)) return url;
-    const apiRoot = (import.meta.env.VITE_API_URL as string | undefined ?? '').replace(/\/api\/?$/, '');
+    const apiRoot = (import.meta.env.VITE_API_URL as string | undefined ?? '').replace(/\/api(?:\/v2)?\/?$/, '');
     return `${apiRoot}${url}`;
 };

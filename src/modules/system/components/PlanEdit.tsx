@@ -16,7 +16,7 @@ interface PlanEditProps {
     onClose: () => void;
     onSubmit: (e: FormEvent<HTMLFormElement>) => void;
     form: Required<UpdatePlanPayload> | null;
-    onFieldChange: (name: keyof UpdatePlanPayload) => (value: string | number | boolean) => void;
+    onFieldChange: (name: keyof UpdatePlanPayload) => (value: string | number | boolean | null) => void;
     newFeature: string;
     onNewFeatureChange: (value: string) => void;
     onAddFeature: () => void;
@@ -32,6 +32,12 @@ export const PlanEdit = ({
 }: PlanEditProps) => {
     if (!form) return null;
 
+    // Un límite vacío representa NULL: ilimitado. Cualquier número es un tope real.
+    const handleLimitChange = (name: 'max_subsidiaries' | 'max_spaces' | 'max_users' | 'max_invoices_monthly') =>
+        (e: ChangeEvent<HTMLInputElement>) => {
+            onFieldChange(name)(e.target.value.trim() === '' ? null : e.target.value);
+        };
+
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Editar plan" icon={Gift}>
             <form className="plan_edit_form" onSubmit={onSubmit}>
@@ -45,14 +51,16 @@ export const PlanEdit = ({
                     <InputField name="price_yearly" label="Precio anual" value={form.price_yearly} onChange={(e) => onFieldChange('price_yearly')(e.target.value)} required numberOnly />
                 </FormRow>
 
+                <p className="plan_limits_hint">Dejá un límite vacío para guardarlo como ilimitado (∞).</p>
+
                 <FormRow>
-                    <InputField name="max_subsidiaries" label="Máx. sucursales" value={form.max_subsidiaries} onChange={(e) => onFieldChange('max_subsidiaries')(e.target.value)} required numberOnly />
-                    <InputField name="max_spaces" label="Máx. espacios" value={form.max_spaces} onChange={(e) => onFieldChange('max_spaces')(e.target.value)} required numberOnly />
-                    <InputField name="max_users" label="Máx. usuarios" value={form.max_users} onChange={(e) => onFieldChange('max_users')(e.target.value)} required numberOnly />
+                    <InputField name="max_subsidiaries" label="Máx. sucursales" value={form.max_subsidiaries ?? ''} onChange={handleLimitChange('max_subsidiaries')} placeholder="Ilimitado" numberOnly="integer" />
+                    <InputField name="max_spaces" label="Máx. espacios" value={form.max_spaces ?? ''} onChange={handleLimitChange('max_spaces')} placeholder="Ilimitado" numberOnly="integer" />
+                    <InputField name="max_users" label="Máx. usuarios" value={form.max_users ?? ''} onChange={handleLimitChange('max_users')} placeholder="Ilimitado" numberOnly="integer" />
                 </FormRow>
 
                 <FormRow>
-                    <InputField name="max_invoices_monthly" label="Máx. facturas/mes" value={form.max_invoices_monthly} onChange={(e) => onFieldChange('max_invoices_monthly')(e.target.value)} required numberOnly />
+                    <InputField name="max_invoices_monthly" label="Máx. facturas/mes" value={form.max_invoices_monthly ?? ''} onChange={handleLimitChange('max_invoices_monthly')} placeholder="Ilimitado" numberOnly="integer" />
                     <SelectField name="notifications_tier" label="Notificaciones" value={form.notifications_tier} onChange={(e) => onFieldChange('notifications_tier')(e.target.value)} options={NOTIFICATIONS_TIER_OPTIONS} required />
                 </FormRow>
 

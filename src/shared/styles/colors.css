@@ -4,106 +4,219 @@
  * Los tokens existentes se conservan para los componentes que ya los usan.
  * `--accent` sigue siendo una superficie suave; `--accent-solid` es el sólido.
  */
-:root {
+:root,
+[data-theme="light"] {
   color-scheme: light;
+  /* =========================================
+     1. PRIMARY — Identidad de marca
+  ========================================= */
+  --primary: #24866B;
+  --primary-dark: #1e735b;
+  --primary-light: #EAF6F1;
 
-  /* Marca: acción principal, selección y foco. */
-  --primary:       #238263;
-  --primary-dark:  #1b6b51;
-  --primary-text:  #206f56;
-  --primary-light: #eaf5ef;
-  --primary-border: #c6e2d4;
-  --accent:        #f1edfb;
-  --accent-solid:  #7961bd;
-  --accent-text:   #68509f;
-  --accent-hover:  #e7dff7;
+  /* =========================================
+     2. ACCENT — Acciones complementarias
+  ========================================= */
+  --accent: #6D83E8;
+  --accent-dark: #5269c4;
+  --accent-light: #e5eaff;
 
-  /* Superficies: blanco y escala de grises puros. */
-  --color-bg:    #f7f7f7;
-  --surface:     #ffffff;
-  --input-bg:    #ffffff;
-  --gray-light:  #f7f7f7;
-  --gray-medium: #efefef;
-  --gray-dark:   #e7e7e7;
-  --border:        #edf0f3;
-  --border-strong: #d0d0d0;
+  /* =========================================
+     3. NEUTRAL — Superficies
+  ========================================= */
+  --color-bg: #f8fafd;
+  --surface: #FFFFFF;
+  --surface-muted: #F1F4F8;
+  --input-bg: #FFFFFF;
+  --gray-light: #F6F8FB;
+  --gray-medium: #eaeff5;
+  --gray-dark: #D7DEE8;
 
-  --text:       #2c2c2c;
-  --text-soft:  #555555;
-  --text-muted: #84909f;
-  --text-white: #ffffff;
+  --border: #E7ECF2;
 
-  /* Pares semánticos: texto legible sobre su correspondiente fondo suave. */
-  --success:      #267453;
-  --success-soft: #eaf5ed;
-  --danger:       #bf4d51;
-  --danger-text:  #a63e44;
-  --danger-soft:  #fbeef0;
-  --warning:      #936820;
-  --warning-text: #865e1b;
-  --warning-soft: #fbf3e3;
-  --info:         #426fba;
-  --info-text:    #3c62a1;
-  --info-soft:    #edf3fc;
+  /* =========================================
+     4. TYPOGRAPHY
+  ========================================= */
+  --text: #263241;
+  --text-soft: #526174;
+  --text-muted: #738196;
+  --text-white: #FFFFFF;
 
-  --brand-facebook:  #1877f2;
-  --brand-instagram: #e4405f;
-  --brand-tiktok:    #010101;
-  --brand-youtube:   #ff0000;
-  --brand-whatsapp:  #25d366;
+  /* =========================================
+     5. SECONDARY — Botones neutros
+  ========================================= */
+  --secondary: #F1F4F8;
+  --secondary-dark: #D7DEE8;
+  --secondary-light: #E1E7EF;
+  --secondary-text: #405065;
+
+  /* =========================================
+     6. SUCCESS
+  ========================================= */
+  --success: #278566;
+  --success-dark: #176449;
+  --success-light: #EAF7F0;
+
+  /* =========================================
+     7. DANGER
+  ========================================= */
+  --danger: #D95562;
+  --danger-dark: #B73C49;
+  --danger-light: #FFF0F1;
+
+  /* =========================================
+     8. WARNING
+  ========================================= */
+  --warning: #B77916;
+  --warning-dark: #925B0B;
+  --warning-light: #FFF6E5;
+
+  /* =========================================
+     9. INFO
+  ========================================= */
+  --info: #477CCF;
+  --info-dark: #305FAE;
+  --info-light: #EDF4FF;
+
+  /* =========================================
+     10. INTERACTION
+  ========================================= */
+  --focus-ring: #58B692;
+  --focus-border: #1D765D;
+
+  --disabled-bg: #F1F4F8;
+  --disabled-text: #A5AFBD;
+  --disabled-border: #E7ECF2;
 
   /* Elevación difusa: las cards se separan sin bordes o sombras pesados. */
-  --ring:         rgb(35 130 99 / .18);
-  --shadow:       0 1px 3px rgb(0 0 0 / .04);
-  --shadow-md:    0 3px 8px rgb(0 0 0 / .03), 0 12px 28px -12px rgb(0 0 0 / .12);
-  --shadow-lg:    0 8px 24px -12px rgb(0 0 0 / .12), 0 28px 80px -24px rgb(0 0 0 / .24);
+  --shadow-xs:       0 0 4px rgb(0 0 0 / 0.05), 0 0 2px 0 rgb(0 0 0 / 0.05);
+  --shadow:       0 0 4px 1px rgb(0 0 0 / 0.05), 0 0 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-sm:    0 1px 7px 1px rgb(0 0 0 / 0.06), 0 1px 4px 0 rgb(0 0 0 / 0.04);
+  --shadow-md:    0 2px 10px 0 rgb(0 0 0 / 0.07), 0 2px 5px 0 rgb(0 0 0 / 0.05);
   --overlay:      rgb(0 0 0 / .30);
   --radius-sm:    4px;
-  --radius-md:    8px;
-  --radius-lg:    13px;
+  --radius-md:    7px;
+  --radius-lg:    12px;
 
   --font-primary:   'Poppins', sans-serif;
   --font-secondary: 'Outfit', sans-serif;
-  --transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
+  --transition: all .3s linear;
 }
 
 [data-theme="dark"] {
+  /* =========================================
+     1. PRIMARY — Identidad de marca
+  ========================================= */
+  /* PRIMARY — Dark Mode */
+--primary: #45b491;
+--primary-dark: #3ca181;
+--primary-light: #19352B;
+
+  /* =========================================
+     2. ACCENT — Acciones complementarias
+  ========================================= */
+  --accent: #A0AEFF;
+  --accent-dark: #7C8EE8;
+  --accent-light: #292C40;
+
+  /* =========================================
+     3. NEUTRAL — Superficies negras
+  ========================================= */
+  --color-bg: #0F0F0F;
+  --surface: #181818;
+  --surface-muted: #222222;
+  --input-bg: #202020;
+
+  --gray-light: #242424;
+  --gray-medium: #303030;
+  --gray-dark: #404040;
+
+  --border: #303030;
+
+  /* =========================================
+     4. TYPOGRAPHY
+  ========================================= */
+  --text: #F5F5F5;
+  --text-soft: #C4C4C4;
+  --text-muted: #A3A3A3;
+  --text-white: #FFFFFF;
+
+  /* =========================================
+     5. SECONDARY — Botones neutros
+  ========================================= */
+  --secondary: #292929;
+  --secondary-dark: #383838;
+  --secondary-light: #222222;
+  --secondary-text: #E5E5E5;
+
+  /* =========================================
+     6. SUCCESS
+  ========================================= */
+  --success: #4ECBA1;
+  --success-dark: #35A983;
+  --success-light: #17352B;
+
+  /* =========================================
+     7. DANGER
+  ========================================= */
+  --danger: #F08087;
+  --danger-dark: #D95E68;
+  --danger-light: #3D2225;
+
+  /* =========================================
+     8. WARNING
+  ========================================= */
+  --warning: #E7B45D;
+  --warning-dark: #C99642;
+  --warning-light: #3D301C;
+
+  /* =========================================
+     9. INFO
+  ========================================= */
+  --info: #80ACF5;
+  --info-dark: #5B8CD9;
+  --info-light: #202D42;
+
+  /* =========================================
+     10. INTERACTION
+  ========================================= */
+  --focus-ring: #59C69F;
+  --focus-border: #70DDB7;
+
+  --disabled-bg: #242424;
+  --disabled-text: #777777;
+  --disabled-border: #333333;
+
+  /* =========================================
+     11. SHADOWS & OVERLAY
+  ========================================= */
+  --shadow:
+    0 0 4px 1px rgb(0 0 0 / 0.25),
+    0 0 2px 0 rgb(0 0 0 / 0.18);
+
+  --shadow-sm:
+    0 1px 7px 1px rgb(0 0 0 / 0.30),
+    0 1px 4px 0 rgb(0 0 0 / 0.20);
+
+  --shadow-md:
+    0 2px 10px 0 rgb(0 0 0 / 0.40),
+    0 2px 5px 0 rgb(0 0 0 / 0.30);
+
+  --overlay: rgb(0 0 0 / 0.70);
+
+  /* =========================================
+     12. RADIUS
+  ========================================= */
+  --radius-sm: 4px;
+  --radius-md: 7px;
+  --radius-lg: 12px;
+
+  /* =========================================
+     13. TYPOGRAPHY & TRANSITION
+  ========================================= */
+  --font-primary: 'Poppins', sans-serif;
+  --font-secondary: 'Outfit', sans-serif;
+  --transition: all .3s linear;
+
   color-scheme: dark;
-  /* El sólido conserva contraste con texto blanco; el texto de marca se aclara. */
-  --primary-text:   #8bd5b5;
-  --primary-light:  #223b30;
-  --primary-border: #365b49;
-  --accent:         #332c45;
-  --accent-solid:   #a18ad9;
-  --accent-text:    #cfbdf4;
-  --accent-hover:   #403655;
-
-  --color-bg:    #1b1b1b;
-  --surface:     #232323;
-  --input-bg:    #202020;
-  /* Escala cercana a --surface (#232323), con incrementos suaves de brillo. */
-  --gray-light:  #262626;
-  --gray-medium: #2a2a2a;
-  --gray-dark:   #2e2e2e;
-  --border:        #383838;
-  --border-strong: #555555;
-
-  --text:       #e9e9e9;
-  --text-soft:  #c7c7c7;
-  --text-muted: #84909f;
-
-  --success:      #94d3ac;
-  --success-soft: #253c2e;
-  --danger-text:  #f1a4ac;
-  --danger-soft:  #43292e;
-  --warning-text: #e7c181;
-  --warning-soft: #3b3223;
-  --info-text:    #a6c4f2;
-  --info-soft:    #293548;
-
-  --ring:      rgb(139 213 181 / .24);
-  --shadow:    0 1px 3px rgb(0 0 0 / .14);
-  --shadow-md: 0 4px 12px rgb(0 0 0 / .12), 0 12px 28px -12px rgb(0 0 0 / .28);
-  --shadow-lg: 0 8px 24px -12px rgb(0 0 0 / .30), 0 28px 80px -24px rgb(0 0 0 / .60);
-  --overlay:   rgb(0 0 0 / .60);
 }

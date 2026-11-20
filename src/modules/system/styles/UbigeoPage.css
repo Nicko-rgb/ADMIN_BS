@@ -64,18 +64,18 @@
             }
 
             &.accent_level1 {
-                --tree-accent: var(--info-text);
-                --tree-accent-tint: var(--info-soft);
+                --tree-accent: var(--info);
+                --tree-accent-tint: var(--info-light);
             }
 
             &.accent_level2 {
-                --tree-accent: var(--warning-text);
-                --tree-accent-tint: var(--warning-soft);
+                --tree-accent: var(--warning);
+                --tree-accent-tint: var(--warning-light);
             }
 
             &.accent_level3 {
-                --tree-accent: var(--purple-text);
-                --tree-accent-tint: var(--purple-soft);
+                --tree-accent: var(--accent);
+                --tree-accent-tint: var(--accent-light);
             }
         }
 
@@ -179,7 +179,7 @@
                     }
 
                     &.edit {
-                        background-color: var(--info-text);
+                        background-color: var(--info);
                         color: var(--text-white);
                     }
 

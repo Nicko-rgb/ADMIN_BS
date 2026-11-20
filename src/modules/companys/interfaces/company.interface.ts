@@ -63,6 +63,8 @@ export interface CompanySubsidiary {
     publicId: string;
     name: string;
     address: string;
+    // País de la sucursal — lo usa Configuración de pagos para pedir el catálogo de ese país.
+    countryId: number | null;
     ubigeo: string | null;
     status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE' | null;
 }

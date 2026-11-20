@@ -20,7 +20,7 @@ export const UserAsingSucursal = ({ onClose, subsidiaries, onSaved }: UserAsingS
     const { values, setField, errors, isSubmitting, handleSubmit } = useUserAsingSucursal({ onClose, onSaved });
 
     return (
-        <Modal isOpen onClose={onClose} title="Nuevo usuario" icon={UserPlus} size="lg">
+        <Modal isOpen onClose={onClose} title="Nuevo usuario" icon={UserPlus}>
             <form onSubmit={handleSubmit} noValidate>
                 <FormUserManage
                     role={values.role}

@@ -7,13 +7,14 @@ import { useState } from 'react';
 import { usePageHeader } from '../../../shared/store/headerStore';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import toast from '../../../shared/utils/toast';
+import { BookingDetail } from '../components/BookingDetail';
 import { CreateBooking } from '../components/CreateBooking';
 import { MonthView } from '../components/MonthView';
 import { Sidebar } from '../components/Sidebar';
 import { WeekView } from '../components/WeekView';
 import useCalendar from '../hooks/useCalendar';
 import type { BookingCalendarViewOption } from '../interfaces/booking.interface';
-import type { CreateBookingContext } from '../interfaces/createBooking.interface';
+import type { BookingData, CreateBookingContext } from '../interfaces/createBooking.interface';
 import '../styles/bookingColors.css';
 import '../styles/Bookings.css';
 
@@ -30,6 +31,8 @@ const VIEW_OPTIONS: BookingCalendarViewOption[] = [
  */
 const Bookings = () => {
     const [createBookingContext, setCreateBookingContext] = useState<CreateBookingContext | null>(null);
+    // Reserva abierta en el detalle (estado de cobro + registrar el saldo).
+    const [selectedBooking, setSelectedBooking] = useState<BookingData | null>(null);
     const can = usePermission();
     const hasBookingPermissions = ['booking.create', 'booking.view', 'booking.confirm', 'payment.create', 'user.client_manage']
         .every((permission) => can(permission));
@@ -53,7 +56,7 @@ const Bookings = () => {
         if (errorMessage) return { message: errorMessage, kind: 'error' };
         if (!selectedBranch) return { message: 'No hay una sucursal seleccionada.', kind: 'warning' };
         if (!hasSpaces) return { message: 'La sucursal no tiene espacios disponibles.', kind: 'warning' };
-        if (!hasBranchWindow) return { message: 'La sucursal no tiene horario de apertura y cierre configurado.', kind: 'warning' };
+        if (!hasBranchWindow) return { message: 'La sucursal no tiene horario configurado', kind: 'warning' };
         if (!hasSpaceHours) return { message: 'Sin bloques de horarios configurados.', kind: 'warning' };
         return null;
     };
@@ -82,6 +85,7 @@ const Bookings = () => {
         visible: true,
         title: 'Hola',
         showCard: false,
+        documentTitle: 'Calendario de Reservas',
         breadcrumbs: [
             { label: 'Reservas', path: '/bookings' },
             { label: isTreeLoading ? 'Cargando...' : company?.name || '-' },
@@ -200,6 +204,7 @@ const Bookings = () => {
                             monthCells={monthCells}
                             bookingsByDate={bookingsByDate}
                             onSelectDay={selectDay}
+                            onSelectBooking={setSelectedBooking}
                         />
                     ) : (
                         <WeekView
@@ -210,6 +215,7 @@ const Bookings = () => {
                             scheduleEnd={scheduleEnd}
                             scheduleDurationHours={scheduleDurationHours}
                             onSelectSlot={openCreateBooking}
+                            onSelectBooking={setSelectedBooking}
                         />
                     )}
                 </main>
@@ -220,6 +226,15 @@ const Bookings = () => {
                     {...createBookingContext}
                     onClose={() => setCreateBookingContext(null)}
                     onCreated={reloadBookings}
+                />
+            )}
+
+            {selectedBooking && (
+                <BookingDetail
+                    booking={selectedBooking}
+                    spaceName={selectedSpace?.name ?? ''}
+                    branchName={selectedBranch?.name ?? ''}
+                    onClose={() => setSelectedBooking(null)}
                 />
             )}
         </div>

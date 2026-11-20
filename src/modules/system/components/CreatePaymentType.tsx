@@ -19,13 +19,13 @@ interface CreatePaymentTypeProps {
 
 /** Modal de registro de tipo de pago — campos agrupados por FormSection/FormRow; el hook maneja estado y submit. */
 export const CreatePaymentType = ({ isOpen, onClose, onSubmit, form, setField, countryOptions, isSaving = false }: CreatePaymentTypeProps) => (
-    <Modal isOpen={isOpen} onClose={onClose} title="Registrar nuevo tipo de pago" icon={CreditCard} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Registrar nuevo tipo de pago" icon={CreditCard}>
         <form onSubmit={onSubmit}>
             <FormSection title="Datos generales" icon={CreditCard}>
                 <FormRow>
                     <InputField name="name" label="Nombre" value={form.name} onChange={(e) => setField('name')(e.target.value)} required />
                     <InputField name="code" label="Código" placeholder='CARD, YAPE' value={form.code} onChange={(e) => setField('code')(e.target.value)} required mayus />
-                    <SelectField name="country_id" label="País" value={form.country_id || ''} onChange={(e) => setField('country_id')(Number(e.target.value))} options={countryOptions} required />
+                    <SelectField name="country_id" label="País" value={form.country_id === null ? 'GLOBAL' : form.country_id || ''} onChange={(e) => setField('country_id')(e.target.value === 'GLOBAL' ? null : Number(e.target.value))} options={countryOptions} required />
                 </FormRow>
             </FormSection>
 

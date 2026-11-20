@@ -26,7 +26,7 @@
 
     .booking_form_error {
         margin-top: 1.5rem;
-        color: var(--danger-text);
+        color: var(--danger-dark);
         font-size: 1.3rem;
         line-height: 1.5;
     }

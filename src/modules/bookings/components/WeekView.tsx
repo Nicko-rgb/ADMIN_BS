@@ -5,6 +5,7 @@ import { resolveScheduleTime } from '../utils/businessHours';
 import { dateKey, formatMinutes } from '../../../shared/utils/formatDate';
 import type { CalendarSchedule } from '../interfaces/booking.interface';
 import type { PositionedBookingDay } from '../interfaces/calendarBookings.interface';
+import type { BookingData } from '../interfaces/createBooking.interface';
 
 interface WeekViewProps {
     view: 'day' | 'week';
@@ -13,6 +14,8 @@ interface WeekViewProps {
     scheduleStart: number;
     scheduleEnd: number;
     scheduleDurationHours: number;
+    /** Abre el detalle (y los cobros) de una reserva existente. */
+    onSelectBooking: (booking: BookingData) => void;
     /** Abre el formulario con la fecha y el rango horario del clic. */
     onSelectSlot: (date: string, startTime: string, endTime: string) => void;
 }
@@ -40,12 +43,14 @@ const WeekDayColumn = ({
     scheduleStart,
     scheduleEnd,
     onSelectSlot,
+    onSelectBooking,
 }: {
     day: PositionedBookingDay;
     timeSlots: CalendarSchedule['slots'];
     scheduleStart: number;
     scheduleEnd: number;
     onSelectSlot: WeekViewProps['onSelectSlot'];
+    onSelectBooking: WeekViewProps['onSelectBooking'];
 }) => {
     const [cursor, setCursor] = useState<CursorState | null>(null);
 
@@ -108,6 +113,7 @@ const WeekDayColumn = ({
                 <BookingEvent
                     key={item.booking.bookingId}
                     booking={item.booking}
+                    onSelect={onSelectBooking}
                     style={{
                         top: `${item.top}%`,
                         height: `calc(${item.height}% - 2px)`,
@@ -156,6 +162,7 @@ export const WeekView = ({
     scheduleEnd,
     scheduleDurationHours,
     onSelectSlot,
+    onSelectBooking,
 }: WeekViewProps) => (
     <div className="calendar_timegrid" style={{
         '--booking-hour-count': scheduleDurationHours,
@@ -187,6 +194,7 @@ export const WeekView = ({
                         scheduleStart={scheduleStart}
                         scheduleEnd={scheduleEnd}
                         onSelectSlot={onSelectSlot}
+                        onSelectBooking={onSelectBooking}
                     />
                 ))}
             </div>

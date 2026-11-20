@@ -16,13 +16,13 @@ interface CompanyEditProps {
 
 /** Modal de edición de la propia empresa — reusa CompanyStepForm, incluido el documento (RUC), por si se cargó mal al registrar. */
 export const CompanyEdit = ({ isOpen, onClose, onSubmit, isSaving = false, fields }: CompanyEditProps) => (
-    <Modal isOpen={isOpen} onClose={onClose} title="Editar empresa" icon={Building2} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Editar empresa" icon={Building2}>
         <form onSubmit={onSubmit} noValidate>
             <CompanyStepForm {...fields} />
 
             <FormActions>
-                <Button text="Cancelar" icon={X} size="lg" color="secondary" type="button" onClick={onClose} />
-                <Button text="Guardar" icon={UploadCloud} size="lg" type="submit" loading={isSaving} />
+                <Button text="Cancelar" icon={X} size='lg' color="secondary" type="button" onClick={onClose} />
+                <Button text="Guardar" icon={UploadCloud} size='lg' type="submit" loading={isSaving} />
             </FormActions>
         </form>
     </Modal>

@@ -1,6 +1,6 @@
 import type { ChangeEvent, FocusEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { LuChevronDown } from 'react-icons/lu';
+import { ChevronDown } from 'lucide-react';
 import { useSelectField } from '../hooks/useSelectField';
 import type {
     InputFieldProps,
@@ -180,7 +180,7 @@ export const SelectField = ({
                     className={`form_input custom_select_trigger ${error ? 'error' : ''} ${disabled ? 'disabled' : ''}`}
                 />
 
-                <LuChevronDown
+                <ChevronDown
                     className={`dropdown_arrow ${isOpen ? 'rotate' : ''}`}
                     onClick={() => toggle(disabled)}
                 />

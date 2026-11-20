@@ -19,7 +19,7 @@
         color: var(--text-muted);
 
         &.danger {
-            color: var(--danger-text);
+            color: var(--danger-dark);
         }
     }
 

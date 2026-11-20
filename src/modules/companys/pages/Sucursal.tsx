@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaFacebook, FaInstagram, FaTiktok, FaWhatsapp, FaYoutube } from 'react-icons/fa';
-import type { IconType } from 'react-icons';
+import type { LucideIcon } from 'lucide-react';
 import {
     Store, Pencil, Settings, Phone, MapPin, FileText,
     CalendarDays, BriefcaseBusiness, Clock, Dumbbell, Plus,
     Image, ArrowLeft, Globe, Sparkles, ExternalLink, Share2,
+    Users, Camera, Music2, CirclePlay, MessageCircle,
 } from 'lucide-react';
 import { MedibleImage } from '../../../shared/components/MedibleImage';
 import SucursalService from '../service/sucursalService';
@@ -85,7 +85,7 @@ const Sucursal = () => {
         showCard: false,
         breadcrumbs: [
             { label: 'Empresas', path: '/companys' },
-            ...(sucursal?.companyName ? [{ label: sucursal.companyName, path: `/companys/company/${sucursal.companyPublicId}` }] : []),
+            ...(sucursal?.companyName ? [{ label: sucursal.companyName, path: `/company/${sucursal.companyPublicId}` }] : []),
             { label: sucursal?.name || 'Cargando...' },
         ],
     });
@@ -110,21 +110,21 @@ const Sucursal = () => {
         return <NotFoundScreen onRetry={retry} message="No se pudo encontrar información de esta sucursal" />;
     }
 
-    const goBack = () => navigate(`/companys/company/${sucursal.companyPublicId}`);
+    const goBack = () => navigate(`/company/${sucursal.companyPublicId}`);
 
-    // Redes con valor para el cover — brand icons vía react-icons.
+    // Redes configuradas para la portada.
     const socials = [
-        config?.socialFacebook ? { href: config.socialFacebook, label: 'Facebook', key: 'facebook', Icon: FaFacebook } : null,
-        config?.socialInstagram ? { href: config.socialInstagram, label: 'Instagram', key: 'instagram', Icon: FaInstagram } : null,
-        config?.socialTiktok ? { href: config.socialTiktok, label: 'TikTok', key: 'tiktok', Icon: FaTiktok } : null,
-        config?.socialYoutube ? { href: config.socialYoutube, label: 'YouTube', key: 'youtube', Icon: FaYoutube } : null,
+        config?.socialFacebook ? { href: config.socialFacebook, label: 'Facebook', key: 'facebook', Icon: Users } : null,
+        config?.socialInstagram ? { href: config.socialInstagram, label: 'Instagram', key: 'instagram', Icon: Camera } : null,
+        config?.socialTiktok ? { href: config.socialTiktok, label: 'TikTok', key: 'tiktok', Icon: Music2 } : null,
+        config?.socialYoutube ? { href: config.socialYoutube, label: 'YouTube', key: 'youtube', Icon: CirclePlay } : null,
         config?.socialWhatsapp ? {
             href: `https://wa.me/${config.socialWhatsapp}${config.whatsappMessage ? `?text=${encodeURIComponent(config.whatsappMessage)}` : ''}`,
             label: 'WhatsApp',
             key: 'whatsapp',
-            Icon: FaWhatsapp,
+            Icon: MessageCircle,
         } : null,
-    ].filter((s): s is { href: string; label: string; key: string; Icon: IconType } => s !== null);
+    ].filter((s): s is { href: string; label: string; key: string; Icon: LucideIcon } => s !== null);
 
     const featuresList = config?.features
         ? config.features.split(',').map((f) => f.trim()).filter(Boolean)
@@ -203,11 +203,14 @@ const Sucursal = () => {
                                 </div>
                             )}
                             {can('company.view') && (
-                                <Button text="Mi Empresa" size="sm" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
+                                <Button text="Mi Empresa" icon={BriefcaseBusiness} iconPosition="left" onClick={goBack} />
                             )}
                             {can('sucursal.edit') && (
-                                <Button text="Editar" size="sm" icon={Pencil} onClick={() => setIsEditOpen(true)} />
+                                <Button text="Editar" icon={Pencil} onClick={() => setIsEditOpen(true)} />
                             )}
+                            {can('payment.account_manage') &&
+                                <Button text='Cuentas de Pago' />
+                            }
                         </div>
                     </div>
                 </div>
@@ -299,7 +302,7 @@ const Sucursal = () => {
                                 <div className="info">
                                     <p><Dumbbell size={20} /><span>{space.sport}</span></p>
                                 </div>
-                                <Button text='Administrar' color='secondary' icon={Settings} onClick={() => navigate(`/companys/company/space/${space.publicId}`)} />
+                                <Button text='Administrar' color='secondary' icon={Settings} onClick={() => navigate(`/company/space/${space.publicId}`)} />
                             </article>
                         ))}
                     </div>
