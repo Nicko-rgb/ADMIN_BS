@@ -135,10 +135,10 @@
             /* background: var(--color-bg); */
 
             .form_section {
-                border: none;
 
                 [data-theme="dark"] & {
                     box-shadow: none;
+                    border-color: var(--gray-light);
                 }
             }
         }

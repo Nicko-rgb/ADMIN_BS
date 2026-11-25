@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import {
-    Settings, Pencil, Store, Plus, Users, MapPin, Globe, Gift,
-    ShieldCheck, UserCog, Phone, FileText, Mail, Calendar, Building2, UserCircle,
-    CardSim,
+    Settings, Pencil, Store, Plus, Users, MapPin, Globe, Gift, ShieldCheck,
+    UserCog, Phone, FileText, Mail, Calendar, Building2, UserCircle, CardSim,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button, LoadingScreen, NotFoundScreen, ForbiddenScreen, EmptyScreen } from '../../../shared/components';
@@ -38,7 +37,7 @@ const Company = () => {
 
     const can = usePermission();
     const canEditCompany = can('company.edit');
-    const canManageSucursales = can('sucursal.create');
+    const canCreateSucursal = can('sucursal.create');
     const canManagePayments = can('payment.account_manage');
     const canManageCompanyUsers = can(ROLE_MANAGE_PERMISSIONS.administrador, ROLE_MANAGE_PERMISSIONS.empleado);
     const canManagePermissions = can('user.permission_manage');
@@ -184,8 +183,8 @@ const Company = () => {
                     <div className="heading"><h2>Sucursales</h2><p>Gestiona las sedes y sus ubicaciones.</p></div>
                     <div className="controls">
                         <PlanUsageBar value={planUsage?.subsidiaries} label="Sucursales" />
-                        {canManageSucursales && (
-                            <Button text="Nueva Sucursal" size="sm" icon={Plus} onClick={openRegisterSucursal} />
+                        {canCreateSucursal && (
+                            <Button text="Sucursal" icon={Plus} onClick={openRegisterSucursal} />
                         )}
                     </div>
                 </header>
@@ -205,14 +204,12 @@ const Company = () => {
                                         <p><Globe size={18} /><span>{subsidiary.ubigeo}</span></p>
                                     </div>
                                     <div className="card_actions">
-                                        {canManageSucursales && (
-                                            <Button
-                                                text="Administrar"
-                                                icon={Settings}
-                                                color="secondary"
-                                                onClick={() => navigate(`/company/sucursal/${subsidiary.publicId}`)}
-                                            />
-                                        )}
+                                        <Button
+                                            text="Administrar"
+                                            icon={Settings}
+                                            color="secondary"
+                                            onClick={() => navigate(`/company/sucursal/${subsidiary.publicId}`)}
+                                        />
                                     </div>
                                 </article>
                             ))}
@@ -230,7 +227,7 @@ const Company = () => {
                     <div className="controls">
                         <PlanUsageBar value={planUsage?.users} label="Usuarios" />
                         {canManageCompanyUsers && (
-                            <Button text="Nuevo Usuario" size="sm" icon={Plus} onClick={openUserModal} disabled={branchesStatus !== 'ready'} />
+                            <Button text="Nuevo Usuario" icon={Plus} onClick={openUserModal} disabled={branchesStatus !== 'ready'} />
                         )}
                     </div>
                 </header>
@@ -313,7 +310,7 @@ const Company = () => {
                 />
             )}
 
-            {canManageSucursales && isRegisterSucursalOpen && (
+            {canCreateSucursal && isRegisterSucursalOpen && (
                 <SucursalForm
                     companyPublicId={company.publicId}
                     sucursalPublicId={null}

@@ -1,5 +1,4 @@
-import { IoArrowForwardOutline, IoLockClosedOutline, IoMailOutline } from 'react-icons/io5';
-import { MdAdminPanelSettings } from 'react-icons/md';
+import { ArrowRight, Lock, Mail, ShieldUser } from 'lucide-react';
 import { Button, InputField } from '../../../shared/components';
 import { useDocumentTitle } from '../../../shared/store/headerStore';
 import { GradientWaves } from '../components/GradientWaves';
@@ -29,7 +28,7 @@ const LoginPage = () => {
                 <section className="login_card">
                     <header className="login_brand">
                         <span className="brand_icon">
-                            <MdAdminPanelSettings />
+                            <ShieldUser />
                         </span>
                         <span className="brand_name">Admin BS</span>
                     </header>
@@ -48,7 +47,7 @@ const LoginPage = () => {
                             autoComplete="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            icon={IoMailOutline}
+                            icon={Mail}
                         />
                         <InputField
                             type="password"
@@ -58,7 +57,7 @@ const LoginPage = () => {
                             autoComplete="current-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            icon={IoLockClosedOutline}
+                            icon={Lock}
                         />
 
                         <button type="button" className="forgot_password" onClick={handlePasswordFoget}>
@@ -72,7 +71,7 @@ const LoginPage = () => {
                             className="login_submit"
                             disabled={isSubmitting}
                             loading={isSubmitting}
-                            icon={IoArrowForwardOutline}
+                            icon={ArrowRight}
                             iconPosition="left"
                         />
                     </form>
