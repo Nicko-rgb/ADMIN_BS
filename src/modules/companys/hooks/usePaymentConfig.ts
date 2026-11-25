@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PaymentConfigService from '../service/paymentConfigService';
+import ContextService from '../../../shared/service/contextService';
 import { getApiErrorStatus, handleApiError } from '../../../shared/utils/errorHandler';
 import { useCatalogActive } from '../../../shared/hooks/useCatalogActive';
 import type { PaymentType } from '../../../shared/interfaces/catalog.interface';
-import type { CompanyDetail, CompanySubsidiary } from '../interfaces/company.interface';
+import type { ContextCompany, ContextSucursal } from '../../../shared/interfaces/session.interface';
 import type {
+    ManualPaymentAccount,
     PaymentConfigBranch,
+    PaymentConfigCompany,
     PaymentConfigErrorStatus,
     PaymentConfigStatus,
     PaymentTypesStatus,
@@ -32,8 +35,8 @@ const usePaymentConfig = (enabled = true) => {
 
     const { countries, loadCountries } = useCatalogActive();
 
-    const [company, setCompany] = useState<CompanyDetail | null>(null);
-    const [branches, setBranches] = useState<CompanySubsidiary[]>([]);
+    const [companyNode, setCompanyNode] = useState<ContextCompany | null>(null);
+    const [branches, setBranches] = useState<ContextSucursal[]>([]);
     const [isCompanyLoading, setIsCompanyLoading] = useState(enabled);
     const [errorStatus, setErrorStatus] = useState<PaymentConfigErrorStatus | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
@@ -50,6 +53,34 @@ const usePaymentConfig = (enabled = true) => {
     const [mpConnected, setMpConnected] = useState(false);
     const [mpStatus, setMpStatus] = useState<PaymentConfigStatus>('idle');
     const [mpError, setMpError] = useState('');
+
+    const [manualAccounts, setManualAccounts] = useState<ManualPaymentAccount[]>([]);
+    const [accountsStatus, setAccountsStatus] = useState<PaymentConfigStatus>('idle');
+    const [accountsError, setAccountsError] = useState('');
+    const [accountsReload, setAccountsReload] = useState(0);
+
+    useEffect(() => {
+        if (!enabled || !selectedBranchPublicId) return;
+        let active = true;
+        const load = async () => {
+            setAccountsStatus('loading');
+            setAccountsError('');
+            setManualAccounts([]);
+            try {
+                const accounts = await PaymentConfigService.listManualAccounts(selectedBranchPublicId);
+                if (!active) return;
+                setManualAccounts(accounts);
+                setAccountsStatus('ready');
+            } catch (err) {
+                if (!active) return;
+                setAccountsStatus('error');
+                setAccountsError(handleApiError(err));
+            }
+        };
+        void load();
+        return () => { active = false; };
+    }, [enabled, selectedBranchPublicId, accountsReload]);
+    const reloadManualAccounts = useCallback(() => setAccountsReload((value) => value + 1), []);
 
     const typesCache = useRef(new Map<number, PaymentType[]>());
     const typesRequestId = useRef(0);
@@ -70,6 +101,7 @@ const usePaymentConfig = (enabled = true) => {
             setIsCompanyLoading(true);
             setErrorStatus(null);
             setErrorMessage('');
+            setCompanyNode(null);
             setBranches([]);
             setBranchesStatus('loading');
             setBranchesError('');
@@ -84,30 +116,40 @@ const usePaymentConfig = (enabled = true) => {
             typesRequestId.current += 1;
             mpRequestId.current += 1;
 
-            // Empresa y sucursales cargan en paralelo y fallan por separado: si
-            // las sucursales fallan, la empresa igual se muestra y el árbol
-            // ofrece reintentar.
-            const [companyResult, branchesResult] = await Promise.allSettled([
-                PaymentConfigService.getCompany(companyPublicId),
-                PaymentConfigService.listBranches(companyPublicId),
-            ]);
-            if (!active) return;
+            // El árbol es la única fuente: empresa + sucursales en un solo request.
+            // `access` lo calcula el backend; acá se descarta lo que no está en
+            // alcance (empresa sin acceso → forbidden, sucursales sin acceso → no se listan).
+            try {
+                const tree = await ContextService.getContext(companyPublicId);
+                if (!active) return;
 
-            if (companyResult.status === 'fulfilled') {
-                setCompany(companyResult.value);
-            } else {
-                const status = getApiErrorStatus(companyResult.reason);
-                setErrorStatus(status === 404 ? 'not_found' : status === 403 ? 'forbidden' : 'unknown');
-                setErrorMessage(handleApiError(companyResult.reason));
-            }
-            setIsCompanyLoading(false);
+                const node = tree.companies.find((company) => company.publicId === companyPublicId);
+                if (!node) {
+                    setErrorStatus('not_found');
+                    setErrorMessage('La empresa que buscás no existe.');
+                    setBranchesStatus('idle');
+                    return;
+                }
+                if (!node.access) {
+                    setErrorStatus('forbidden');
+                    setErrorMessage('No tenés acceso a esta empresa.');
+                    setBranchesStatus('idle');
+                    return;
+                }
 
-            if (branchesResult.status === 'fulfilled') {
-                setBranches(branchesResult.value);
+                setCompanyNode(node);
+                setBranches(node.sucursales);
                 setBranchesStatus('ready');
-            } else {
+            } catch (err) {
+                if (!active) return;
+                const message = handleApiError(err);
+                const status = getApiErrorStatus(err);
+                setErrorStatus(status === 404 ? 'not_found' : status === 403 ? 'forbidden' : 'unknown');
+                setErrorMessage(message);
                 setBranchesStatus('error');
-                setBranchesError(handleApiError(branchesResult.reason));
+                setBranchesError(message);
+            } finally {
+                if (active) setIsCompanyLoading(false);
             }
         };
 
@@ -163,23 +205,17 @@ const usePaymentConfig = (enabled = true) => {
         }
     }, []);
 
-    // El estado se consulta al seleccionar sucursal, no al abrir el modal.
-    useEffect(() => {
-        if (!enabled || !selectedBranchPublicId) return;
-
-        const load = async () => {
-            await loadMercadoPagoStatus(selectedBranchPublicId);
-        };
-
-        void load();
-    }, [enabled, selectedBranchPublicId, loadMercadoPagoStatus]);
-
-    const selectBranch = useCallback((branch: CompanySubsidiary) => {
+    const selectBranch = useCallback((branch: PaymentConfigBranch) => {
         setSelectedBranchPublicId(branch.publicId);
+        if (branch.publicId !== selectedBranchPublicId) {
+            setManualAccounts([]);
+            setAccountsStatus('loading');
+            setAccountsError('');
+        }
         setTypesError('');
         // El estado de la sucursal anterior no debe verse mientras carga la nueva.
         setMpConnected(false);
-        setMpStatus('loading');
+        setMpStatus(branch.supportsMercadoPago ? 'loading' : 'idle');
         setMpError('');
 
         if (branch.countryId == null) {
@@ -190,26 +226,57 @@ const usePaymentConfig = (enabled = true) => {
         }
 
         void loadTypes(branch.countryId);
-    }, [loadTypes]);
+    }, [loadTypes, selectedBranchPublicId]);
 
     const countryById = useMemo(
         () => new Map(countries.map((country) => [country.id, country])),
         [countries],
     );
 
-    const branchNodes = useMemo<PaymentConfigBranch[]>(() => branches.map((branch) => {
-        const country = branch.countryId != null ? countryById.get(branch.countryId) : undefined;
+    const company = useMemo<PaymentConfigCompany | null>(() => {
+        if (!companyNode) return null;
+        const country = companyNode.countryId != null ? countryById.get(companyNode.countryId) : undefined;
         return {
-            ...branch,
-            countryName: country?.country ?? null,
-            countryFlagUrl: country?.flagUrl ?? null,
+            publicId: companyNode.publicId,
+            name: companyNode.name,
+            country: country ? { name: country.country, flagUrl: country.flagUrl } : null,
         };
-    }), [branches, countryById]);
+    }, [companyNode, countryById]);
+
+    // Solo sucursales en alcance: las que el backend marca `access: false` no se listan.
+    const branchNodes = useMemo<PaymentConfigBranch[]>(() => branches
+        .filter((branch) => branch.access)
+        .map((branch) => {
+            const country = branch.countryId != null ? countryById.get(branch.countryId) : undefined;
+            return {
+                publicId: branch.publicId,
+                name: branch.name,
+                address: branch.address,
+                countryId: branch.countryId,
+                status: branch.status,
+                countryName: country?.country ?? null,
+                countryFlagUrl: country?.flagUrl ?? null,
+                supportsMercadoPago: country?.isoCountry === 'PE',
+            };
+        }), [branches, countryById]);
 
     const selectedBranch = useMemo(
         () => branchNodes.find((branch) => branch.publicId === selectedBranchPublicId) ?? null,
         [branchNodes, selectedBranchPublicId],
     );
+
+    const selectedSupportsMercadoPago = selectedBranch?.supportsMercadoPago ?? false;
+
+    // Mercado Pago solo existe en Perú: para el resto de sucursales no se pide estado.
+    useEffect(() => {
+        if (!enabled || !selectedBranchPublicId || !selectedSupportsMercadoPago) return;
+
+        const load = async () => {
+            await loadMercadoPagoStatus(selectedBranchPublicId);
+        };
+
+        void load();
+    }, [enabled, selectedBranchPublicId, selectedSupportsMercadoPago, loadMercadoPagoStatus]);
 
     // Sin `?company=` no hay nada que pedir: se resuelve como recurso inexistente
     // sin tocar estado desde el efecto.
@@ -223,10 +290,13 @@ const usePaymentConfig = (enabled = true) => {
     }, [selectedBranch, loadTypes]);
 
     const reloadMercadoPago = useCallback(() => {
-        if (selectedBranchPublicId) void loadMercadoPagoStatus(selectedBranchPublicId);
-    }, [selectedBranchPublicId, loadMercadoPagoStatus]);
+        if (selectedBranchPublicId && selectedSupportsMercadoPago) {
+            void loadMercadoPagoStatus(selectedBranchPublicId);
+        }
+    }, [selectedBranchPublicId, selectedSupportsMercadoPago, loadMercadoPagoStatus]);
 
     return {
+        manualAccounts, accountsStatus, accountsError, reloadManualAccounts,
         companyPublicId,
         company,
         branches: branchNodes,

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import CompanyService from '../../companys/service/companyService';
+import ContextService from '../../../shared/service/contextService';
 import { handleApiError } from '../../../shared/utils/errorHandler';
 import { addDays, addMonths } from '../../../shared/utils/formatDate';
 import type { CalendarStoreState } from '../interfaces/booking.interface';
@@ -46,7 +46,7 @@ export const useCalendarStore = create<CalendarStoreState>((set, get) => ({
         });
 
         try {
-            const tree = await CompanyService.getBranchTree(sucursalPublicId);
+            const tree = await ContextService.getContext(sucursalPublicId);
             if (get().requestedSucursal !== sucursalPublicId) return;
             set({ tree, treeStatus: 'ready', treeError: null });
         } catch (error) {

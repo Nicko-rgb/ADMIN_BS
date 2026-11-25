@@ -25,7 +25,9 @@ export interface ContextSucursal {
     publicId: string;
     name: string;
     access: boolean;
-    /** 'HH:mm' — null si la sucursal todavía no tiene horario configurado. */
+    countryId: number | null;
+    address: string | null;
+    status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE' | null;
     openTime: string | null;
     /** 'HH:mm' — '24:00' representa fin del día. */
     closeTime: string | null;
@@ -38,7 +40,7 @@ export interface ContextCompany {
     isPrimary: boolean;
     publicId: string;
     name: string;
-    /** Alcance de la empresa; las acciones también requieren sus permisos. */
+    countryId: number | null;
     access: boolean;
     sucursales: ContextSucursal[];
 }

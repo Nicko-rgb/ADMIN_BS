@@ -1,27 +1,40 @@
 import { apiService } from '../../../shared/utils/apiService';
-import type { CompanyDetail, CompanySubsidiary } from '../interfaces/company.interface';
 import type {
-    PaymentConfigPaymentType,
+    PaymentConfigPaymentType, ManualPaymentAccount, ManualPaymentAccountFormValues,
     RegisterMercadoPagoPayload,
 } from '../interfaces/paymentConfig.interface';
 
 /**
  * Datos de Configuración de pagos.
  *
- * Empresa, sucursales y catálogo de tipos de pago por país, más el registro de
- * la credencial de Mercado Pago de una sucursal. Sin try/catch: los errores los
- * maneja el hook.
+ * El árbol empresa → sucursales sale de `shared/service/contextService`
+ * (misma fuente que el login), así que la pantalla no depende de
+ * `company.view`/`sucursal.view`. Sin try/catch: los errores los maneja el hook.
  */
 class PaymentConfigService {
-    static async getCompany(publicId: string): Promise<CompanyDetail> {
-        const res = await apiService.get(`/companys/${publicId}`);
+    static async listManualAccounts(branchId: string): Promise<ManualPaymentAccount[]> {
+        const res = await apiService.get(`/payment-config/${branchId}/manual-accounts`);
         return res.data.data;
     }
 
-    static async listBranches(companyPublicId: string): Promise<CompanySubsidiary[]> {
-        const res = await apiService.get(`/sucursals/company/${companyPublicId}/branches`);
+    static async getManualAccount(branchId: string, typeId: number): Promise<ManualPaymentAccount | null> {
+        const res = await apiService.get(`/payment-config/${branchId}/manual-accounts/${typeId}`);
         return res.data.data;
     }
+
+    static async saveManualAccount(branchId: string, typeId: number, payload: ManualPaymentAccountFormValues, qrFile: File | null, removeQr: boolean): Promise<ManualPaymentAccount> {
+        const data = new FormData();
+        Object.entries(payload).forEach(([key, value]) => data.append(key, value));
+        data.append('remove_qr', String(removeQr));
+        if (qrFile) data.append('account_qr', qrFile);
+        const res = await apiService.put(`/payment-config/${branchId}/manual-accounts/${typeId}`, data);
+        return res.data.data;
+    }
+
+    static async deleteManualAccount(branchId: string, typeId: number): Promise<void> {
+        await apiService.delete(`/payment-config/${branchId}/manual-accounts/${typeId}`);
+    }
+
 
     // Tipos activos del país de la sucursal + los globales (country_id null).
     static async listPaymentTypesByCountry(countryId: number): Promise<PaymentConfigPaymentType[]> {

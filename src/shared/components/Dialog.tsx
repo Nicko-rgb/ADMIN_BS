@@ -21,6 +21,8 @@ interface DialogAction {
 
 interface DialogProps {
     isOpen: boolean;
+    /** Bloquea cierre y acciones mientras se procesa la confirmación. */
+    isLoading?: boolean;
     onClose: () => void;
     title: string;
     description?: string;
@@ -48,7 +50,7 @@ const VARIANT_BUTTON_COLOR: Record<DialogVariant, 'primary' | 'danger' | 'info'>
  * Diálogo de confirmación genérico: ícono con el color de la variante, título,
  * descripción y hasta dos acciones en el pie (la principal a la derecha).
  */
-export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary', primaryAction, secondaryAction }: DialogProps) => {
+export const Dialog = ({ isOpen, isLoading = false, onClose, title, description, variant = 'primary', primaryAction, secondaryAction }: DialogProps) => {
     // Sigue montado hasta que termina la animación de salida (ignora las de los hijos).
     const [isRendered, setIsRendered] = useState(isOpen);
 
@@ -60,17 +62,22 @@ export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary
         if (!isOpen) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
+            if (e.key === 'Escape' && !isLoading) onClose();
         };
 
         document.addEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = 'hidden';
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = '';
         };
-    }, [isOpen, onClose]);
+    }, [isOpen, isLoading, onClose]);
+
+    useEffect(() => {
+        if (!isRendered) return;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = previousOverflow; };
+    }, [isRendered]);
 
     // Desmonta al terminar la animación de salida del overlay.
     const handleAnimationEnd = (e: AnimationEvent<HTMLDivElement>) => {
@@ -83,7 +90,7 @@ export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary
 
     return (
         <div className={`dialog_overlay ${isClosing ? 'is_closing' : ''}`} onAnimationEnd={handleAnimationEnd}>
-            <div className={`dialog_container dialog_${variant}`}>
+            <div className={`dialog_container dialog_${variant}`} role="alertdialog" aria-modal="true" aria-label={title} aria-busy={isLoading}>
                 <header className="dialog_header">
                     <h2 className="dialog_title">
                         <span className="dialog_icon">
@@ -91,7 +98,7 @@ export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary
                         </span>
                         {title}
                     </h2>
-                    <button className="dialog_close_btn" onClick={onClose} aria-label="Cerrar">
+                    <button type="button" className="dialog_close_btn" disabled={isLoading} onClick={onClose} aria-label="Cerrar">
                         <X size={18} />
                     </button>
                 </header>
@@ -104,9 +111,9 @@ export const Dialog = ({ isOpen, onClose, title, description, variant = 'primary
 
                 <footer className="dialog_footer">
                     {secondaryAction && (
-                        <Button text={secondaryAction.label} size='sm' color="secondary" onClick={secondaryAction.onClick} />
+                        <Button text={secondaryAction.label} size='sm' color="secondary" disabled={isLoading} onClick={secondaryAction.onClick} />
                     )}
-                    <Button text={primaryAction.label} icon={primaryAction.icon} size='sm' color={VARIANT_BUTTON_COLOR[variant]} onClick={primaryAction.onClick} />
+                    <Button text={primaryAction.label} icon={primaryAction.icon} size='sm' color={VARIANT_BUTTON_COLOR[variant]} loading={isLoading} onClick={primaryAction.onClick} />
                 </footer>
             </div>
         </div>

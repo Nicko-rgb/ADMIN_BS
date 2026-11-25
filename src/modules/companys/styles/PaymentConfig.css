@@ -381,6 +381,24 @@
                     color: var(--accent);
                 }
             }
+
+            /* Estado de la cuenta de Mercado Pago de la sucursal seleccionada. */
+            .mp_status {
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+                padding: .25rem .7rem;
+                border-radius: 999px;
+                background: var(--danger-light);
+                color: var(--danger);
+                font-size: 1.1rem;
+                font-weight: 600;
+
+                &.connected {
+                    background: var(--accent-light);
+                    color: var(--accent);
+                }
+            }
         }
     }
 
@@ -407,4 +425,11 @@
             width: 100%;
         }
     }
+}
+
+.payment_config_page .type_account_note {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }

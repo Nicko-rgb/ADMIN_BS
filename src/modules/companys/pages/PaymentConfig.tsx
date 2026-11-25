@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Banknote, Bitcoin, Building2, ChevronDown, ChevronRight, Clock,
-    CreditCard, Globe, Landmark, Percent, ShieldCheck, Store, Wallet,
+    CreditCard, Globe, Landmark, Percent, ShieldCheck, Store, Wallet, Wifi, WifiOff,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { EmptyScreen, ForbiddenScreen, LoadingScreen, NotFoundScreen } from '../../../shared/components';
@@ -11,6 +11,7 @@ import { usePageHeader } from '../../../shared/store/headerStore';
 import { usePermission } from '../../../shared/hooks/usePermission';
 import usePaymentConfig from '../hooks/usePaymentConfig';
 import MercadoPagoForm from '../components/MercadoPagoForm';
+import PaymentAccountForm from '../components/PaymentAccountForm';
 import type { PaymentConfigBranch } from '../interfaces/paymentConfig.interface';
 import type { PaymentType } from '../../../shared/interfaces/catalog.interface';
 import { formatPaymentCommission } from '../../../shared/utils/formatPaymentCommission';
@@ -48,6 +49,11 @@ const STATUS_CLASSNAMES: Record<NonNullable<PaymentConfigBranch['status']>, stri
 
 const categoryIcon = (category: string): LucideIcon => CATEGORY_ICONS[category] ?? CreditCard;
 
+// Mercado Pago se identifica por proveedor: hoy lo usan tarjeta en línea y Yape.
+// El estado mostrado es el de la sucursal seleccionada, no el del tipo de pago.
+const isMercadoPago = (provider: string | null) =>
+    (provider ?? '').trim().toLowerCase() === 'mercado pago';
+
 const branchCountLabel = (count: number) => count === 1 ? '1 sucursal' : `${count} sucursales`;
 
 const methodCountLabel = (count: number) => count === 1 ? '1 método' : `${count} métodos`;
@@ -69,12 +75,16 @@ const PaymentConfig = () => {
         branchesStatus, branchesError, selectedBranch, selectBranch,
         paymentTypes, typesStatus, typesError, retry, retryTypes,
         mpConnected, mpStatus, mpError, reloadMercadoPago,
+        manualAccounts, accountsStatus, accountsError, reloadManualAccounts,
     } = usePaymentConfig(canManagePayments);
 
     const [isTreeOpen, setIsTreeOpen] = useState(true);
 
     // Sucursal cuyo modal de Mercado Pago está abierto.
     const [credentialBranch, setCredentialBranch] = useState<PaymentConfigBranch | null>(null);
+
+    const [accountTarget, setAccountTarget] = useState<{ branch: PaymentConfigBranch; type: PaymentType } | null>(null);
+    const accountKey = (branchId: string, typeId: number) => `${branchId}:${typeId}`;
 
     usePageHeader({
         title: 'Configuración de pagos',
@@ -219,22 +229,20 @@ const PaymentConfig = () => {
                                 {mpStatus === 'ready' && mpConnected && (
                                     <span className="mp_connected">
                                         <ShieldCheck size={13} />
-                                        Mercado Pago
+                                        Mercado Pago MP
                                     </span>
                                 )}
                                 {typesStatus === 'ready' && (
                                     <span className="count_pill">{methodCountLabel(paymentTypes.length)}</span>
                                 )}
-                                <Button
-                                    text="Conectar Mercado Pago"
-                                    icon={Wallet}
-                                    color="secondary"
-                                    onClick={() => setCredentialBranch(selectedBranch)}
-                                />
+
                             </div>
                         </header>
 
                         <div className="detail_body">
+                            {accountsStatus === 'error' && (
+                                <EmptyScreen message={accountsError} size="sm" actionText="Reintentar cuentas" onAction={reloadManualAccounts} />
+                            )}
                             {typesStatus === 'loading' && <LoadingScreen message="Tipos de pago..." size="sm" />}
 
                             {typesStatus === 'no_country' && (
@@ -283,6 +291,13 @@ const PaymentConfig = () => {
                                                             type.fixedCommission,
                                                             type.countryCurrency,
                                                         );
+                                                        const showMpStatus = selectedBranch.supportsMercadoPago
+                                                            && mpStatus === 'ready'
+                                                            && isMercadoPago(type.provider);
+
+                                                        const usesMp = isMercadoPago(type.provider);
+                                                        const isCash = type.code.trim().toUpperCase() === 'CASH';
+                                                        const account = manualAccounts.find((item) => item.paymentTypeId === type.id);
 
                                                         return (
                                                             <article key={type.id} className="payment_type_card">
@@ -303,6 +318,12 @@ const PaymentConfig = () => {
                                                                 )}
 
                                                                 <div className="type_meta">
+                                                                    {showMpStatus && (
+                                                                        <span className={`mp_status ${mpConnected ? 'connected' : 'disconnected'}`}>
+                                                                            {mpConnected ? <Wifi size={12} /> : <WifiOff size={12} />}
+                                                                            {mpConnected ? 'MP conectado' : 'MP sin conectar'}
+                                                                        </span>
+                                                                    )}
                                                                     {type.countryId == null && (
                                                                         <span className="type_chip global">
                                                                             <Globe size={12} />Global
@@ -324,6 +345,28 @@ const PaymentConfig = () => {
                                                                         </span>
                                                                     )}
                                                                 </div>
+                                                                {usesMp && !isCash && (
+                                                                    <p className="type_account_note">Cuenta de Mercado Pago compartida para Yape y tarjetas de esta sucursal.</p>
+                                                                )}
+                                                                {!usesMp && !isCash && (
+                                                                    <p className="type_account_note">
+                                                                        {accountsStatus === 'loading' ? 'Consultando cuenta…' : accountsStatus === 'error' ? 'No se pudo consultar la cuenta.' : account ? `${account.isActive ? 'Cuenta registrada' : 'Cuenta inactiva'}: ${account.account_name} · ${account.account_number}` : 'Sin cuenta registrada.'}
+                                                                    </p>
+                                                                )}
+                                                                {isCash ? (
+                                                                    <p className="type_account_note">No requiere conectar una cuenta.</p>
+                                                                ) : (
+                                                                    <Button
+                                                                        text={usesMp ? (mpConnected ? 'Ver cuenta' : 'Conectar') : (accountsStatus !== 'ready' ? 'Ver cuenta' : account ? 'Ver cuenta' : 'Conectar')}
+                                                                        icon={Wallet}
+                                                                        iconPosition="left"
+                                                                        color="accent"
+                                                                        disabled={usesMp && !selectedBranch.supportsMercadoPago}
+                                                                        onClick={() => usesMp
+                                                                            ? setCredentialBranch(selectedBranch)
+                                                                            : setAccountTarget({ branch: selectedBranch, type })}
+                                                                    />
+                                                                )}
                                                             </article>
                                                         );
                                                     })}
@@ -337,6 +380,17 @@ const PaymentConfig = () => {
                     </>
                 )}
             </section>
+
+            {accountTarget && (
+                <PaymentAccountForm
+                    key={accountKey(accountTarget.branch.publicId, accountTarget.type.id)}
+                    branchName={accountTarget.branch.name}
+                    paymentType={accountTarget.type}
+                    branchPublicId={accountTarget.branch.publicId}
+                    onClose={() => setAccountTarget(null)}
+                    onChanged={reloadManualAccounts}
+                />
+            )}
 
             {credentialBranch && (
                 <MercadoPagoForm

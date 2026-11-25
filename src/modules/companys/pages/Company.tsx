@@ -36,9 +36,6 @@ const Company = () => {
     const navigate = useNavigate();
 
     const can = usePermission();
-    const canEditCompany = can('company.edit');
-    const canCreateSucursal = can('sucursal.create');
-    const canManagePayments = can('payment.account_manage');
     const canManageCompanyUsers = can(ROLE_MANAGE_PERMISSIONS.administrador, ROLE_MANAGE_PERMISSIONS.empleado);
     const canManagePermissions = can('user.permission_manage');
 
@@ -97,21 +94,17 @@ const Company = () => {
                         </div>
                     </div>
                     <div className="actions">
-                        {canEditCompany && (
-                            <Button
-                                text="Editar"
-                                icon={Pencil}
-                                onClick={openEditCompany}
-                            />
-                        )}
-                        {canManagePayments && (
-                            <Button
-                                text="Configurar Pagos"
-                                icon={Settings}
-                                color="secondary"
-                                onClick={() => navigate(`/company/payments/config?company=${company.publicId}`)}
-                            />
-                        )}
+                        <Button
+                            text="Editar"
+                            icon={Pencil}
+                            onClick={openEditCompany}
+                        />
+                        <Button
+                            text="Configurar Pagos"
+                            icon={Settings}
+                            color="secondary"
+                            onClick={() => navigate(`/company/payments/config?company=${company.publicId}`)}
+                        />
                     </div>
                 </div>
 
@@ -183,9 +176,7 @@ const Company = () => {
                     <div className="heading"><h2>Sucursales</h2><p>Gestiona las sedes y sus ubicaciones.</p></div>
                     <div className="controls">
                         <PlanUsageBar value={planUsage?.subsidiaries} label="Sucursales" />
-                        {canCreateSucursal && (
-                            <Button text="Sucursal" icon={Plus} onClick={openRegisterSucursal} />
-                        )}
+                        <Button text="Sucursal" icon={Plus} onClick={openRegisterSucursal} />
                     </div>
                 </header>
                 {branchesStatus === 'loading' ?
@@ -310,7 +301,7 @@ const Company = () => {
                 />
             )}
 
-            {canCreateSucursal && isRegisterSucursalOpen && (
+            { isRegisterSucursalOpen && (
                 <SucursalForm
                     companyPublicId={company.publicId}
                     sucursalPublicId={null}
