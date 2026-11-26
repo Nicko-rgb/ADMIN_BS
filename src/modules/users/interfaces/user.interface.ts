@@ -41,7 +41,6 @@ export interface UserDetail {
 export interface ManagedUserAssignment {
     publicId: string;
     name: string;
-    isOwner: boolean;
 }
 
 export interface ManagedUserDetail extends UserDetail {
