@@ -8,6 +8,7 @@ type ModalIcon = ComponentType<{ size?: number; className?: string }>;
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onAfterClose?: () => void;
     title: string;
     description?: string;
     /** Bloquea los cierres del modal (X y Escape) durante una operación. */
@@ -22,7 +23,7 @@ interface ModalProps {
  * Overlay + panel modal genérico con animación de entrada/salida: sigue montado hasta
  * que termina la salida, cierra con Escape y bloquea el scroll del body mientras se ve.
  */
-export const Modal = ({ isOpen, onClose, title, description, isLoading = false, icon: Icon = PanelTop, children, size = 'md' }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, onAfterClose, title, description, isLoading = false, icon: Icon = PanelTop, children, size = 'md' }: ModalProps) => {
     const [isRendered, setIsRendered] = useState(isOpen);
     const titleId = useId();
     const descriptionId = useId();
@@ -54,7 +55,10 @@ export const Modal = ({ isOpen, onClose, title, description, isLoading = false, 
 
     // Desmonta al terminar la animación de salida del overlay (ignora las de los hijos)
     const handleAnimationEnd = (e: AnimationEvent<HTMLDivElement>) => {
-        if (isClosing && e.target === e.currentTarget) setIsRendered(false);
+        if (isClosing && e.target === e.currentTarget) {
+            setIsRendered(false);
+            onAfterClose?.();
+        }
     };
 
     if (!isRendered) return null;

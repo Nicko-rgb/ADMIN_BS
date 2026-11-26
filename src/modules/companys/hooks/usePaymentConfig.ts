@@ -86,11 +86,10 @@ const usePaymentConfig = (enabled = true) => {
     const typesRequestId = useRef(0);
     const mpRequestId = useRef(0);
 
-    // Catálogo de países para mostrar nombre + bandera de cada sucursal. El hook
-    // compartido cachea la respuesta por sesión, así que no es un request extra
-    // si otra pantalla ya lo pidió.
+    // Incluye países inactivos para resolver sucursales existentes y su soporte de
+    // Mercado Pago. El hook comparte la caché de esta modalidad entre pantallas.
     useEffect(() => {
-        if (enabled) void loadCountries();
+        if (enabled) void loadCountries(true);
     }, [enabled, loadCountries]);
 
     useEffect(() => {

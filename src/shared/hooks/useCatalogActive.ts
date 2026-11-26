@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import CatalogActiveService from '../service/catalogActiveService';
 import { useSessionStore } from '../store/sessionStore';
 import { handleApiError } from '../utils/errorHandler';
@@ -10,8 +10,9 @@ import type {
 // Cache a nivel de módulo, una por catálogo — se comparte entre todos los componentes que llaman
 // a su load*, así cada catálogo se pide una sola vez por sesión sin importar cuántas pantallas lo
 // usen (ni cuántas veces React.StrictMode monte el mismo componente en desarrollo).
-let countriesCache: Country[] | null = null;
-let countriesInFlight: Promise<Country[]> | null = null;
+// Separa los países activos del catálogo que también incluye inactivos.
+const countriesCache = new Map<boolean, Country[]>();
+const countriesInFlight = new Map<boolean, Promise<Country[]>>();
 
 let sportTypesCache: SportType[] | null = null;
 let sportTypesInFlight: Promise<SportType[]> | null = null;
@@ -49,22 +50,38 @@ useSessionStore.subscribe((state, prev) => {
  * sesión (desde cualquier pantalla), no vuelve a golpear el backend.
  */
 export const useCatalogActive = () => {
-    const [countries, setCountries] = useState<Country[]>(countriesCache ?? []);
-    const [isLoadingCountries, setIsLoadingCountries] = useState(!countriesCache);
+    const [countries, setCountries] = useState<Country[]>(countriesCache.get(false) ?? []);
+    const [isLoadingCountries, setIsLoadingCountries] = useState(!countriesCache.has(false));
+    const countriesRequestId = useRef(0);
 
-    const loadCountries = useCallback(async () => {
-        if (countriesCache) return;
-        if (!countriesInFlight) countriesInFlight = CatalogActiveService.listCountries();
+    // Sin argumento: solo activos. true: activos e inactivos, sin paginar.
+    const loadCountries = useCallback(async (includeInactive = false) => {
+        const requestId = ++countriesRequestId.current;
+        const cached = countriesCache.get(includeInactive);
+        if (cached) {
+            setCountries(cached);
+            setIsLoadingCountries(false);
+            return;
+        }
+        setIsLoadingCountries(true);
+        let pending = countriesInFlight.get(includeInactive);
+        if (!pending) {
+            pending = CatalogActiveService.listCountries(includeInactive)
+                .then((result) => {
+                    countriesCache.set(includeInactive, result);
+                    return result;
+                })
+                .finally(() => countriesInFlight.delete(includeInactive));
+            countriesInFlight.set(includeInactive, pending);
+        }
 
         try {
-            const result = await countriesInFlight;
-            countriesCache = result;
-            setCountries(result);
+            const result = await pending;
+            if (requestId === countriesRequestId.current) setCountries(result);
         } catch (err) {
-            toast.error(handleApiError(err));
+            if (requestId === countriesRequestId.current) toast.error(handleApiError(err));
         } finally {
-            setIsLoadingCountries(false);
-            countriesInFlight = null;
+            if (requestId === countriesRequestId.current) setIsLoadingCountries(false);
         }
     }, []);
 

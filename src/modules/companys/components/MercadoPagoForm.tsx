@@ -13,7 +13,9 @@ interface MercadoPagoFormProps {
     isConnected: boolean;
     status: PaymentConfigStatus;
     error: string;
+    isOpen: boolean;
     onClose: () => void;
+    onAfterClose: () => void;
     onRetry: () => void;
     onChanged: () => void;
 }
@@ -31,6 +33,8 @@ export const MercadoPagoForm = ({
     isConnected,
     status,
     error,
+    isOpen,
+    onAfterClose,
     onClose,
     onRetry,
     onChanged,
@@ -45,7 +49,8 @@ export const MercadoPagoForm = ({
 
     return (
         <Modal
-            isOpen
+            isOpen={isOpen}
+            onAfterClose={onAfterClose}
             onClose={onClose}
             isLoading={isSubmitting || isDisconnecting}
             title="Conectar Mercado Pago"
