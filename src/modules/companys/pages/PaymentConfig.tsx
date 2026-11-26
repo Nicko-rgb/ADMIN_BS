@@ -84,9 +84,13 @@ const PaymentConfig = () => {
         branch: PaymentConfigBranch;
         type: PaymentType;
         isOpen: boolean;
+        key: number;
     } | null>(null);
     const closeForm = () => setPaymentForm((form) => form && { ...form, isOpen: false });
-    const clearClosedForm = () => setPaymentForm((form) => form?.isOpen ? form : null);
+    const openForm = (branch: PaymentConfigBranch, type: PaymentType) => {
+        // Cada apertura empieza con un borrador nuevo, incluso para la misma sucursal y cuenta.
+        setPaymentForm((previous) => ({ branch, type, isOpen: true, key: (previous?.key ?? 0) + 1 }));
+    };
 
     usePageHeader({
         title: 'Configuración de pagos',
@@ -364,7 +368,7 @@ const PaymentConfig = () => {
                                                                         iconPosition="left"
                                                                         color="accent"
                                                                         disabled={usesMp && !selectedBranch.supportsMercadoPago}
-                                                                        onClick={() => setPaymentForm({ branch: selectedBranch, type, isOpen: true })}
+                                                                        onClick={() => openForm(selectedBranch, type)}
                                                                     />
                                                                 )}
                                                             </article>
@@ -383,6 +387,7 @@ const PaymentConfig = () => {
 
             {paymentForm && (isMercadoPago(paymentForm.type.provider) ? (
                 <MercadoPagoForm
+                    key={paymentForm.key}
                     sucursalPublicId={paymentForm.branch.publicId}
                     sucursalName={paymentForm.branch.name}
                     isConnected={mpConnected}
@@ -390,19 +395,17 @@ const PaymentConfig = () => {
                     error={mpError}
                     isOpen={paymentForm.isOpen}
                     onClose={closeForm}
-                    onAfterClose={clearClosedForm}
                     onRetry={reloadMercadoPago}
                     onChanged={reloadMercadoPago}
                 />
             ) : (
                 <PaymentAccountForm
-                    key={`${paymentForm.branch.publicId}:${paymentForm.type.id}`}
+                    key={paymentForm.key}
                     branchName={paymentForm.branch.name}
                     paymentType={paymentForm.type}
                     branchPublicId={paymentForm.branch.publicId}
                     isOpen={paymentForm.isOpen}
                     onClose={closeForm}
-                    onAfterClose={clearClosedForm}
                     onChanged={reloadManualAccounts}
                 />
             ))}

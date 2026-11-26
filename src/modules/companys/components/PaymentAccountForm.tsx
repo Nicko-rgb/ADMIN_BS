@@ -16,11 +16,10 @@ interface Props {
     paymentType: PaymentType;
     isOpen: boolean;
     onClose: () => void;
-    onAfterClose: () => void;
     onChanged: () => void;
 }
 
-export default function PaymentAccountForm({ branchName, branchPublicId, paymentType, isOpen, onClose, onAfterClose, onChanged }: Props) {
+export default function PaymentAccountForm({ branchName, branchPublicId, paymentType, isOpen, onClose, onChanged }: Props) {
     const { form, exists, loading, error, busy, errors, setField, submit, remove, retry,
         savedAccount, isEditing, startEditing, cancelEditing, confirmDelete, setConfirmDelete, previewUrl, qrFile, qrError, removeQr, pickQr, discardQr, clearQrSelection } = usePaymentAccountForm(branchPublicId, paymentType, onChanged);
     const isWallet = paymentType.category === 'billetera_digital';
@@ -32,7 +31,7 @@ export default function PaymentAccountForm({ branchName, branchPublicId, payment
 
     return (
         <>
-        <Modal isOpen={isOpen} onClose={onClose} onAfterClose={onAfterClose} isLoading={busy !== null || confirmDelete} title={`${loading || error ? 'Cuenta de pago' : exists ? (isEditing ? 'Editar cuenta' : 'Cuenta registrada') : 'Registrar cuenta'} · ${paymentType.name}`}
+        <Modal isOpen={isOpen} onClose={onClose} isLoading={busy !== null || confirmDelete} title={`${loading || error ? 'Cuenta de pago' : exists ? (isEditing ? 'Editar cuenta' : 'Cuenta registrada') : 'Registrar cuenta'} · ${paymentType.name}`}
             description={branchName} icon={Wallet}>
             {loading && <LoadingScreen message="Cargando cuenta…" size="sm" />}
             {!loading && error && <EmptyScreen message={error} size="sm" actionText="Reintentar" onAction={retry} />}
