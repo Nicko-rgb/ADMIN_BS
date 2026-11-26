@@ -16,7 +16,7 @@ const Header = () => {
 
     return (
         <header className={`page_header ${!config.showCard ? 'no_card' : ''}`}>
-            {(config.breadcrumbs || config.showNotification) && (
+            {(config.breadcrumbs) && (
                 <div className="header_top">
                     {config.breadcrumbs && (
                         <nav className="breadcrumb" aria-label="Breadcrumb">

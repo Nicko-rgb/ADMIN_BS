@@ -44,7 +44,6 @@ const Company = () => {
     // Los hooks van SIEMPRE antes de cualquier return condicional. El header se
     // configura con datos opcionales y se actualiza solo cuando llega la empresa.
     usePageHeader({
-        visible: Boolean(company) && !errorStatus,
         showCard: false,
         breadcrumbs: [
             { label: 'Empresas', path: '/companys' },

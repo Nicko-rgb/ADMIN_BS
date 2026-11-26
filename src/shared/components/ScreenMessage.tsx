@@ -132,7 +132,7 @@ export const EmptyScreen = ({
         <p>{message}</p>
         {actionText && onAction && (
             <div className="actions">
-                <Button icon={iconBtn ?? iconBtn} text={actionText} size='sm' color="secondary" onClick={onAction} />
+                <Button icon={iconBtn ?? iconBtn} text={actionText} color="secondary" onClick={onAction} />
             </div>
         )}
     </div>

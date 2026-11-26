@@ -5,6 +5,9 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 
     &.no_card {
         padding: 5px 10px;
@@ -56,12 +59,12 @@
                 gap: .15rem;
                 min-width: 0;
 
-                > svg {
+                >svg {
                     flex: 0 0 auto;
                     color: var(--gray-dark);
                 }
 
-                > a,
+                >a,
                 .breadcrumb_current {
                     display: inline-flex;
                     align-items: center;
@@ -73,7 +76,7 @@
                     white-space: nowrap;
                 }
 
-                > a:hover {
+                >a:hover {
                     color: var(--text);
                     background: var(--gray-light);
                 }
