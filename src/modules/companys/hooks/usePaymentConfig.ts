@@ -31,7 +31,7 @@ import type {
  */
 const usePaymentConfig = (enabled = true) => {
     const [searchParams] = useSearchParams();
-    const companyPublicId = searchParams.get('company') ?? '';
+    const entityPublicId = searchParams.get('company') ?? searchParams.get('branch');
 
     const { countries, loadCountries } = useCatalogActive();
 
@@ -86,15 +86,14 @@ const usePaymentConfig = (enabled = true) => {
     const typesRequestId = useRef(0);
     const mpRequestId = useRef(0);
 
-    // Catálogo de países para mostrar nombre + bandera de cada sucursal. El hook
-    // compartido cachea la respuesta por sesión, así que no es un request extra
-    // si otra pantalla ya lo pidió.
+    // Incluye países inactivos para resolver sucursales existentes y su soporte de
+    // Mercado Pago. El hook comparte la caché de esta modalidad entre pantallas.
     useEffect(() => {
-        if (enabled) void loadCountries();
+        if (enabled) void loadCountries(true);
     }, [enabled, loadCountries]);
 
     useEffect(() => {
-        if (!enabled || !companyPublicId) return;
+        if (!enabled || !entityPublicId) return;
         let active = true;
 
         const load = async () => {
@@ -118,21 +117,31 @@ const usePaymentConfig = (enabled = true) => {
 
             // El árbol es la única fuente: empresa + sucursales en un solo request.
             // `access` lo calcula el backend; acá se descarta lo que no está en
-            // alcance (empresa sin acceso → forbidden, sucursales sin acceso → no se listan).
+            // alcance (entidad sin acceso → forbidden, sucursales sin acceso → no se listan).
             try {
-                const tree = await ContextService.getContext(companyPublicId);
+                const tree = await ContextService.getContext(entityPublicId);
                 if (!active) return;
 
-                const node = tree.companies.find((company) => company.publicId === companyPublicId);
+                // `entityPublicId` puede ser el public_id de una empresa o de una
+                // sucursal: si es sucursal, se resuelve la empresa que la contiene.
+                const node = tree.companies.find((company) => company.publicId === entityPublicId)
+                    ?? tree.companies.find((company) => company.sucursales.some((branch) => branch.publicId === entityPublicId));
+
                 if (!node) {
                     setErrorStatus('not_found');
                     setErrorMessage('La empresa que buscás no existe.');
                     setBranchesStatus('idle');
                     return;
                 }
-                if (!node.access) {
+
+                // Entrando por sucursal, el acceso que importa es el de esa sucursal:
+                // un rol puede tener la empresa fuera de alcance y la sucursal accesible.
+                const scopedBranch = node.sucursales.find((branch) => branch.publicId === entityPublicId) ?? null;
+                const hasAccess = scopedBranch ? scopedBranch.access : node.access;
+
+                if (!hasAccess) {
                     setErrorStatus('forbidden');
-                    setErrorMessage('No tenés acceso a esta empresa.');
+                    setErrorMessage(scopedBranch ? 'No tenés acceso a esta sucursal.' : 'No tenés acceso a esta empresa.');
                     setBranchesStatus('idle');
                     return;
                 }
@@ -156,7 +165,7 @@ const usePaymentConfig = (enabled = true) => {
         void load();
 
         return () => { active = false; };
-    }, [enabled, companyPublicId, reloadToken]);
+    }, [enabled, entityPublicId, reloadToken]);
 
     const loadTypes = useCallback(async (countryId: number, force = false) => {
         const cached = typesCache.current.get(countryId);
@@ -280,7 +289,7 @@ const usePaymentConfig = (enabled = true) => {
 
     // Sin `?company=` no hay nada que pedir: se resuelve como recurso inexistente
     // sin tocar estado desde el efecto.
-    const isMissingCompany = enabled && !companyPublicId;
+    const isMissingCompany = enabled && !entityPublicId;
 
     const retry = useCallback(() => setReloadToken((token) => token + 1), []);
 
@@ -297,7 +306,7 @@ const usePaymentConfig = (enabled = true) => {
 
     return {
         manualAccounts, accountsStatus, accountsError, reloadManualAccounts,
-        companyPublicId,
+        entityPublicId,
         company,
         branches: branchNodes,
         isCompanyLoading: isMissingCompany ? false : isCompanyLoading,

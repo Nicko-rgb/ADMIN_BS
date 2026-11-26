@@ -19,16 +19,6 @@ const ICON_SIZE_BY_SIZE: Record<ButtonSize, number> = { sm: 16, md: 17, lg: 17 }
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
     /** Texto visible dentro del botón. */
     text: string;
-    /**
-     * Color del botón.
-     * - `'primary'` (default) — verde de marca, `var(--primary)`.
-     * - `'secondary'` — superficie neutra con borde suave.
-     * - `'accent'` — lavanda suave para acciones complementarias.
-     * - `'danger'` — rojo, `var(--danger)`.
-     * - `'warning'` — ámbar, `var(--warning)`.
-     * - Hex propio, ej. `'#2c9d75'` — para un color puntual fuera de la paleta. Texto queda blanco en este caso.
-     * @default 'primary'
-     */
     color?: ButtonColor;
     /**
      * Tamaño del botón.

@@ -111,9 +111,9 @@ export const Dialog = ({ isOpen, isLoading = false, onClose, title, description,
 
                 <footer className="dialog_footer">
                     {secondaryAction && (
-                        <Button text={secondaryAction.label} size='sm' color="secondary" disabled={isLoading} onClick={secondaryAction.onClick} />
+                        <Button text={secondaryAction.label} color="secondary" disabled={isLoading} onClick={secondaryAction.onClick} />
                     )}
-                    <Button text={primaryAction.label} icon={primaryAction.icon} size='sm' color={VARIANT_BUTTON_COLOR[variant]} loading={isLoading} onClick={primaryAction.onClick} />
+                    <Button text={primaryAction.label} icon={primaryAction.icon} color={VARIANT_BUTTON_COLOR[variant]} loading={isLoading} onClick={primaryAction.onClick} />
                 </footer>
             </div>
         </div>

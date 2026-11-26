@@ -91,7 +91,7 @@ button {
 
     &.btn_app_sm { padding: .4rem .8rem; font-size: 1.2rem; }
     &.btn_app_md { padding: .6rem 1.2rem; font-size: 1.35rem; }
-    &.btn_app_lg { padding: .6rem 1.4rem; font-size: 1.5rem; }
+    &.btn_app_lg { padding: .7rem 1.4rem; font-size: 1.45rem; }
 }
 
 @keyframes btn-spin { to { transform: rotate(360deg); } }

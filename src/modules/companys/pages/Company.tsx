@@ -198,6 +198,7 @@ const Company = () => {
                                             text="Administrar"
                                             icon={Settings}
                                             color="secondary"
+                                            size='lg'
                                             onClick={() => navigate(`/company/sucursal/${subsidiary.publicId}`)}
                                         />
                                     </div>
@@ -258,6 +259,7 @@ const Company = () => {
                                                     publicId: user.publicId,
                                                     name: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || user.email || '—',
                                                 })}
+                                                size='lg'
                                             />
                                             <Button
                                                 text="Gestionar"
@@ -265,6 +267,7 @@ const Company = () => {
                                                 color="secondary"
                                                 disabled
                                                 onClick={() => { }}
+                                                size='lg'
                                             />
                                         </div>
                                     )}

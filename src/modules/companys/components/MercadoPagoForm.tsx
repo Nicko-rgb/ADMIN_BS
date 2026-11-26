@@ -13,6 +13,7 @@ interface MercadoPagoFormProps {
     isConnected: boolean;
     status: PaymentConfigStatus;
     error: string;
+    isOpen: boolean;
     onClose: () => void;
     onRetry: () => void;
     onChanged: () => void;
@@ -31,6 +32,7 @@ export const MercadoPagoForm = ({
     isConnected,
     status,
     error,
+    isOpen,
     onClose,
     onRetry,
     onChanged,
@@ -45,7 +47,7 @@ export const MercadoPagoForm = ({
 
     return (
         <Modal
-            isOpen
+            isOpen={isOpen}
             onClose={onClose}
             isLoading={isSubmitting || isDisconnecting}
             title="Conectar Mercado Pago"
@@ -77,7 +79,7 @@ export const MercadoPagoForm = ({
                     </div>
 
                     <FormActions>
-                        <Button text="Cerrar" color="secondary" size="lg" type="button" onClick={onClose} disabled={isDisconnecting} />
+                        <Button text="Cerrar" icon={X} color="secondary" size="lg" type="button" onClick={onClose} disabled={isDisconnecting} />
                         <Button
                             text="Desconectar"
                             color="danger"
@@ -111,11 +113,12 @@ export const MercadoPagoForm = ({
                         <FormRow>
                             <InputField
                                 name="public_key"
-                                label="Public key (Opcional)"
+                                label="Public key"
                                 value={form.public_key}
                                 onChange={(e) => setField('public_key')(e.target.value)}
                                 placeholder="APP_USR-..."
                                 autoComplete="off"
+                                required
                                 error={errors.public_key}
                             />
                             <SelectField

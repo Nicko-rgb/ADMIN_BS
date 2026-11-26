@@ -209,7 +209,7 @@ const Sucursal = () => {
                                 <Button text="Editar" icon={Pencil} onClick={() => setIsEditOpen(true)} />
                             )}
                             {can('payment.account_manage') &&
-                                <Button text='Cuentas de Pago' />
+                                <Button text='Cuentas de Pago'  onClick={() => navigate(`/company/payments/config?branch=${sucursal.publicId}`)} />
                             }
                         </div>
                     </div>
@@ -338,6 +338,7 @@ const Sucursal = () => {
                 onChanged={() => { reloadBanner(); setIsBannerOpen(false); }}
                 save={publicId ? SucursalService.uploadBanner(publicId) : undefined}
                 remove={publicId ? SucursalService.removeBanner(publicId) : undefined}
+                size='md'
             />
 
             {isSpaceOpen && publicId && (

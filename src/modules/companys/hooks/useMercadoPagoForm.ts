@@ -26,7 +26,7 @@ export const MERCADO_PAGO_ENVIRONMENT_OPTIONS = [
 const MIN_ACCESS_TOKEN_LENGTH = 10;
 
 const validate = (form: MercadoPagoFormValues): FormErrors<MercadoPagoFormValues> => {
-    const errors = requiredErrors(form, ['access_token']);
+    const errors = requiredErrors(form, ['access_token', 'public_key']);
     if (!errors.access_token && form.access_token.trim().length < MIN_ACCESS_TOKEN_LENGTH) {
         errors.access_token = 'El access token no parece válido';
     }
@@ -83,7 +83,7 @@ export const useMercadoPagoForm = ({ sucursalPublicId, isConnected, onChanged }:
             const trimmed = trimValues(form);
             const payload: RegisterMercadoPagoPayload = {
                 access_token: trimmed.access_token,
-                public_key: trimmed.public_key || null,
+                public_key: trimmed.public_key,
                 environment: trimmed.environment,
             };
 

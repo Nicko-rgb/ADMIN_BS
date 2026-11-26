@@ -1,4 +1,4 @@
-import { Wallet, QrCode, Pencil, Trash2 } from 'lucide-react';
+import { CheckCircle2, Landmark, Pencil, QrCode, Store, Trash2, Wallet } from 'lucide-react';
 import { Dialog } from '../../../shared/components/Dialog';
 import { Modal } from '../../../shared/components/Modal';
 import { Button } from '../../../shared/components/Button';
@@ -6,21 +6,24 @@ import { InputField, FormSection, FormRow, FormActions, LoadingScreen, EmptyScre
 import type { PaymentType } from '../../../shared/interfaces/catalog.interface';
 import type { ManualPaymentAccountFormValues } from '../interfaces/paymentConfig.interface';
 import usePaymentAccountForm from '../hooks/usePaymentAccountForm';
-import PaymentAccountDetails from './PaymentAccountDetails';
+import { resolveImageUrl } from '../../../shared/utils/formatText';
+import '../styles/PaymentAccountDetails.css';
 import '../styles/PaymentAccountForm.css';
 
 interface Props {
     branchName: string;
     branchPublicId: string;
     paymentType: PaymentType;
+    isOpen: boolean;
     onClose: () => void;
     onChanged: () => void;
 }
 
-export default function PaymentAccountForm({ branchName, branchPublicId, paymentType, onClose, onChanged }: Props) {
+export default function PaymentAccountForm({ branchName, branchPublicId, paymentType, isOpen, onClose, onChanged }: Props) {
     const { form, exists, loading, error, busy, errors, setField, submit, remove, retry,
         savedAccount, isEditing, startEditing, cancelEditing, confirmDelete, setConfirmDelete, previewUrl, qrFile, qrError, removeQr, pickQr, discardQr, clearQrSelection } = usePaymentAccountForm(branchPublicId, paymentType, onChanged);
     const isWallet = paymentType.category === 'billetera_digital';
+    const qrUrl = savedAccount?.qr?.url ?? savedAccount?.qr_url;
     const field = (name: keyof ManualPaymentAccountFormValues, label: string, maxLength: number, required = false) => (
         <InputField name={name} label={label} value={form[name]} onChange={(e) => setField(name, e.target.value)}
             maxLength={maxLength} required={required} error={errors[name]} disabled={busy !== null} />
@@ -28,17 +31,48 @@ export default function PaymentAccountForm({ branchName, branchPublicId, payment
 
     return (
         <>
-        <Modal isOpen onClose={onClose} isLoading={busy !== null || confirmDelete} title={`${loading || error ? 'Cuenta de pago' : exists ? (isEditing ? 'Editar cuenta' : 'Cuenta registrada') : 'Registrar cuenta'} · ${paymentType.name}`}
+        <Modal isOpen={isOpen} onClose={onClose} isLoading={busy !== null || confirmDelete} title={`${loading || error ? 'Cuenta de pago' : exists ? (isEditing ? 'Editar cuenta' : 'Cuenta registrada') : 'Registrar cuenta'} · ${paymentType.name}`}
             description={branchName} icon={Wallet}>
             {loading && <LoadingScreen message="Cargando cuenta…" size="sm" />}
             {!loading && error && <EmptyScreen message={error} size="sm" actionText="Reintentar" onAction={retry} />}
             {!loading && !error && !isEditing && savedAccount && (
                 <>
-                    <PaymentAccountDetails account={savedAccount} paymentType={paymentType} branchName={branchName} />
+                    <section className="payment_account_details" aria-label="Datos de la cuenta registrada">
+                        <header className="account_details_header">
+                            <span className="account_details_icon">
+                                {paymentType.iconUrl ? <img src={paymentType.iconUrl} alt="" /> : <Wallet size={25} />}
+                            </span>
+                            <div className="account_details_heading">
+                                <h3>{savedAccount.account_alias || paymentType.name}</h3>
+                                <p><Store size={14} aria-hidden="true" />{branchName}</p>
+                            </div>
+                            <span className={`account_details_status ${savedAccount.isActive ? '' : 'inactive'}`}>
+                                {savedAccount.isActive && <CheckCircle2 size={14} aria-hidden="true" />}
+                                {savedAccount.isActive ? 'Activa' : 'Inactiva'}
+                            </span>
+                        </header>
+                        <div className="account_details_body">
+                            <dl className="account_details_fields">
+                                <div><dt>Titular de la cuenta</dt><dd>{savedAccount.account_name || 'Sin especificar'}</dd></div>
+                                <div className="account_details_number">
+                                    <dt>{isWallet ? 'Teléfono asociado' : 'Número de cuenta'}</dt>
+                                    <dd>{savedAccount.account_number || 'Sin especificar'}</dd>
+                                </div>
+                                <div><dt>Alias</dt><dd>{savedAccount.account_alias || 'Sin alias'}</dd></div>
+                                <div><dt><Landmark size={13} aria-hidden="true" />Nombre de banco</dt><dd>{savedAccount.bank_name || 'Sin especificar'}</dd></div>
+                            </dl>
+                            <figure className={`account_details_qr ${qrUrl ? '' : 'empty'}`}>
+                                {qrUrl ? (
+                                    <img src={resolveImageUrl(qrUrl)} alt={`Código QR de ${paymentType.name} de ${branchName}`} />
+                                ) : <QrCode size={52} strokeWidth={1.3} aria-hidden="true" />}
+                                <figcaption>{qrUrl ? 'QR de la cuenta' : 'Sin código QR'}</figcaption>
+                            </figure>
+                        </div>
+                    </section>
                     <FormActions>
-                        <Button text="Cerrar" type="button" color="secondary" onClick={onClose} disabled={busy !== null} />
-                        <Button text="Eliminar cuenta" icon={Trash2} type="button" color="danger" disabled={busy !== null || confirmDelete} onClick={() => setConfirmDelete(true)} />
-                        <Button text="Editar" icon={Pencil} type="button" disabled={busy !== null || confirmDelete} onClick={startEditing} />
+                        <Button text="Cerrar" size='lg' type="button" color="secondary" onClick={onClose} disabled={busy !== null} />
+                        <Button text="Eliminar cuenta" size='lg' icon={Trash2} type="button" color="danger" disabled={busy !== null || confirmDelete} onClick={() => setConfirmDelete(true)} />
+                        <Button text="Editar" size='lg' icon={Pencil} type="button" disabled={busy !== null || confirmDelete} onClick={startEditing} />
                     </FormActions>
                 </>
             )}
@@ -71,8 +105,8 @@ export default function PaymentAccountForm({ branchName, branchPublicId, payment
                         </div>
                     </FormSection>
                     <FormActions>
-                        <Button text={exists ? "Cancelar edición" : "Cancelar"} type="button" color="secondary" onClick={exists ? cancelEditing : onClose} disabled={busy !== null} />
-                        <Button text={exists ? 'Guardar cambios' : 'Registrar cuenta'} type="submit" loading={busy === 'save'} disabled={busy !== null || confirmDelete || Boolean(qrError)} />
+                        <Button text={exists ? "Cancelar edición" : "Cancelar"} type="button" size='lg' color="secondary" onClick={exists ? cancelEditing : onClose} disabled={busy !== null} />
+                        <Button text={exists ? 'Guardar cambios' : 'Registrar cuenta'} type="submit" size='lg' loading={busy === 'save'} disabled={busy !== null || confirmDelete || Boolean(qrError)} />
                     </FormActions>
                 </form>
             )}
@@ -84,8 +118,8 @@ export default function PaymentAccountForm({ branchName, branchPublicId, payment
             title={`¿Eliminar la cuenta de ${paymentType.name}?`}
             description={`Se eliminarán los datos de esta cuenta y su QR de ${branchName}.`}
             variant="danger"
-            primaryAction={{ label: 'Eliminar cuenta', icon: Trash2, onClick: () => { void remove(); } }}
-            secondaryAction={{ label: 'Conservar cuenta', onClick: () => setConfirmDelete(false) }}
+            primaryAction={{ label: 'Eliminar', icon: Trash2, onClick: () => { void remove(); } }}
+            secondaryAction={{ label: 'Conservar', onClick: () => setConfirmDelete(false) }}
         />
         </>
     );

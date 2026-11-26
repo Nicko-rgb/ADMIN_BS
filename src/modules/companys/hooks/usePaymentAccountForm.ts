@@ -93,7 +93,7 @@ export default function usePaymentAccountForm(branchId: string, type: PaymentTyp
         if (!value.account_name) nextErrors.account_name = 'Ingresá el nombre del titular.';
         if (!value.account_number) nextErrors.account_number = 'Ingresá el teléfono o número de cuenta.';
         if (type.code.trim().toUpperCase() === 'PLIN' && !/^9\d{8}$/.test(value.account_number)) {
-            nextErrors.account_number = 'Ingresá un celular peruano de 9 dígitos que comience con 9.';
+            nextErrors.account_number = 'Ingresá un celular válido.';
         }
         setErrors(nextErrors);
         if (Object.keys(nextErrors).length) return;

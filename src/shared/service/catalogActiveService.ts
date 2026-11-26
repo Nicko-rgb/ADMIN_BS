@@ -15,8 +15,10 @@ const extractArrayData = <T>(payload: unknown): T[] => {
  * Sin cache: la cache vive en useCatalogActive.
  */
 class CatalogActiveService {
-    static async listCountries(): Promise<Country[]> {
-        const res = await apiService.get('/system/countries/active');
+    static async listCountries(includeInactive = false): Promise<Country[]> {
+        const res = await apiService.get('/system/countries/active', {
+            params: { includeInactive },
+        });
         return extractArrayData<Country>(res.data);
     }
 

@@ -80,11 +80,17 @@ const PaymentConfig = () => {
 
     const [isTreeOpen, setIsTreeOpen] = useState(true);
 
-    // Sucursal cuyo modal de Mercado Pago está abierto.
-    const [credentialBranch, setCredentialBranch] = useState<PaymentConfigBranch | null>(null);
-
-    const [accountTarget, setAccountTarget] = useState<{ branch: PaymentConfigBranch; type: PaymentType } | null>(null);
-    const accountKey = (branchId: string, typeId: number) => `${branchId}:${typeId}`;
+    const [paymentForm, setPaymentForm] = useState<{
+        branch: PaymentConfigBranch;
+        type: PaymentType;
+        isOpen: boolean;
+        key: number;
+    } | null>(null);
+    const closeForm = () => setPaymentForm((form) => form && { ...form, isOpen: false });
+    const openForm = (branch: PaymentConfigBranch, type: PaymentType) => {
+        // Cada apertura empieza con un borrador nuevo, incluso para la misma sucursal y cuenta.
+        setPaymentForm((previous) => ({ branch, type, isOpen: true, key: (previous?.key ?? 0) + 1 }));
+    };
 
     usePageHeader({
         title: 'Configuración de pagos',
@@ -345,9 +351,6 @@ const PaymentConfig = () => {
                                                                         </span>
                                                                     )}
                                                                 </div>
-                                                                {usesMp && !isCash && (
-                                                                    <p className="type_account_note">Cuenta de Mercado Pago compartida para Yape y tarjetas de esta sucursal.</p>
-                                                                )}
                                                                 {!usesMp && !isCash && (
                                                                     <p className="type_account_note">
                                                                         {accountsStatus === 'loading' ? 'Consultando cuenta…' : accountsStatus === 'error' ? 'No se pudo consultar la cuenta.' : account ? `${account.isActive ? 'Cuenta registrada' : 'Cuenta inactiva'}: ${account.account_name} · ${account.account_number}` : 'Sin cuenta registrada.'}
@@ -362,9 +365,7 @@ const PaymentConfig = () => {
                                                                         iconPosition="left"
                                                                         color="accent"
                                                                         disabled={usesMp && !selectedBranch.supportsMercadoPago}
-                                                                        onClick={() => usesMp
-                                                                            ? setCredentialBranch(selectedBranch)
-                                                                            : setAccountTarget({ branch: selectedBranch, type })}
+                                                                        onClick={() => openForm(selectedBranch, type)}
                                                                     />
                                                                 )}
                                                             </article>
@@ -381,29 +382,30 @@ const PaymentConfig = () => {
                 )}
             </section>
 
-            {accountTarget && (
-                <PaymentAccountForm
-                    key={accountKey(accountTarget.branch.publicId, accountTarget.type.id)}
-                    branchName={accountTarget.branch.name}
-                    paymentType={accountTarget.type}
-                    branchPublicId={accountTarget.branch.publicId}
-                    onClose={() => setAccountTarget(null)}
-                    onChanged={reloadManualAccounts}
-                />
-            )}
-
-            {credentialBranch && (
+            {paymentForm && (isMercadoPago(paymentForm.type.provider) ? (
                 <MercadoPagoForm
-                    sucursalPublicId={credentialBranch.publicId}
-                    sucursalName={credentialBranch.name}
+                    key={paymentForm.key}
+                    sucursalPublicId={paymentForm.branch.publicId}
+                    sucursalName={paymentForm.branch.name}
                     isConnected={mpConnected}
                     status={mpStatus}
                     error={mpError}
-                    onClose={() => setCredentialBranch(null)}
+                    isOpen={paymentForm.isOpen}
+                    onClose={closeForm}
                     onRetry={reloadMercadoPago}
                     onChanged={reloadMercadoPago}
                 />
-            )}
+            ) : (
+                <PaymentAccountForm
+                    key={paymentForm.key}
+                    branchName={paymentForm.branch.name}
+                    paymentType={paymentForm.type}
+                    branchPublicId={paymentForm.branch.publicId}
+                    isOpen={paymentForm.isOpen}
+                    onClose={closeForm}
+                    onChanged={reloadManualAccounts}
+                />
+            ))}
         </div>
     );
 };
